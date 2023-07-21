@@ -1,0 +1,75 @@
+ext {
+    _versionCode = (System.getenv("BUILD_NUMBER") as Integer) ?: 1
+
+    // 项目构建相关的版本号
+    build_version = [
+            compile_sdk: 28,
+            target_sdk : 28,
+            build_tools: '28.0.3',
+            min_sdk    : 18,
+    ]
+
+    ver_xh_dep = [
+            gradle_plugin                : "3.3.2",
+            android_native_c_dependencies: "0.1.3",
+            gradle_release               : "2.4.1",
+            butterknife_gradle_plugin    : "10.1.0",
+            dynamicanimation             : '1.0.0',
+            cardview                     : '1.0.0',
+            appcompat                    : '1.2.0-rc01',
+            fragment                     : "1.2.4",
+            legacy                       : '1.0.0',
+            recyclerview                 : '1.1.0',
+            versionedparcelable          : '1.1.0',
+            core                         : '1.0.0',
+            constraintlayout             : '2.0.0-beta3',
+            lifecycle_extensions         : '2.0.0',
+            material                     : '1.2.0',
+            coroutines_android           : '1.3.2',
+            kotlin                       : '1.3.60',
+
+    ]
+
+    // 项目构建引进来插件
+    dep_build_plugin = [
+            gradle_plugin                : "com.android.tools.build:gradle:${ver_xh_dep.gradle_plugin}",
+            android_native_c_dependencies: "com.nabilhachicha:android-native-dependencies:${ver_xh_dep.android_native_c_dependencies}",
+            gradle_release               : "net.researchgate:gradle-release:${ver_xh_dep.gradle_release}",
+            butterknife_gradle_plugin    : "com.jakewharton:butterknife-gradle-plugin:${ver_xh_dep.butterknife_gradle_plugin}",
+    ]
+
+    // AndroidX库
+    dep_androidx = [
+            dynamic_animation   : "androidx.dynamicanimation:dynamicanimation:${ver_xh_dep.dynamicanimation}",
+            card_view           : "androidx.cardview:cardview:${ver_xh_dep.cardview}",
+            appcompat           : "androidx.appcompat:appcompat:${ver_xh_dep.appcompat}",
+            fragment            : "androidx.fragment:fragment:${ver_xh_dep.fragment}",
+            fragment_ktx        : "androidx.fragment:fragment-ktx:${ver_xh_dep.fragment}",
+            legacy_support_v4   : "androidx.legacy:legacy-support-v4:${ver_xh_dep.legacy}",
+            recyclerview        : "androidx.recyclerview:recyclerview:${ver_xh_dep.recyclerview}",
+            versionedparcelable : "androidx.versionedparcelable:versionedparcelable:${ver_xh_dep.versionedparcelable}",
+            core                : "androidx.core:core:${ver_xh_dep.core}",
+            constraintlayout    : "androidx.constraintlayout:constraintlayout:${ver_xh_dep.constraintlayout}",
+            lifecycle_extensions: "androidx.lifecycle:lifecycle-extensions:${ver_xh_dep.lifecycle_extensions}",
+            multidex            : "androidx.multidex:multidex:${ver_xh_dep.multidex}",
+            room_runtime        : "androidx.room:room-runtime:${ver_xh_dep.room}",
+            room_compiler       : "androidx.room:room-compiler:${ver_xh_dep.room}",
+            room_ktx            : "androidx.room:room-ktx:${ver_xh_dep.room}",
+            textclassifier      : "androidx.textclassifier:textclassifier:${ver_xh_dep.textclassifier}",
+            viewpage2           : "androidx.viewpager2:viewpager2:${ver_xh_dep.viewpage2}"
+    ]
+
+    // Android库
+    dep_android = [
+            flexbox : "com.google.android:flexbox:${ver_xh_dep.flexbox}",
+            material: "com.google.android.material:material:${ver_xh_dep.material}"
+    ]
+
+
+    // kotlin用到的一些库
+    dep_kotlin_lib = [
+            ktx_coroutines_android: "org.jetbrains.kotlinx:kotlinx-coroutines-android:${ver_xh_dep.coroutines_android}",
+            kotlin_stdlib_jdk7    : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${ver_xh_dep.kotlin}",
+            kotlin_reflect        : "org.jetbrains.kotlin:kotlin-reflect:${ver_xh_dep.kotlin}"
+    ]
+}

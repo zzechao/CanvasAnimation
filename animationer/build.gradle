@@ -1,0 +1,57 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+//apply plugin: 'maven'
+apply plugin: 'net.researchgate.release'
+//apply plugin: 'architecture-lint'
+//apply from: 'https://git.duowan.com/ci_team/build-snippet/raw/master/gradlebuild/publish-aar-551.gradle'
+
+android {
+    compileSdkVersion build_version.compile_sdk
+
+    defaultConfig {
+        minSdkVersion build_version.min_sdk
+        targetSdkVersion build_version.target_sdk
+        versionCode _versionCode
+        versionName "$version"
+        buildConfigField "int", "BUILD_NUMBER", "${System.env.BUILD_NUMBER ?: '1'}"
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    lintOptions { abortOnError false }
+
+    release {
+        failOnUnversionedFiles = false
+        failOnUpdateNeeded = false
+        buildTasks = []
+        //git仓库,需要加上git相关配置且gradle-release版本使用2.4.0以上
+        git {
+            requireBranch = 'master|.*_maint'
+            pushToRemote = 'origin'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation dep_kotlin_lib.kotlin_stdlib_jdk7
+    implementation dep_androidx.lifecycle_extensions
+    implementation dep_kotlin_lib.ktx_coroutines_android
+    implementation dep_kotlin_lib.kotlin_reflect
+}
+
+//uploadArchives {
+//    repositories {
+//        mavenDeployer {
+//            pom.groupId = 'com.base.canvasanim'
+//            pom.artifactId = "AnimationCanvas-Android"
+//            pom.version = "1.0.0"
+//            pom.packaging = 'aar'
+//            repository(url: uri("${rootProject.projectDir}/repo"))
+//        }
+//    }
+//}

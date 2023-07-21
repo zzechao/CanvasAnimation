@@ -1,0 +1,2 @@
+include ':app',':animationer'
+rootProject.name = "CanvasAnimation"
