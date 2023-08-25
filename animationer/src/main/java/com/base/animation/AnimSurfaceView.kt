@@ -12,8 +12,12 @@ import android.view.SurfaceView
 import android.view.View
 import com.base.animation.item.BaseDisplayItem
 import com.base.animation.model.AnimPathObject
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 /**
  * @author:zhouzechao
@@ -27,6 +31,16 @@ class AnimSurfaceView @JvmOverloads constructor(
 
     private val helper: AnimViewHelper
 
+    private var loggingExceptionHandler = CoroutineExceptionHandler { context, throwable ->
+        Animer.log.e("CoroutineException", "Coroutine exception occurred. $context", throwable)
+    }
+
+
+    private val animScope =
+        CoroutineScope(
+            SupervisorJob() + Animer.animDispatcher + loggingExceptionHandler
+        )
+
     init {
         holder.addCallback(this)
         isFocusable = true
@@ -35,13 +49,15 @@ class AnimSurfaceView @JvmOverloads constructor(
         holder.setFormat(PixelFormat.TRANSLUCENT)
         isFocusableInTouchMode = true
         helper = AnimViewHelper(context) {
-            val canvas = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                holder.lockHardwareCanvas()
-            } else {
-                holder.lockCanvas()
+            animScope.launch {
+                val canvas = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    holder.lockHardwareCanvas()
+                } else {
+                    holder.lockCanvas()
+                }
+                drawAnim(canvas)
+                holder.unlockCanvasAndPost(canvas)
             }
-            drawAnim(canvas)
-            holder.unlockCanvasAndPost(canvas)
         }
     }
 

@@ -61,11 +61,6 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
     private val animDrawIds: CopyOnWriteArrayList<Long> = CopyOnWriteArrayList()
 
     /**
-     * 是否存在执行中画布缓存
-     */
-    private var hasCache = false
-
-    /**
      * 画布缓存
      */
     private val displayItemCache = DisplayItemCache()
@@ -270,7 +265,6 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
      * 加入路径，并刷新画布缓存策略的时间
      */
     fun sendAnimPath(animPathObject: AnimPathObject) {
-        hasCache = true
         lastCacheTime = cacheTime
         animPather.offer(animPathObject)
     }
@@ -285,19 +279,6 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
         animListeners.clear()
         animDrawIds.clear()
         animPather.close()
-    }
-
-    /**
-     * 执行超时画布缓存策略
-     */
-    fun runCacheStrategy() {
-        if (hasCache) {
-            lastCacheTime -= intervalDeal
-            if (lastCacheTime <= 0) {
-                displayItemCache.recycler()
-                hasCache = false
-            }
-        }
     }
 
     /**

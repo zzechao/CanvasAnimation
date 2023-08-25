@@ -1,15 +1,13 @@
 package com.base.animation
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
 import android.util.AttributeSet
 import android.view.View
 import com.base.animation.item.BaseDisplayItem
 import com.base.animation.model.AnimPathObject
-import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlin.reflect.KClass
 
 /**
  * @author:zhouzechao
@@ -25,20 +23,12 @@ class AnimView @JvmOverloads constructor(
 
     init {
         isClickable = true
-        setBackgroundColor(Color.TRANSPARENT)
         helper = AnimViewHelper(context) {
-            postInvalidate()
+            background.invalidateSelf()
         }
-    }
-
-    override fun draw(canvas: Canvas?) {
-        super.draw(canvas)
-        drawAnim(canvas)
-    }
-
-    private fun drawAnim(canvas: Canvas?) {
-        canvas?.drawColor(Color.TRANSPARENT) // 设置画布的背景为透明
-        helper.drawAnim(canvas)
+        background = AnimViewDrawable {
+            helper.drawAnim(it)
+        }
     }
 
     override fun setCacheTime(cacheTime: Long) {

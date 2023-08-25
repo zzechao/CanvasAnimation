@@ -1,5 +1,7 @@
 package com.base.animation.log
 
+import android.util.Log
+
 /**
  * @author:zhouzechao
  * @date: 2/24/21
@@ -34,7 +36,7 @@ open class DefaultLog : ILog {
     }
 
     override fun i(tag: String, message: String) {
-        //Log.i(tag, message)
+        Log.i(tag, message)
     }
 
     override fun w(tag: String, message: () -> Any?) {

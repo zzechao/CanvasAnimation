@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/darker_gray"
     android:gravity="center"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:background="@android:color/darker_gray"
     android:orientation="vertical">
 
     <TextView
@@ -11,38 +11,38 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textSize="20sp"
-        android:text="普通view" />
+        android:text="surfaceview" />
 
     <Button
         android:id="@+id/anim_1"
-        android:layout_width="wrap_content"
-        android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
+        android:layout_height="60dp"
         android:layout_marginBottom="150dp"
+        android:layout_width="wrap_content"
         android:text="送一个" />
 
     <Button
         android:id="@+id/anim_2"
-        android:layout_width="wrap_content"
-        android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
+        android:layout_height="60dp"
         android:layout_marginBottom="80dp"
+        android:layout_width="wrap_content"
         android:text="送多个" />
 
-    <com.base.animation.AnimView
+    <com.base.animation.AnimSurfaceView
         android:id="@+id/anim_surface"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_width="match_parent" />
 
     <Button
         android:id="@+id/anim_3"
-        android:layout_width="wrap_content"
-        android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
+        android:layout_height="60dp"
         android:layout_marginBottom="20dp"
-        android:text="礼物雨" />
+        android:layout_width="wrap_content"
+        android:text="礼物雨"/>
 
 </RelativeLayout>

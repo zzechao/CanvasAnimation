@@ -19,16 +19,6 @@ object CanvasHandler {
     var lastTime = 0L
 
 
-    private var loggingExceptionHandler = CoroutineExceptionHandler { context, throwable ->
-        Animer.log.e("CoroutineException", "Coroutine exception occurred. $context", throwable)
-    }
-
-
-    private val animScope =
-        CoroutineScope(
-            SupervisorJob() + Animer.animDispatcher + loggingExceptionHandler
-        )
-
     private val mFrameCallback: Choreographer.FrameCallback = object : Choreographer.FrameCallback {
         override fun doFrame(frameTimeNanos: Long) {
             if (lastTime == 0L) {
@@ -72,10 +62,8 @@ object CanvasHandler {
     }
 
     private fun doAnimationFrame(frameTime: Long) {
-        animScope.launch {
-            mCanvasCallbacks.forEach {
-                it.doCanvasFrame(frameTime)
-            }
+        mCanvasCallbacks.forEach {
+            it.doCanvasFrame(frameTime)
         }
     }
 

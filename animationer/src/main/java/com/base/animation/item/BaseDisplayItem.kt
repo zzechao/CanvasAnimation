@@ -29,9 +29,6 @@ abstract class BaseDisplayItem constructor(paint: Paint) : IDisplayItem, IRecycl
     }
 
     override var displayItemId: String = itemId.toString()
-        set(value) {
-            field = value
-        }
 
     override var width: Int = 0
 

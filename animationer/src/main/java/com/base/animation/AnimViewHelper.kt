@@ -149,7 +149,6 @@ class AnimViewHelper(context: Context, private val doFrame: () -> Unit) : IAnimV
         }
         Animer.log.i(TAG, "doCanvasFrame mFramePositionCount:$mFramePositionCount")
         doFrame.invoke()
-        pathObjectDeal.runCacheStrategy()
         return true
     }
 
