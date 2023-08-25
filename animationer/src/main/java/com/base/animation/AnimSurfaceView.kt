@@ -33,7 +33,6 @@ class AnimSurfaceView @JvmOverloads constructor(
         keepScreenOn = true
         setZOrderOnTop(true)
         holder.setFormat(PixelFormat.TRANSLUCENT)
-        holder.setType(View.LAYER_TYPE_HARDWARE)
         isFocusableInTouchMode = true
         helper = AnimViewHelper(context) {
             val canvas = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

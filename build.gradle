@@ -3,7 +3,7 @@
 
 buildscript {
     apply from: "$rootDir/versions.gradle"
-    ext.kotlin_version = "1.3.72"
+    ext.kotlin_version = "1.6.20"
     repositories {
        // maven { url 'https://nexus-android.duowan.com/nexus/content/groups/public' }
         google()
@@ -11,7 +11,7 @@ buildscript {
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.1'
+        classpath 'com.android.tools.build:gradle:7.4.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'net.researchgate:gradle-release:2.6.0'
         //classpath "tv.athena:api-gradle-plugin:2.3.10-611-duowan"

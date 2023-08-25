@@ -50,7 +50,7 @@ class DrawObject(val animId: Long) {
                         canvas, drawObject.point.x, drawObject.point.y, drawObject.alpha,
                         drawObject.scaleX, drawObject.scaleY, drawObject.rotation
                     )
-                    if (drawObject.clickable && touchPoint != null && touchPoint.isNotEmpty()
+                    if (drawObject.clickable && !touchPoint.isNullOrEmpty()
                         && pathObjectDeal.clickIntercepts.isNotEmpty()
                     ) {
                         touch(animId, pathObjectDeal.clickIntercepts, drawObject, touchPoint)
