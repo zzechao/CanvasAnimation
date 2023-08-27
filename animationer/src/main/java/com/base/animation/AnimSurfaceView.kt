@@ -46,7 +46,7 @@ class AnimSurfaceView @JvmOverloads constructor(
         isFocusable = true
         keepScreenOn = true
         setZOrderOnTop(true)
-        holder.setFormat(PixelFormat.TRANSLUCENT)
+        holder.setFormat(PixelFormat.TRANSPARENT)
         isFocusableInTouchMode = true
         helper = AnimViewHelper(context) {
             animScope.launch {
