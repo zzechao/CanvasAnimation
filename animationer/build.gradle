@@ -42,6 +42,7 @@ dependencies {
     implementation dep_androidx.lifecycle_extensions
     implementation dep_kotlin_lib.ktx_coroutines_android
     implementation dep_kotlin_lib.kotlin_reflect
+    implementation dep_androidx.guava_android
 }
 
 //uploadArchives {

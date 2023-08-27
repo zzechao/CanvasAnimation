@@ -1,5 +1,6 @@
 package com.base.animation
 
+import android.util.Log
 import android.view.View
 import com.base.animation.item.BaseDisplayItem
 import java.security.MessageDigest
@@ -29,7 +30,7 @@ class DisplayObject private constructor(private val animView: IAnimView) {
     ): String {
         val md5Key = getDisPlayItemKey(key, displayWidth, displayHeight, kClass)
         if (!animView.hasDisplayItem(md5Key, kClass)) {
-            val displayItem = (animView.obtain(kClass) as? T) ?: create().apply {
+            val displayItem = create().apply {
                 displayItemId = md5Key
                 roomView?.let {
                     attachView(roomView.width, roomView.height)
@@ -47,7 +48,7 @@ class DisplayObject private constructor(private val animView: IAnimView) {
     ): String {
         val md5Key = getDisPlayItemKey(key, displayWidth, displayHeight, kClass)
         if (!animView.hasDisplayItem(md5Key, kClass)) {
-            val displayItem = (animView.obtain(kClass) as? T) ?: create().apply {
+            val displayItem = create().apply {
                 displayItemId = md5Key
                 roomView?.let {
                     attachView(roomView.width, roomView.height)
@@ -64,7 +65,8 @@ class DisplayObject private constructor(private val animView: IAnimView) {
     ): String {
         val md5Key = getDisPlayItemKey(key, kClass = kClass)
         if (!animView.hasDisplayItem(md5Key, kClass)) {
-            val displayItem = (animView.obtain(kClass) as? T) ?: create().apply {
+            Log.i("ttt","hasDisplayItem")
+            val displayItem = create().apply {
                 displayItemId = md5Key
                 roomView?.let {
                     attachView(roomView.width, roomView.height)
@@ -80,7 +82,7 @@ class DisplayObject private constructor(private val animView: IAnimView) {
     ): String {
         val md5Key = getDisPlayItemKey(key, kClass = kClass)
         if (!animView.hasDisplayItem(md5Key, kClass)) {
-            val displayItem = (animView.obtain(kClass) as? T) ?: create().apply {
+            val displayItem = create().apply {
                 displayItemId = md5Key
                 roomView?.let {
                     attachView(roomView.width, roomView.height)

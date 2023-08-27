@@ -20,14 +20,6 @@ abstract class BaseDisplayItem constructor(paint: Paint) : IDisplayItem, IRecycl
     open var displayWidth: Int = 0
     private var itemId = animDisplayId.incrementAndGet()
 
-    companion object {
-        fun <T : BaseDisplayItem> of(
-            iAnimView: IAnimView, clazz: KClass<out BaseDisplayItem>
-        ): T? {
-            return (iAnimView.obtain(clazz) as? T)
-        }
-    }
-
     override var displayItemId: String = itemId.toString()
 
     override var width: Int = 0

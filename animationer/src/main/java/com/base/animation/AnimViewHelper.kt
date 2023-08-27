@@ -78,9 +78,6 @@ class AnimViewHelper(context: Context, private val doFrame: () -> Unit) : IAnimV
 
     override fun endAnimation() {
         pause()
-        checkInMainThread {
-            pathObjectDeal.release()
-        }
     }
 
     override fun addAnimDisplay(animPathObject: AnimPathObject) {
@@ -130,10 +127,6 @@ class AnimViewHelper(context: Context, private val doFrame: () -> Unit) : IAnimV
                 pathObjectDeal.clickIntercepts.remove(iClickIntercept)
             }
         }
-    }
-
-    override fun <T : BaseDisplayItem> obtain(clazz: KClass<out BaseDisplayItem>): T? {
-        return pathObjectDeal.obtain(clazz)
     }
 
     override fun doCanvasFrame(frameTime: Long): Boolean {

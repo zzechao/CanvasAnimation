@@ -6,6 +6,11 @@
     android:background="@android:color/darker_gray"
     android:orientation="vertical">
 
+    <com.base.animation.AnimSurfaceView
+        android:id="@+id/anim_surface"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent" />
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -30,11 +35,6 @@
         android:layout_marginBottom="80dp"
         android:layout_width="wrap_content"
         android:text="送多个" />
-
-    <com.base.animation.AnimSurfaceView
-        android:id="@+id/anim_surface"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent" />
 
     <Button
         android:id="@+id/anim_3"

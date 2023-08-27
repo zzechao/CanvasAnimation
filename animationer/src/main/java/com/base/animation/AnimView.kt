@@ -86,8 +86,4 @@ class AnimView @JvmOverloads constructor(
     override fun removeClickIntercept(iClickIntercept: IClickIntercept?) {
         helper.removeClickIntercept(iClickIntercept)
     }
-
-    override fun <T : BaseDisplayItem> obtain(clazz: KClass<out BaseDisplayItem>): T? {
-        return helper.obtain(clazz)
-    }
 }

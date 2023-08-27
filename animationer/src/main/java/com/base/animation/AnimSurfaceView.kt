@@ -118,10 +118,6 @@ class AnimSurfaceView @JvmOverloads constructor(
         helper.removeClickIntercept(iClickIntercept)
     }
 
-    override fun <T : BaseDisplayItem> obtain(clazz: KClass<out BaseDisplayItem>): T? {
-        return helper.obtain(clazz)
-    }
-
     private fun drawAnim(canvas: Canvas?) {
         canvas?.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR) // 设置画布的背景为透明
         helper.drawAnim(canvas)

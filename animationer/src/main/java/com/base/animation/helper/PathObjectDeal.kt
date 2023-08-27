@@ -249,7 +249,6 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
                         Animer.log.i(TAG, "calculation end")
                     }
                 }
-                delay(10L)
             }
         }
     }
@@ -286,13 +285,6 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
      */
     fun hasTask(): Boolean {
         return animDrawIds.isNotEmpty()
-    }
-
-    /**
-     * 获取缓存对象
-     */
-    fun <T : BaseDisplayItem> obtain(clazz: KClass<out BaseDisplayItem>): T? {
-        return displayItemCache.obtain(clazz)
     }
 
     /**

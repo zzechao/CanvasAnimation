@@ -1,10 +1,6 @@
 package com.base.animation
 
 import android.view.Choreographer
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 
 /**
  * @author:zhouzechao
@@ -18,17 +14,16 @@ object CanvasHandler {
 
     var lastTime = 0L
 
-
     private val mFrameCallback: Choreographer.FrameCallback = object : Choreographer.FrameCallback {
         override fun doFrame(frameTimeNanos: Long) {
             if (lastTime == 0L) {
-                lastTime = System.nanoTime() / 1000000
+                lastTime = System.nanoTime()
                 doAnimationFrame(0L)
             } else {
-                val curFrameTime = System.nanoTime() / 1000000
+                val curFrameTime = System.nanoTime()
                 val frameDuringTime = curFrameTime - lastTime
                 lastTime = curFrameTime
-                doAnimationFrame(frameDuringTime)
+                doAnimationFrame(frameDuringTime / 1000000)
             }
             if (mCanvasCallbacks.isNotEmpty()) {
                 getProvider()?.postFrameCallback(this)

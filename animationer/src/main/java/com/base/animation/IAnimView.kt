@@ -32,6 +32,4 @@ interface IAnimView {
     fun addClickIntercept(iClickIntercept: IClickIntercept)
 
     fun removeClickIntercept(iClickIntercept: IClickIntercept?)
-
-    fun <T : BaseDisplayItem> obtain(clazz: KClass<out BaseDisplayItem>): T?
 }

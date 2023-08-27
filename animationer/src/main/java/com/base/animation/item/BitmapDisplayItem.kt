@@ -38,7 +38,7 @@ class BitmapDisplayItem private constructor() :
 
     companion object {
         fun of(iAnimView: IAnimView, bitmap: Bitmap): BitmapDisplayItem {
-            return (of(iAnimView, BitmapDisplayItem::class) ?: BitmapDisplayItem()).apply {
+            return BitmapDisplayItem().apply {
                 Animer.log.i(TAG, "of this:$this")
                 mBitmap = bitmap
                 reInit()

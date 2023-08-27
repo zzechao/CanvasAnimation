@@ -27,7 +27,7 @@ ext {
             material                     : '1.2.0',
             coroutines_android           : '1.3.2',
             kotlin                       : '1.3.60',
-
+            guava_android                : '29.0-android'
     ]
 
     // 项目构建引进来插件
@@ -56,7 +56,8 @@ ext {
             room_compiler       : "androidx.room:room-compiler:${ver_xh_dep.room}",
             room_ktx            : "androidx.room:room-ktx:${ver_xh_dep.room}",
             textclassifier      : "androidx.textclassifier:textclassifier:${ver_xh_dep.textclassifier}",
-            viewpage2           : "androidx.viewpager2:viewpager2:${ver_xh_dep.viewpage2}"
+            viewpage2           : "androidx.viewpager2:viewpager2:${ver_xh_dep.viewpage2}",
+            guava_android       : "com.google.guava:guava:${ver_xh_dep.guava_android}"
     ]
 
     // Android库
