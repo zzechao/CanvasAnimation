@@ -12,6 +12,7 @@ import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.base.animation.BitmapLoader
 import com.base.animation.DisplayObject
 import com.base.animation.IAnimListener
 import com.base.animation.IClickIntercept
@@ -35,7 +36,11 @@ import kotlinx.coroutines.ObsoleteCoroutinesApi
 @ObsoleteCoroutinesApi
 class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_anim_canvas, container, false)
     }
 
@@ -76,12 +81,12 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
         val displayItemId1 = displayObject.add(
             key = "xin_startSingleAnim", kClass = BitmapDisplayItem::class, roomView = anim_surface
         ) {
-            var bitmap = BitmapFactory.decodeResource(this@TestAnimCanvasFragment.resources, R.mipmap.xin)
+            val bitmap =
+                BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, size, size)
             val bitmapWidth = bitmap.width
             val bitmapHeight = bitmap.height
             val displayWidth = size * bitmapWidth / bitmapHeight
-            bitmap = Bitmap.createScaledBitmap(bitmap, displayWidth, size, true)
-            return@add BitmapDisplayItem.of(anim_surface, bitmap).apply {
+            return@add BitmapDisplayItem.of(bitmap).apply {
                 setDisplaySize(displayWidth, size)
             }
         }
@@ -122,7 +127,8 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
             AnimPathObject.Inner.with(
                 displayObject.build(), true
             ).beginAnimPath(start).doAnimPath(1000, next).beginNextAnimPath(next)
-                .doAnimPath(1000, next1).beginNextAnimPath(next1).doAnimPath(200, next2).beginNextAnimPath(next2)
+                .doAnimPath(1000, next1).beginNextAnimPath(next1).doAnimPath(200, next2)
+                .beginNextAnimPath(next2)
                 .doAnimPath(200, next3).build()
         )
     }
@@ -137,17 +143,21 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
         val displayItemId = displayObject.add(
             key = "xin_startMoreAnim", kClass = BitmapDisplayItem::class, roomView = anim_surface
         ) {
-            var bitmap = BitmapFactory.decodeResource(this@TestAnimCanvasFragment.resources, R.mipmap.xin)
+            val bitmap =
+                BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, size, size)
             val bitmapWidth = bitmap.width
             val bitmapHeight = bitmap.height
             val displayWidth = size * bitmapWidth / bitmapHeight
-            bitmap = Bitmap.createScaledBitmap(bitmap, displayWidth, size, true)
-            return@add BitmapDisplayItem.of(anim_surface, bitmap).apply {
+            return@add BitmapDisplayItem.of(bitmap).apply {
                 setDisplaySize(displayWidth, size)
             }
         }
 
-        val start = PathObject(displayItemId, point = PointF(0f, 0f), interpolator = DecelerateInterpolator())
+        val start = PathObject(
+            displayItemId,
+            point = PointF(0f, 0f),
+            interpolator = DecelerateInterpolator()
+        )
         val next = PathObject(
             displayItemId, point = PointF(
                 DisplayUtils.getScreenWidth(this.activity).toFloat() / 2 - size / 2,
@@ -157,12 +167,18 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
         val next1 =
             PathObject(
                 displayItemId,
-                point = PointF(DisplayUtils.getScreenWidth(this.activity).toFloat() / 2 - size / 2, 0f),
+                point = PointF(
+                    DisplayUtils.getScreenWidth(this.activity).toFloat() / 2 - size / 2,
+                    0f
+                ),
                 rotation = 360f
             )
         val next2 = PathObject(
             displayItemId,
-            point = PointF(0f, DisplayUtils.getScreenHeight(this.activity).toFloat() / 2 - size / 2),
+            point = PointF(
+                0f,
+                DisplayUtils.getScreenHeight(this.activity).toFloat() / 2 - size / 2
+            ),
             alpha = 0
         )
         val next3 = PathObject(
@@ -178,7 +194,8 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
             )
         )
         anim_surface?.addAnimDisplay(
-            AnimPathObject.Inner.with(displayObject.build(), true).beginAnimPath(start).doAnimPath(1500, next)
+            AnimPathObject.Inner.with(displayObject.build(), true).beginAnimPath(start)
+                .doAnimPath(1500, next)
                 .beginNextAnimPath(next)
                 .doAnimPaths(1500, mutableListOf(next1, next2, next3, next4)).build()
         )
@@ -193,12 +210,12 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
         val displayItemId = displayObject.add(
             key = "xin_startMoreAnim", kClass = BitmapDisplayItem::class, roomView = anim_surface
         ) {
-            var bitmap = BitmapFactory.decodeResource(this@TestAnimCanvasFragment.resources, R.mipmap.xin)
+            val bitmap =
+                BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, size, size)
             val bitmapWidth = bitmap.width
             val bitmapHeight = bitmap.height
             val displayWidth = size * bitmapWidth / bitmapHeight
-            bitmap = Bitmap.createScaledBitmap(bitmap, displayWidth, size, true)
-            return@add BitmapDisplayItem.of(anim_surface, bitmap).apply {
+            return@add BitmapDisplayItem.of(bitmap).apply {
                 setDisplaySize(displayWidth, size)
             }
         }
@@ -227,7 +244,8 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                 )
             val time = (1000L..10000L).random()
             anim_surface?.addAnimDisplay(
-                AnimPathObject.Inner.with(displayObject.build()).beginAnimPath(start).doAnimPath(time, next).build()
+                AnimPathObject.Inner.with(displayObject.build()).beginAnimPath(start)
+                    .doAnimPath(time, next).build()
                     .apply {
                         clickable = true
                         expand = "rain"

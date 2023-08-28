@@ -7,7 +7,6 @@ import android.graphics.PointF
 import android.graphics.Rect
 import android.graphics.RectF
 import com.base.animation.Animer
-import com.base.animation.IAnimView
 import com.base.animation.IClickIntercept
 import com.base.animation.cache.AteDisplayItem
 import com.base.animation.model.AnimDrawObject
@@ -37,7 +36,7 @@ class BitmapDisplayItem private constructor() :
         }
 
     companion object {
-        fun of(iAnimView: IAnimView, bitmap: Bitmap): BitmapDisplayItem {
+        fun of(bitmap: Bitmap): BitmapDisplayItem {
             return BitmapDisplayItem().apply {
                 Animer.log.i(TAG, "of this:$this")
                 mBitmap = bitmap

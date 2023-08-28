@@ -12,6 +12,7 @@ import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.base.animation.BitmapLoader
 import com.base.animation.DisplayObject
 import com.base.animation.IAnimListener
 import com.base.animation.IClickIntercept
@@ -80,13 +81,12 @@ class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
         val displayItemId1 = displayObject.add(
             key = "xin_startSingleAnim", kClass = BitmapDisplayItem::class, roomView = anim_surface
         ) {
-            var bitmap =
-                BitmapFactory.decodeResource(this@TestAnimCanvasFragment2.resources, R.mipmap.xin)
+            val bitmap =
+                BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, size, size)
             val bitmapWidth = bitmap.width
             val bitmapHeight = bitmap.height
             val displayWidth = size * bitmapWidth / bitmapHeight
-            bitmap = Bitmap.createScaledBitmap(bitmap, displayWidth, size, true)
-            return@add BitmapDisplayItem.of(anim_surface, bitmap).apply {
+            return@add BitmapDisplayItem.of(bitmap).apply {
                 setDisplaySize(displayWidth, size)
             }
         }
@@ -143,13 +143,12 @@ class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
         val displayItemId = displayObject.add(
             key = "xin_startMoreAnim", kClass = BitmapDisplayItem::class, roomView = anim_surface
         ) {
-            var bitmap =
-                BitmapFactory.decodeResource(this@TestAnimCanvasFragment2.resources, R.mipmap.xin)
+            val bitmap =
+                BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, size, size)
             val bitmapWidth = bitmap.width
             val bitmapHeight = bitmap.height
             val displayWidth = size * bitmapWidth / bitmapHeight
-            bitmap = Bitmap.createScaledBitmap(bitmap, displayWidth, size, true)
-            return@add BitmapDisplayItem.of(anim_surface, bitmap).apply {
+            return@add BitmapDisplayItem.of(bitmap).apply {
                 setDisplaySize(displayWidth, size)
             }
         }
@@ -211,13 +210,12 @@ class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
         val displayItemId = displayObject.add(
             key = "xin_startMoreAnim", kClass = BitmapDisplayItem::class, roomView = anim_surface
         ) {
-            var bitmap =
-                BitmapFactory.decodeResource(this@TestAnimCanvasFragment2.resources, R.mipmap.xin)
+            val bitmap =
+                BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, size, size)
             val bitmapWidth = bitmap.width
             val bitmapHeight = bitmap.height
             val displayWidth = size * bitmapWidth / bitmapHeight
-            bitmap = Bitmap.createScaledBitmap(bitmap, displayWidth, size, true)
-            return@add BitmapDisplayItem.of(anim_surface, bitmap).apply {
+            return@add BitmapDisplayItem.of(bitmap).apply {
                 setDisplaySize(displayWidth, size)
             }
         }
