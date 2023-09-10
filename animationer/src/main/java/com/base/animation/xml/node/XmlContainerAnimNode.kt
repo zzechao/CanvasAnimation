@@ -1,5 +1,7 @@
 package com.base.animation.xml.node
 
+import com.base.animation.node.IAnimNode
+
 open class XmlContainerAnimNode<T : XmlBaseAnimNode> : XmlBaseAnimNode {
     private val childNodes by lazy(LazyThreadSafetyMode.NONE) {
         mutableListOf<T>()
@@ -8,12 +10,12 @@ open class XmlContainerAnimNode<T : XmlBaseAnimNode> : XmlBaseAnimNode {
     override fun setAttribute(name: String, value: String) {
     }
 
-    override fun createChildNode(name: String): XmlBaseAnimNode? {
+    override fun createChildNode(name: String): IAnimNode? {
         return null
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun addNode(obj: XmlBaseAnimNode) {
+    override fun addNode(obj: IAnimNode) {
         childNodes.add(obj as T)
     }
 

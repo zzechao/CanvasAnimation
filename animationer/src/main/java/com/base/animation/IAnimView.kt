@@ -1,5 +1,6 @@
 package com.base.animation
 
+import android.view.View
 import com.base.animation.item.BaseDisplayItem
 import com.base.animation.model.AnimPathObject
 import kotlin.reflect.KClass
@@ -32,4 +33,8 @@ interface IAnimView {
     fun addClickIntercept(iClickIntercept: IClickIntercept)
 
     fun removeClickIntercept(iClickIntercept: IClickIntercept?)
+
+    fun getView(): View? {
+        return null
+    }
 }

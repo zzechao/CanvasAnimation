@@ -6,6 +6,7 @@ import android.graphics.PointF
 import android.os.Handler
 import android.os.Looper
 import android.view.MotionEvent
+import android.view.View
 import android.view.WindowManager
 import com.base.animation.helper.PathObjectDeal
 import com.base.animation.item.BaseDisplayItem

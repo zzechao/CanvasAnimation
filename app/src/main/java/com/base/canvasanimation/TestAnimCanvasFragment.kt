@@ -1,9 +1,8 @@
 package com.base.canvasanimation
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.PointF
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +19,13 @@ import com.base.animation.item.BitmapDisplayItem
 import com.base.animation.model.AnimDrawObject
 import com.base.animation.model.AnimPathObject
 import com.base.animation.model.PathObject
+import com.base.animation.xml.AnimDecoder
+import com.base.animation.xml.AnimEncoder
+import com.base.animation.xml.buildAnimNode
+import com.base.animation.xml.buildAnimXmlString
+import com.base.animation.xml.node.coder.InterpolatorEnum
+import com.base.animation.xml.node.coder.Location
+import com.base.animation.xml.node.coder.ValueLoader
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_1
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_2
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_3
@@ -47,7 +53,7 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         anim_1?.setOnClickListener {
-            startSingleAnim()
+            startSingleAnim2()
         }
 
         anim_2?.setOnClickListener {
@@ -131,6 +137,61 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                 .beginNextAnimPath(next2)
                 .doAnimPath(200, next3).build()
         )
+    }
+
+    private fun startSingleAnim2() {
+        val size = 80
+        AnimEncoder().buildAnimNode {
+            startNode {
+                url = "kankan"
+                point = ValueLoader.toJsonString(Location(0f, 0f))
+                scaleX = 0.5f
+                scaleY = 0.5f
+                endNode {
+                    point = ValueLoader.toJsonString(
+                        Location(
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                                .toFloat() / 2 - size / 2,
+                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                                .toFloat() / 2 - size / 2
+                        )
+                    )
+                    scaleX = 2f
+                    scaleY = 2f
+                    durTime = 1000
+                    interpolator = InterpolatorEnum.Accelerate.type
+                }
+                endNode {
+                    point = ValueLoader.toJsonString(
+                        Location(
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                                .toFloat() / 2 - size / 2, 9f
+                        )
+                    )
+                    scaleX = 0.5f
+                    scaleY = 0.5f
+                    durTime = 1000
+                }
+            }
+        }.apply {
+            AnimDecoder.playAnimWithNode(anim_surface, this) {
+                Log.i("ttttt", "create")
+                val bitmap =
+                    BitmapLoader.decodeBitmapFrom(
+                        resources,
+                        R.mipmap.xin,
+                        1,
+                        size,
+                        size
+                    )
+                val bitmapWidth = bitmap.width
+                val bitmapHeight = bitmap.height
+                val displayWidth = size * bitmapWidth / bitmapHeight
+                BitmapDisplayItem.of(bitmap).apply {
+                    setDisplaySize(displayWidth, size)
+                }
+            }
+        }
     }
 
     /**

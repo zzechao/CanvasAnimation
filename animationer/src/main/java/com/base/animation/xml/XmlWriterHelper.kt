@@ -31,8 +31,8 @@ class XmlWriterHelper {
         xmlSerializer.endTag(null, name)
     }
 
-    fun atttibute(attriName: String, attriValue: String) {
-        xmlSerializer.attribute(null, attriName, attriValue)
+    fun atttibute(attriName: String, attriValue: Any) {
+        xmlSerializer.attribute(null, attriName, attriValue.toString())
     }
 
     fun text(text: String) {
