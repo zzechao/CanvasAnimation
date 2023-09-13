@@ -42,6 +42,10 @@ class StartNode : IAnimNode {
     @JvmField
     var rotation = 0f
 
+    @AnimAttributeName("displaySize", DefaultAttributeCoder::class)
+    @JvmField
+    var displayHeightSize = 80
+
     private val childNodes by lazy(LazyThreadSafetyMode.NONE) {
         mutableListOf<IAnimNode>()
     }

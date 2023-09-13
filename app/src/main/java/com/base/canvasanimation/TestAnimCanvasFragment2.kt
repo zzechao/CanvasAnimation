@@ -1,5 +1,6 @@
 package com.base.canvasanimation
 
+import android.graphics.BitmapFactory
 import android.graphics.PointF
 import android.os.Bundle
 import android.util.Log
@@ -30,7 +31,9 @@ import kotlinx.android.synthetic.main.fragment_anim_canvas2.anim_2
 import kotlinx.android.synthetic.main.fragment_anim_canvas2.anim_3
 import kotlinx.android.synthetic.main.fragment_anim_canvas2.anim_surface
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.launch
 
 /**
  * @author:zhouzechao
@@ -140,9 +143,10 @@ class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
 
     private fun startSingleAnim2() {
         val size = 80
+        val url = "https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png"
         AnimEncoder().buildAnimNode {
             startNode {
-                url = "kankan"
+                this.url = url
                 point = ValueLoader.toJsonString(Location(0f, 0f))
                 scaleX = 0.5f
                 scaleY = 0.5f
@@ -173,21 +177,9 @@ class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
                 }
             }
         }.apply {
-            AnimDecoder.playAnimWithNode(anim_surface, this) {
-                Log.i("ttttt", "create")
-                val bitmap =
-                    BitmapLoader.decodeBitmapFrom(
-                        resources,
-                        R.mipmap.xin,
-                        1,
-                        size,
-                        size
-                    )
-                val bitmapWidth = bitmap.width
-                val bitmapHeight = bitmap.height
-                val displayWidth = size * bitmapWidth / bitmapHeight
-                BitmapDisplayItem.of(bitmap).apply {
-                    setDisplaySize(displayWidth, size)
+            GlobalScope.launch {
+                AnimDecoder.suspendPlayAnimWithNode(url, anim_surface, this@apply) {
+                    BitmapFactory.decodeResource(resources, R.mipmap.xin)
                 }
             }
         }

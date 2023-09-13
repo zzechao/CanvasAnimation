@@ -61,11 +61,14 @@ class DisplayObject private constructor(private val animView: IAnimView) {
     }
 
     fun <T : BaseDisplayItem> add(
-        key: String, kClass: KClass<out BaseDisplayItem>, roomView: View? = null, create: () -> T
+        key: String,
+        kClass: KClass<out BaseDisplayItem>,
+        roomView: View? = null,
+        create: () -> T
     ): String {
         val md5Key = getDisPlayItemKey(key, kClass = kClass)
         if (!animView.hasDisplayItem(md5Key, kClass)) {
-            Log.i("ttt","hasDisplayItem")
+            Log.i("ttt", "hasDisplayItem")
             val displayItem = create().apply {
                 displayItemId = md5Key
                 roomView?.let {
@@ -78,7 +81,10 @@ class DisplayObject private constructor(private val animView: IAnimView) {
     }
 
     suspend fun <T : BaseDisplayItem> suspendAdd(
-        key: String, kClass: KClass<out BaseDisplayItem>, roomView: View? = null, create: suspend () -> T
+        key: String,
+        kClass: KClass<out BaseDisplayItem>,
+        roomView: View? = null,
+        create: suspend () -> T
     ): String {
         val md5Key = getDisPlayItemKey(key, kClass = kClass)
         if (!animView.hasDisplayItem(md5Key, kClass)) {

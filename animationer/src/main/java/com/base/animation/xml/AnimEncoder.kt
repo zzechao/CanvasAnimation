@@ -3,6 +3,7 @@ package com.base.animation.xml
 import android.util.Log
 import com.base.animation.node.AnimNode
 import com.base.animation.node.EndNode
+import com.base.animation.node.EndNodeContainer
 import com.base.animation.node.StartNode
 import com.base.animation.xml.node.XmlBaseAnimNode
 
@@ -32,6 +33,20 @@ class AnimEncoder {
             onInit(this)
         })
     }
+
+    fun endContainer(onInit: EndNodeContainer.(encoder: AnimEncoder) -> Unit) {
+        curNode.addNode(EndNodeContainer().apply {
+            val lastNode = curNode
+            try {
+                curNode = this
+                onInit(this, this@AnimEncoder)
+            } finally {
+                curNode = lastNode
+            }
+        })
+    }
+
+
 }
 
 fun AnimEncoder.buildAnimXmlString(onInit: AnimEncoder.() -> Unit): String {

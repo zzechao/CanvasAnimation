@@ -1,5 +1,6 @@
 package com.base.animation.xml
 
+import android.graphics.Bitmap
 import com.base.animation.DisplayObject
 import com.base.animation.IAnimView
 import com.base.animation.item.BitmapDisplayItem
@@ -11,27 +12,40 @@ import com.base.animation.node.StartNode
 
 object AnimDecoder {
 
-    fun playAnimWithNode(anim: IAnimView, animNode: AnimNode, create: () -> BitmapDisplayItem) {
-        val displayObject = DisplayObject.with(animView = anim)
-        val displayItemId1 = displayObject.add(
-            key = "xin_startSingleAnim",
-            kClass = BitmapDisplayItem::class,
-            roomView = anim.getView()
-        ) {
-            return@add create()
-        }
-        dealStarAnim(anim, animNode, displayItemId1, displayObject)
-    }
-
-    private fun dealStarAnim(
+    suspend fun suspendPlayAnimWithNode(
+        key: String,
         anim: IAnimView,
         animNode: AnimNode,
-        id: String,
-        displayObject: DisplayObject
+        delegateBitmap: suspend (String) -> Bitmap
+    ) {
+        val displayObject = DisplayObject.with(animView = anim)
+        dealStarAnim(key, anim, animNode, displayObject, delegateBitmap)
+    }
+
+    private suspend fun dealStarAnim(
+        key: String,
+        anim: IAnimView,
+        animNode: AnimNode,
+        displayObject: DisplayObject,
+        delegateBitmap: suspend (String) -> Bitmap
     ) {
         animNode.getNodes().forEach {
             if (it is StartNode) {
                 if (it.point.isNotBlank() && it.getNodes().isNotEmpty()) {
+                    val id = displayObject.suspendAdd(
+                        key = key,
+                        kClass = BitmapDisplayItem::class,
+                        roomView = anim.getView()
+                    ) {
+                        val bitmap = delegateBitmap.invoke(it.url)
+                        val bitmapWidth = bitmap.width
+                        val bitmapHeight = bitmap.height
+                        val displayWidth = it.displayHeightSize * bitmapWidth / bitmapHeight
+                        BitmapDisplayItem.of(bitmap).apply {
+                            setDisplaySize(displayWidth, it.displayHeightSize)
+                        }
+                    }
+
                     val start = it.decode(id)
                     val path = AnimPathObject.Inner.with(
                         displayObject.build(), true

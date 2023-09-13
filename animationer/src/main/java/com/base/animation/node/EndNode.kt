@@ -12,10 +12,12 @@ import com.base.animation.xml.node.coder.InterpolatorAttributeCoder
 import com.base.animation.xml.node.coder.InterpolatorEnum
 import com.base.animation.xml.node.coder.LayoutIDAttributeCoder
 import com.base.animation.xml.node.coder.LocationAttributeCoder
+import com.base.animation.xml.node.coder.UrlAttributeCoder
 import com.base.animation.xml.node.coder.ValueLoader
 
 @AnimNodeName("endAnim")
 class EndNode : IAnimNode {
+
     @AnimAttributeName("endL", LocationAttributeCoder::class)
     @JvmField
     var point: String = ""
@@ -23,6 +25,10 @@ class EndNode : IAnimNode {
     @AnimAttributeName("endId", LayoutIDAttributeCoder::class)
     @JvmField
     var layoutId: Long = 0
+
+    @AnimAttributeName("url", UrlAttributeCoder::class)
+    @JvmField
+    var url: String = ""
 
     @AnimAttributeName("scaleX", DefaultAttributeCoder::class)
     @JvmField
