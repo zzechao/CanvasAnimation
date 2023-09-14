@@ -1,5 +1,8 @@
 package com.base.canvasanimation
 
+import android.animation.Animator
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.graphics.BitmapFactory
 import android.graphics.PointF
 import android.os.Bundle
@@ -10,6 +13,7 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -32,12 +36,13 @@ import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_1
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_2
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_3
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_surface
+import kotlinx.android.synthetic.main.fragment_anim_canvas.relative
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
 
 /**
  * @author:zhouzechao
@@ -61,10 +66,11 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
         anim_1?.setOnClickListener {
             lifecycleScope.launch {
                 repeat(200) {
-                    startSingleAnim2()
+                    startSingleAnimOrigin()
                     delay(50)
                 }
             }
+
         }
 
         anim_2?.setOnClickListener {
@@ -91,6 +97,61 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
     override fun onPause() {
         super.onPause()
         anim_surface?.pause()
+    }
+
+    private fun startSingleAnimOrigin() {
+        val view = ImageView(context)
+        relative.addView(view)
+        view.visibility = View.GONE
+        val size = 80
+        val bitmap =
+            BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, size, size)
+        view.setImageBitmap(bitmap)
+        val translationAnimatorSet = AnimatorSet()
+        val animator = ObjectAnimator.ofFloat(
+            view,
+            "translationX", 0f,
+            DisplayUtils.getScreenWidth(this.activity).toFloat() / 2 - size
+        ).setDuration(1000)
+        val animator1 = ObjectAnimator.ofFloat(
+            view,
+            "translationY", 0f,
+            DisplayUtils.getScreenHeight(this.activity).toFloat() / 2 - size
+        ).setDuration(1000)
+        val animator2 = ObjectAnimator.ofFloat(view, "scaleX", 0f, 1f).setDuration(1000)
+        val animator3 = ObjectAnimator.ofFloat(view, "scaleY", 0f, 1f).setDuration(1000)
+        val animator4 = ObjectAnimator.ofFloat(
+            view,
+            "translationY", 0f,
+        ).setDuration(1000)
+        val animator5 = ObjectAnimator.ofFloat(view, "scaleX", 1f, 0f).setDuration(1000)
+        val animator6 = ObjectAnimator.ofFloat(view, "scaleY", 1f, 0f).setDuration(1000)
+        //translationAnimatorSet.playTogether(animator, animator1, animator2, animator3)
+        translationAnimatorSet
+            .play(animator).with(animator1).with(animator2)
+            .with(animator3).before(AnimatorSet().apply {
+                play(animator4).with(animator5).with(animator6)
+            })
+        translationAnimatorSet.interpolator = AccelerateDecelerateInterpolator()
+        translationAnimatorSet.addListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator?) {
+                view.visibility = View.VISIBLE
+            }
+
+            override fun onAnimationEnd(animation: Animator?) {
+                view.visibility = View.GONE
+                relative.removeView(view)
+            }
+
+            override fun onAnimationCancel(animation: Animator?) {
+                view.visibility = View.GONE
+                relative.removeView(view)
+            }
+
+            override fun onAnimationRepeat(animation: Animator?) {
+            }
+        })
+        translationAnimatorSet.start()
     }
 
     /**
