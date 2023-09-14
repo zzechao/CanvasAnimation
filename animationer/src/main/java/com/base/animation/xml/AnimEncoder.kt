@@ -45,8 +45,6 @@ class AnimEncoder {
             }
         })
     }
-
-
 }
 
 fun AnimEncoder.buildAnimXmlString(onInit: AnimEncoder.() -> Unit): String {
@@ -66,4 +64,10 @@ fun AnimEncoder.buildAnimNode(onInit: AnimEncoder.() -> Unit): AnimNode {
     val encoder = this
     onInit(encoder)
     return rootNode
+}
+
+fun AnimNode.buildString(): String {
+    return XmlWriterHelper.newString {
+        this@buildString.encode(this)
+    }
 }

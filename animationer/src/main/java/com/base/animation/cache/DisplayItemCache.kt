@@ -21,7 +21,7 @@ class DisplayItemCache {
             .concurrencyLevel(4)
             .maximumSize(10)
             .initialCapacity(5)
-            .expireAfterAccess(10, TimeUnit.SECONDS)
+            .expireAfterAccess(5, TimeUnit.SECONDS)
             .removalListener<String, BaseDisplayItem> {}
             .build()
 

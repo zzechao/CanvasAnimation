@@ -8,6 +8,7 @@ import com.base.animation.model.AnimPathObject
 import com.base.animation.model.PathObject
 import com.base.animation.node.AnimNode
 import com.base.animation.node.EndNode
+import com.base.animation.node.EndNodeContainer
 import com.base.animation.node.StartNode
 
 object AnimDecoder {
@@ -59,6 +60,15 @@ object AnimDecoder {
                             }
                             path.doAnimPath(it.durTime, next)
                             preNext = next
+                        }
+                        if (it is EndNodeContainer) {
+                            val nextList = it.getNodes().map {
+                                it.decode(id)
+                            }.filterNotNull()
+                            preNext?.let {
+                                path.beginNextAnimPath(it)
+                            }
+                            path.doAnimPaths(it.durTime, nextList)
                         }
                     }
                     anim.addAnimDisplay(path.build())

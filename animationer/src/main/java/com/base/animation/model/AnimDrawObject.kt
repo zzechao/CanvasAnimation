@@ -3,6 +3,7 @@ package com.base.animation.model
 import android.graphics.Canvas
 import android.graphics.PointF
 import com.base.animation.helper.PathObjectDeal
+import com.base.animation.item.BaseDisplayItem
 
 /**
  * @author:zhouzechao
@@ -39,21 +40,40 @@ class DrawObject(val animId: Long) {
                 pathObjectDeal.animListeners.forEach {
                     it?.startAnim(animId)
                 }
-            } else {
+            } else if (status == Status.START) {
+                status = Status.DRAWING
                 pathObjectDeal.animListeners.forEach {
                     it?.runningAnim(animId)
                 }
             }
+            var curDisplayItemId = ""
+            var displayItem: BaseDisplayItem? = null
             animDraws[currencyPosition]?.forEach { drawObject ->
-                pathObjectDeal.getDisplayItem(drawObject.displayItemId)?.apply {
-                    draw(
-                        canvas, drawObject.point.x, drawObject.point.y, drawObject.alpha,
-                        drawObject.scaleX, drawObject.scaleY, drawObject.rotation
-                    )
-                    if (drawObject.clickable && !touchPoint.isNullOrEmpty()
-                        && pathObjectDeal.clickIntercepts.isNotEmpty()
-                    ) {
-                        touch(animId, pathObjectDeal.clickIntercepts, drawObject, touchPoint)
+                if (drawObject.displayItemId != curDisplayItemId || displayItem == null) {
+                    curDisplayItemId = drawObject.displayItemId
+                    displayItem = pathObjectDeal.getDisplayItem(drawObject.displayItemId)
+                    displayItem?.apply {
+                        draw(
+                            canvas, drawObject.point.x, drawObject.point.y, drawObject.alpha,
+                            drawObject.scaleX, drawObject.scaleY, drawObject.rotation
+                        )
+                        if (drawObject.clickable && !touchPoint.isNullOrEmpty()
+                            && pathObjectDeal.clickIntercepts.isNotEmpty()
+                        ) {
+                            touch(animId, pathObjectDeal.clickIntercepts, drawObject, touchPoint)
+                        }
+                    }
+                } else {
+                    displayItem?.apply {
+                        draw(
+                            canvas, drawObject.point.x, drawObject.point.y, drawObject.alpha,
+                            drawObject.scaleX, drawObject.scaleY, drawObject.rotation
+                        )
+                        if (drawObject.clickable && !touchPoint.isNullOrEmpty()
+                            && pathObjectDeal.clickIntercepts.isNotEmpty()
+                        ) {
+                            touch(animId, pathObjectDeal.clickIntercepts, drawObject, touchPoint)
+                        }
                     }
                 }
             }
@@ -92,5 +112,6 @@ fun PathObject.toAnimDrawObject(clickable: Boolean, expand: String): AnimDrawObj
 enum class Status(val value: Int) {
     INIT(0),
     START(1),
-    STOP(2)
+    DRAWING(2),
+    STOP(3)
 }

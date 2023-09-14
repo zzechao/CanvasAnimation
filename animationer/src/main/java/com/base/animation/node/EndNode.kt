@@ -30,6 +30,10 @@ class EndNode : IAnimNode {
     @JvmField
     var url: String = ""
 
+    @AnimAttributeName("displaySize", DefaultAttributeCoder::class)
+    @JvmField
+    var displayHeightSize = 0
+
     @AnimAttributeName("scaleX", DefaultAttributeCoder::class)
     @JvmField
     var scaleX = 1f

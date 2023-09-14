@@ -13,16 +13,17 @@ import com.base.animation.model.AnimPathObject
 import com.base.animation.model.DrawObject
 import com.base.animation.model.FIRST_START_POSITION
 import com.base.animation.model.toAnimDrawObject
+import com.google.common.cache.CacheBuilder
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope.coroutineContext
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.actor
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.TimeUnit
 import kotlin.math.ceil
 import kotlin.reflect.KClass
 
@@ -68,7 +69,14 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
     /**
      * 路径缓存
      */
-    private val pathCacheMap = mutableMapOf<String, MutableMap<Int, MutableList<AnimDrawObject>>>()
+    private val pathCacheMap: com.google.common.cache.Cache<String,
+            MutableMap<Int, MutableList<AnimDrawObject>>> =
+        CacheBuilder.newBuilder()
+            .concurrencyLevel(4)
+            .maximumSize(10)
+            .initialCapacity(5)
+            .expireAfterAccess(5, TimeUnit.SECONDS)
+            .build()
 
     /**
      * 画布缓存时间策略
@@ -103,7 +111,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
         supervisorScope {
             for (animPath in this@actor) {
                 launch(coroutineContext) {
-                    Animer.log.i(TAG, "calculation start")
+                    Animer.log.i("tttt1", "calculation start")
                     if (animPath.displayItemsMap.isNotEmpty()) {
                         displayItemCache.putDisplayItems(animPath.displayItemsMap)
                     }
@@ -111,9 +119,9 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
                     val drawsMap = mutableMapOf<Int, MutableList<AnimDrawObject>>()
                     var position = 0
                     val drawObject = DrawObject(animPath.animId)
-                    if (pathCacheMap[cacheKey] != null) {
+                    if (pathCacheMap.getIfPresent(cacheKey) != null) {
                         Animer.log.i(TAG, "cache used")
-                        pathCacheMap[cacheKey]?.map {
+                        pathCacheMap.getIfPresent(cacheKey)?.map {
                             val animDrawObjects = mutableListOf<AnimDrawObject>()
                             it.value.forEach {
                                 animDrawObjects.add(
@@ -171,6 +179,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
                         drawObject.animDraws = drawsMap
                         animDrawObjects[drawObject.animId] = drawObject
                         animDrawIds.add(drawObject.animId)
+                        Animer.log.i("tttt1", "calculation end")
                     } else {
                         Animer.log.i(TAG, "no cache used")
                         for ((index, starts) in animPath.startPoints) {
@@ -241,12 +250,12 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
                             }
                         }
                         if (animPath.pathCache && cacheKey.isNotEmpty()) {
-                            pathCacheMap[cacheKey] = drawsMap
+                            pathCacheMap.put(cacheKey, drawsMap)
                         }
                         drawObject.animDraws = drawsMap
                         animDrawObjects[drawObject.animId] = drawObject
                         animDrawIds.add(drawObject.animId)
-                        Animer.log.i(TAG, "calculation end")
+                        Animer.log.i("tttt1", "calculation end")
                     }
                 }
             }

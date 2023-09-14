@@ -161,12 +161,10 @@ class AnimViewHelper(context: Context, private val doFrame: () -> Unit) : IAnimV
 
     fun drawAnim(canvas: Canvas?) {
         canvas ?: return
-        if (pathObjectDeal.animDrawObjects.isNotEmpty()) {
-            pathObjectDeal.animDrawObjects.map {
-                it.value.draw(canvas, pathObjectDeal, mFramePositionCount, mTouchPointFList)
-            }
-            mTouchPointFList.clear()
+        pathObjectDeal.animDrawObjects.map {
+            it.value.draw(canvas, pathObjectDeal, mFramePositionCount, mTouchPointFList)
         }
+        mTouchPointFList.clear()
     }
 
     private fun checkInMainThread(block: () -> Unit) {

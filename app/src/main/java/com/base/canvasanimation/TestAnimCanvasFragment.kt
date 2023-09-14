@@ -3,6 +3,7 @@ package com.base.canvasanimation
 import android.graphics.BitmapFactory
 import android.graphics.PointF
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.base.animation.BitmapLoader
 import com.base.animation.DisplayObject
 import com.base.animation.IAnimListener
@@ -22,6 +24,7 @@ import com.base.animation.model.PathObject
 import com.base.animation.xml.AnimDecoder
 import com.base.animation.xml.AnimEncoder
 import com.base.animation.xml.buildAnimNode
+import com.base.animation.xml.buildString
 import com.base.animation.xml.node.coder.InterpolatorEnum
 import com.base.animation.xml.node.coder.Location
 import com.base.animation.xml.node.coder.ValueLoader
@@ -29,9 +32,11 @@ import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_1
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_2
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_3
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_surface
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -54,11 +59,21 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         anim_1?.setOnClickListener {
-            startSingleAnim2()
+            lifecycleScope.launch {
+                repeat(200) {
+                    startSingleAnim2()
+                    delay(50)
+                }
+            }
         }
 
         anim_2?.setOnClickListener {
-            startMoreAnim()
+            lifecycleScope.launch {
+                repeat(200) {
+                    startMoreAnim2()
+                    delay(50)
+                }
+            }
         }
 
         anim_3?.setOnClickListener {
@@ -149,6 +164,7 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                 point = ValueLoader.toJsonString(Location(0f, 0f))
                 scaleX = 0.5f
                 scaleY = 0.5f
+                displayHeightSize = 80
                 endNode {
                     point = ValueLoader.toJsonString(
                         Location(
@@ -161,7 +177,7 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                     scaleX = 2f
                     scaleY = 2f
                     durTime = 1000
-                    interpolator = InterpolatorEnum.Decelerate.type
+                    interpolator = InterpolatorEnum.Accelerate.type
                 }
                 endNode {
                     point = ValueLoader.toJsonString(
@@ -176,7 +192,8 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                 }
             }
         }.apply {
-            GlobalScope.launch {
+            Log.i("tttt2", this.buildString())
+            lifecycleScope.launch(Dispatchers.IO) {
                 AnimDecoder.suspendPlayAnimWithNode(url, anim_surface, this@apply) {
                     BitmapFactory.decodeResource(resources, R.mipmap.xin)
                 }
@@ -250,6 +267,87 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                 .beginNextAnimPath(next)
                 .doAnimPaths(1500, mutableListOf(next1, next2, next3, next4)).build()
         )
+    }
+
+    private fun startMoreAnim2() {
+        val size = 80
+        val url = "https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png"
+        AnimEncoder().buildAnimNode {
+            startNode {
+                this.url = url
+                point = ValueLoader.toJsonString(Location(0f, 0f))
+                scaleX = 0.5f
+                scaleY = 0.5f
+                displayHeightSize = 80
+                endNode {
+                    point = ValueLoader.toJsonString(
+                        Location(
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                                .toFloat() / 2 - size / 2,
+                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                                .toFloat() / 2 - size / 2
+                        )
+                    )
+                    scaleX = 2f
+                    scaleY = 2f
+                    durTime = 1000
+                    interpolator = InterpolatorEnum.Decelerate.type
+                }
+                endContainer {
+                    durTime = 1500
+                    endNode {
+                        rotation = 360f
+                        point = ValueLoader.toJsonString(
+                            Location(
+                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                                    .toFloat() / 2 - size / 2,
+                                0f
+                            )
+                        )
+                    }
+                    endNode {
+                        point = ValueLoader.toJsonString(
+                            Location(
+                                0f,
+                                DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                                    .toFloat() / 2 - size / 2
+                            )
+                        )
+                        alpha = 0
+                    }
+                    endNode {
+                        point = ValueLoader.toJsonString(
+                            Location(
+                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                                    .toFloat() / 2 - size / 2,
+                                DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                                    .toFloat()
+                            )
+                        )
+                        scaleX = 0f
+                        scaleY = 0f
+                    }
+                    endNode {
+                        point = ValueLoader.toJsonString(
+                            Location(
+                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                                    .toFloat(),
+                                DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                                    .toFloat() / 2 - size / 2
+                            )
+                        )
+                        scaleX = 0f
+                        scaleY = 0f
+                    }
+                }
+            }
+        }.apply {
+            lifecycleScope.launch {
+                AnimDecoder.suspendPlayAnimWithNode(url, anim_surface, this@apply) {
+                    BitmapFactory.decodeResource(resources, R.mipmap.xin)
+                }
+            }
+        }
     }
 
     /**
