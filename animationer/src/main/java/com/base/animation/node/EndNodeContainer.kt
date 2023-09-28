@@ -1,5 +1,6 @@
 package com.base.animation.node
 
+import com.base.animation.xml.XmlWriterHelper
 import com.base.animation.xml.node.AnimAttributeName
 import com.base.animation.xml.node.AnimNodeName
 import com.base.animation.xml.node.coder.DefaultAttributeCoder
@@ -30,5 +31,11 @@ class EndNodeContainer : IAnimNode {
 
     override fun getNodes(): MutableList<IAnimNode> {
         return childNodes
+    }
+
+    override fun encodeSelf(write: XmlWriterHelper) {
+        childNodes.forEach {
+            it.encode(write)
+        }
     }
 }

@@ -1,26 +1,29 @@
 package com.base.animation.node
 
 import android.graphics.PointF
+import android.util.Log
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
+import androidx.annotation.CallSuper
 import com.base.animation.model.PathObject
 import com.base.animation.xml.node.AnimAttributeName
 import com.base.animation.xml.node.AnimNodeName
 import com.base.animation.xml.node.coder.DefaultAttributeCoder
+import com.base.animation.xml.node.coder.IAttributeCoder
 import com.base.animation.xml.node.coder.InterpolatorAttributeCoder
 import com.base.animation.xml.node.coder.InterpolatorEnum
 import com.base.animation.xml.node.coder.LayoutIDAttributeCoder
 import com.base.animation.xml.node.coder.LocationAttributeCoder
 import com.base.animation.xml.node.coder.UrlAttributeCoder
-import com.base.animation.xml.node.coder.ValueLoader
+import java.lang.reflect.Field
 
 @AnimNodeName("endAnim")
 class EndNode : IAnimNode {
 
     @AnimAttributeName("endL", LocationAttributeCoder::class)
     @JvmField
-    var point: String = ""
+    var point: PointF? = null
 
     @AnimAttributeName("endId", LayoutIDAttributeCoder::class)
     @JvmField
@@ -50,7 +53,7 @@ class EndNode : IAnimNode {
     @JvmField
     var interpolator = InterpolatorEnum.Linear.type
 
-    @AnimAttributeName("")
+    @AnimAttributeName("alpha")
     @JvmField
     var alpha = 255
 
@@ -59,7 +62,6 @@ class EndNode : IAnimNode {
     var rotation = 0f
 
     override fun decode(id: String): PathObject {
-        val pointF = ValueLoader.fromObject<PointF>(point, PointF::class.java)
         val interpolatorObject = when (interpolator) {
             InterpolatorEnum.Linear.type -> {
                 LinearInterpolator()
@@ -79,7 +81,7 @@ class EndNode : IAnimNode {
         }
         return PathObject(
             id,
-            pointF,
+            point ?: PointF(),
             alpha,
             scaleX,
             scaleY,

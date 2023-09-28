@@ -8,7 +8,10 @@ interface XmlBaseAnimNode {
      * @param name 属性名，如：url，name
      * @param value 属性值，如xxx
      */
-    fun setAttribute(name: String, value: String) {}
+    fun setAttribute(
+        name: String, value: String
+    ) {
+    }
 
     /**
      * 创建子节点时调用

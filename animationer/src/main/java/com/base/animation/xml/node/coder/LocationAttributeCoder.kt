@@ -1,18 +1,19 @@
 package com.base.animation.xml.node.coder
 
+import android.graphics.PointF
 import kotlin.reflect.KClass
 
 class LocationAttributeCoder : IAttributeCoder<String> {
     override fun attributeDecode(needType: KClass<*>, value: String): Any? {
-        return if (needType == Location::class) {
-            return ValueLoader.fromObject(value, Location::class.java)
+        return if (needType == PointF::class) {
+            return ValueLoader.fromObject<PointF>(value, PointF::class.java)
         } else {
             null
         }
     }
 
     override fun attributeEncode(value: Any?): String? {
-        return value?.toString()
+        return value?.let { ValueLoader.toJsonString(it) }
     }
 }
 

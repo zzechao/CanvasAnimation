@@ -10,8 +10,22 @@ import com.base.animation.node.AnimNode
 import com.base.animation.node.EndNode
 import com.base.animation.node.EndNodeContainer
 import com.base.animation.node.StartNode
+import com.base.animation.xml.node.coder.IAttributeCoder
 
 object AnimDecoder {
+
+    private val decoder by lazy {
+        XmlObjectDecoder().apply {
+            registerNodeCreatetor(AnimNode::class.java)
+            registerNodeCreatetor(StartNode::class.java)
+            registerNodeCreatetor(EndNode::class.java)
+            registerNodeCreatetor(EndNodeContainer::class.java)
+        }
+    }
+
+    val mapNodeAttributeCoderMap by lazy {
+        mutableMapOf<String, IAttributeCoder<out Any>>()
+    }
 
     suspend fun suspendPlayAnimWithNode(
         key: String,
@@ -32,7 +46,7 @@ object AnimDecoder {
     ) {
         animNode.getNodes().forEach {
             if (it is StartNode) {
-                if (it.point.isNotBlank() && it.getNodes().isNotEmpty()) {
+                if (it.point != null && it.getNodes().isNotEmpty()) {
                     val id = displayObject.suspendAdd(
                         key = key,
                         kClass = BitmapDisplayItem::class,
@@ -74,6 +88,28 @@ object AnimDecoder {
                     anim.addAnimDisplay(path.build())
                 }
             }
+        }
+    }
+
+    suspend fun suspendPlayAnimWithXml(
+        key: String,
+        anim: IAnimView,
+        xml: String,
+        delegateBitmap: suspend (String) -> Bitmap
+    ) {
+        val displayObject = DisplayObject.with(animView = anim)
+        dealStarAnimXml(key, anim, xml, displayObject, delegateBitmap)
+    }
+
+    private suspend fun dealStarAnimXml(
+        key: String,
+        anim: IAnimView,
+        xml: String,
+        displayObject: DisplayObject,
+        delegateBitmap: suspend (String) -> Bitmap
+    ) {
+        (decoder.createObject(xml) as? AnimNode)?.let {
+            dealStarAnim(key, anim, it, displayObject, delegateBitmap)
         }
     }
 }

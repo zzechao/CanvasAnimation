@@ -1,7 +1,9 @@
 package com.base.animation.node
 
 import android.util.Log
+import androidx.annotation.CallSuper
 import com.base.animation.model.PathObject
+import com.base.animation.xml.AnimDecoder
 import com.base.animation.xml.XmlWriterHelper
 import com.base.animation.xml.node.AnimAttributeName
 import com.base.animation.xml.node.AnimNodeName
@@ -22,11 +24,20 @@ interface IAnimNode : XmlBaseAnimNode, IXmlObjNodeParser {
         try {
             val annotation = field.getAnnotation(AnimAttributeName::class.java) ?: return
             val fieldValue = field.get(this) ?: return
-            val value = annotation.coder.java.newInstance().attributeEncode(fieldValue) ?: return
-            write.atttibute(
-                attriName = annotation.name,
-                attriValue = value
-            )
+            val animNodeName = javaClass.getAnnotation(AnimNodeName::class.java)?.name ?: return
+            val key = "${animNodeName}_${annotation.name}"
+            AnimDecoder.mapNodeAttributeCoderMap[key]?.let {
+                val value = it.attributeEncode(fieldValue) ?: return
+                write.atttibute(annotation.name, value)
+            } ?: kotlin.run {
+                val attributeCoder = annotation.coder.java.newInstance()
+                AnimDecoder.mapNodeAttributeCoderMap[key] = attributeCoder
+                val value = attributeCoder.attributeEncode(fieldValue) ?: return
+                write.atttibute(
+                    attriName = annotation.name,
+                    attriValue = value
+                )
+            }
         } catch (e: Exception) {
             Log.e(TAG, "[parseAndGetField]:${e}")
         }
@@ -55,5 +66,46 @@ interface IAnimNode : XmlBaseAnimNode, IXmlObjNodeParser {
 
     override fun decode(id: String): PathObject? {
         return null
+    }
+
+    @CallSuper
+    override fun setAttribute(
+        name: String,
+        value: String
+    ) {
+        try {
+            val fields = this.javaClass.fields
+            for (i in fields.indices) {
+                if (parseAndSetField(fields[i], name, value)) return
+            }
+        } catch (e: Exception) {
+            Log.e("ttt", "[setAttribute]:${e}")
+        }
+    }
+
+    private fun parseAndSetField(field: Field, name: String, value: String): Boolean {
+        try {
+            val animNodeName =
+                javaClass.getAnnotation(AnimNodeName::class.java)?.name ?: return false
+            val annotation = field.getAnnotation(AnimAttributeName::class.java) ?: return false
+            val key = "${animNodeName}_${annotation.name}"
+            if (annotation.name.equals(name, true)) {
+                AnimDecoder.mapNodeAttributeCoderMap[key]?.let {
+                    it.attributeDecode(field.type.kotlin, value)?.let {
+                        field.set(this, it)
+                    }
+                } ?: kotlin.run {
+                    val attributeCoder = annotation.coder.java.newInstance()
+                    AnimDecoder.mapNodeAttributeCoderMap[key] = attributeCoder
+                    attributeCoder.attributeDecode(field.type.kotlin, value)?.let {
+                        field.set(this, it)
+                    }
+                }
+                return true
+            }
+        } catch (e: Exception) {
+            Log.e("ttt", "[parseAndSetField]:${e}")
+        }
+        return false
     }
 }

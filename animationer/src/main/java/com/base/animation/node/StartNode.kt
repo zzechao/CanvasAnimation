@@ -1,22 +1,25 @@
 package com.base.animation.node
 
 import android.graphics.PointF
+import android.util.Log
+import androidx.annotation.CallSuper
 import com.base.animation.model.PathObject
 import com.base.animation.xml.XmlWriterHelper
 import com.base.animation.xml.node.AnimAttributeName
 import com.base.animation.xml.node.AnimNodeName
 import com.base.animation.xml.node.coder.DefaultAttributeCoder
+import com.base.animation.xml.node.coder.IAttributeCoder
 import com.base.animation.xml.node.coder.LayoutIDAttributeCoder
 import com.base.animation.xml.node.coder.LocationAttributeCoder
 import com.base.animation.xml.node.coder.UrlAttributeCoder
-import com.base.animation.xml.node.coder.ValueLoader
+import java.lang.reflect.Field
 
 @AnimNodeName("startAnim")
 class StartNode : IAnimNode {
 
     @AnimAttributeName("startL", LocationAttributeCoder::class)
     @JvmField
-    var point: String = ""
+    var point: PointF? = null
 
     @AnimAttributeName("startId", LayoutIDAttributeCoder::class)
     @JvmField
@@ -34,7 +37,7 @@ class StartNode : IAnimNode {
     @JvmField
     var scaleY = 1f
 
-    @AnimAttributeName("")
+    @AnimAttributeName("alpha")
     @JvmField
     var alpha = 255
 
@@ -65,7 +68,6 @@ class StartNode : IAnimNode {
     }
 
     override fun decode(id: String): PathObject {
-        val pointF = ValueLoader.fromObject<PointF>(point, PointF::class.java)
-        return PathObject(id, pointF, alpha, scaleX, scaleY, rotation)
+        return PathObject(id, point ?: PointF(), alpha, scaleX, scaleY, rotation)
     }
 }
