@@ -4,8 +4,8 @@ import kotlin.reflect.KClass
 
 class LayoutIDAttributeCoder : IAttributeCoder<String> {
     override fun attributeDecode(needType: KClass<*>, value: String): Any? {
-        return if (needType == Long::class) {
-            return value.toLong()
+        return if (needType == String::class) {
+            return value
         } else {
             null
         }

@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.graphics.PointF
 import android.graphics.Rect
 import android.graphics.RectF
+import android.util.Log
 import com.base.animation.Animer
 import com.base.animation.IClickIntercept
 import com.base.animation.cache.AteDisplayItem
@@ -20,7 +21,10 @@ private const val TAG = "BitmapDisplayItem"
 
 @AteDisplayItem(usePoolCache = true)
 class BitmapDisplayItem private constructor() :
-    BaseDisplayItem(Paint()) {
+    BaseDisplayItem(Paint().apply {
+        isAntiAlias = false
+        isFilterBitmap = true
+    }) {
 
     private var bitmapWidth: Int = 50
     private var bitmapHeight: Int = 50
@@ -33,6 +37,7 @@ class BitmapDisplayItem private constructor() :
             field = value
             bitmapWidth = value?.width ?: 50
             bitmapHeight = value?.height ?: 50
+            Log.i(TAG, "$bitmapWidth - $bitmapHeight")
         }
 
     companion object {
@@ -56,19 +61,24 @@ class BitmapDisplayItem private constructor() :
         canvas: Canvas, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float
     ) {
         mBitmap.takeUnless { mBitmap?.isRecycled == true }?.let {
-            mPaint.alpha = alpha
+            paint.alpha = alpha
             mBitmap?.let {
                 if (displaySizeSet) {
+                    val drawX = x - (displayWidth / scaleX / 2f)
+                    val drawY = y - (displayHeight / scaleY / 2f)
+
                     mDisplayRect?.set(
-                        x, y,
-                        x + displayWidth,
-                        y + displayHeight
+                        drawX, drawY,
+                        drawX + displayWidth,
+                        drawY + displayHeight
                     )
                     mDisplayRect?.let { rect ->
-                        canvas.drawBitmap(it, mBitmapRect, rect, mPaint)
+                        canvas.drawBitmap(it, null, rect, paint)
                     }
                 } else {
-                    canvas.drawBitmap(it, x, y, mPaint)
+                    val drawX = x - (bitmapWidth / 2 / scaleX)
+                    val drawY = y - (bitmapHeight / 2 / scaleY)
+                    canvas.drawBitmap(it, drawX, drawY, paint)
                 }
             }
         }

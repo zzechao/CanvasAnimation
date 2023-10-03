@@ -45,9 +45,9 @@ class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
 
     private val xml = "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>" +
             "<anim>" +
-            "    <startAnim alpha=\"255\" displaySize=\"80\" startId=\"0\" startL='{\"x\":0.0,\"y\":0.0}' rotation=\"0.0\" scaleX=\"0.5\" scaleY=\"0.5\" url=\"https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png\">" +
-            "        <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"1\" endId=\"0\" endL='{\"x\":680.0,\"y\":1463.5}' rotation=\"0.0\" scaleX=\"2.0\" scaleY=\"2.0\" url=\"\" />" +
-            "        <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"0\" endId=\"0\" endL='{\"x\":680.0,\"y\":9.0}' rotation=\"0.0\" scaleX=\"0.5\" scaleY=\"0.5\" url=\"\" />" +
+            "    <startAnim alpha=\"255\" displaySize=\"100\" startId=\"test1\" startL='{\"x\":0.0,\"y\":0.0}' rotation=\"0.0\" scaleX=\"0.5\" scaleY=\"0.5\" url=\"https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png\">" +
+            "        <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"1\" endId=\"test2\" endL='{\"x\":0.0,\"y\":0.0}' rotation=\"0.0\" scaleX=\"2.0\" scaleY=\"2.0\" url=\"\" />" +
+            "        <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"0\" endId=\"test3\" endL='{\"x\":0.0,\"y\":0.0}' rotation=\"0.0\" scaleX=\"0\" scaleY=\"0\" url=\"\" />" +
             "    </startAnim>" +
             "</anim>"
 
@@ -62,12 +62,7 @@ class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         anim_1?.setOnClickListener {
-            lifecycleScope.launch {
-                repeat(200) {
-                    startSingleAnim3()
-                    delay(50)
-                }
-            }
+            startSingleAnim3()
         }
 
         anim_2?.setOnClickListener {

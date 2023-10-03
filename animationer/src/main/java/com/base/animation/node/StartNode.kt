@@ -1,18 +1,15 @@
 package com.base.animation.node
 
 import android.graphics.PointF
-import android.util.Log
-import androidx.annotation.CallSuper
+import com.base.animation.IAnimView
 import com.base.animation.model.PathObject
 import com.base.animation.xml.XmlWriterHelper
 import com.base.animation.xml.node.AnimAttributeName
 import com.base.animation.xml.node.AnimNodeName
 import com.base.animation.xml.node.coder.DefaultAttributeCoder
-import com.base.animation.xml.node.coder.IAttributeCoder
 import com.base.animation.xml.node.coder.LayoutIDAttributeCoder
 import com.base.animation.xml.node.coder.LocationAttributeCoder
 import com.base.animation.xml.node.coder.UrlAttributeCoder
-import java.lang.reflect.Field
 
 @AnimNodeName("startAnim")
 class StartNode : IAnimNode {
@@ -21,9 +18,9 @@ class StartNode : IAnimNode {
     @JvmField
     var point: PointF? = null
 
-    @AnimAttributeName("startId", LayoutIDAttributeCoder::class)
+    @AnimAttributeName("startIdName", LayoutIDAttributeCoder::class)
     @JvmField
-    var layoutId: Long = 0
+    var layoutIdName: String = ""
 
     @AnimAttributeName("url", UrlAttributeCoder::class)
     @JvmField
@@ -67,7 +64,18 @@ class StartNode : IAnimNode {
         return childNodes
     }
 
-    override fun decode(id: String): PathObject {
-        return PathObject(id, point ?: PointF(), alpha, scaleX, scaleY, rotation)
+    override fun decode(id: String, anim: IAnimView): PathObject {
+        val pointF = if ((point?.x ?: 0f) == 0f && (point?.y ?: 0f) == 0f
+            && layoutIdName.isNotEmpty()
+        ) {
+            anim.getViewByAnimName(layoutIdName)?.let { it ->
+                getCenterOfViewLocationInWindow(it).let {
+                    PointF(it[0].toFloat(), it[1].toFloat())
+                }
+            } ?: PointF()
+        } else {
+            point ?: PointF()
+        }
+        return PathObject(id, pointF, alpha, scaleX, scaleY, rotation)
     }
 }

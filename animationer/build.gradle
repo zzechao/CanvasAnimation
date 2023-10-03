@@ -44,6 +44,8 @@ dependencies {
     implementation dep_kotlin_lib.kotlin_reflect
     implementation dep_androidx.guava_android
     implementation dep_androidx.gson
+    implementation dep_androidx.fragment_ktx
+    implementation dep_androidx.fragment
 }
 
 //uploadArchives {

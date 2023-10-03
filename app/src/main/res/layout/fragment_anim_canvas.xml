@@ -7,6 +7,26 @@
     android:gravity="center"
     android:orientation="vertical">
 
+    <View
+        android:id="@id/test1"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
+
+    <View
+        android:id="@id/test2"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:layout_centerInParent="true" />
+
+    <View
+        android:id="@id/test3"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
     <com.base.animation.AnimView
         android:id="@+id/anim_surface"
         android:layout_width="match_parent"

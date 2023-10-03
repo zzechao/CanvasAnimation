@@ -2,6 +2,7 @@ package com.base.canvasanimation
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.base.animation.AnimationEx
 import kotlinx.android.synthetic.main.activity_main.bt1
 import kotlinx.android.synthetic.main.activity_main.bt2
 
@@ -9,6 +10,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AnimationEx.init(this.application)
+
         setContentView(R.layout.activity_main)
         bt1.setOnClickListener {
             val transactionTooLargeException = supportFragmentManager.beginTransaction()

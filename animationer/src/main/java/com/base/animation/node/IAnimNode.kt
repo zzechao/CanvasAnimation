@@ -1,7 +1,11 @@
 package com.base.animation.node
 
+import android.annotation.SuppressLint
 import android.util.Log
+import android.view.View
 import androidx.annotation.CallSuper
+import com.base.animation.AnimationEx
+import com.base.animation.IAnimView
 import com.base.animation.model.PathObject
 import com.base.animation.xml.AnimDecoder
 import com.base.animation.xml.XmlWriterHelper
@@ -64,7 +68,7 @@ interface IAnimNode : XmlBaseAnimNode, IXmlObjNodeParser {
         }
     }
 
-    override fun decode(id: String): PathObject? {
+    override fun decode(id: String, anim: IAnimView): PathObject? {
         return null
     }
 
@@ -107,5 +111,28 @@ interface IAnimNode : XmlBaseAnimNode, IXmlObjNodeParser {
             Log.e("ttt", "[parseAndSetField]:${e}")
         }
         return false
+    }
+
+    fun getCenterOfViewLocationInWindow(view: View): IntArray {
+        val pos = IntArray(2)
+        view.getLocationInWindow(pos)
+        pos[1] = pos[1] - getStatusBarHeight()
+        pos[0] = (pos[0] + view.width / 2f).toInt()
+        pos[1] = (pos[1] + view.height / 2f).toInt()
+        return pos
+    }
+
+    @SuppressLint("InternalInsetResource")
+    private fun getStatusBarHeight(): Int {
+        var height = 0
+        val resourceId: Int = AnimationEx.mApplication.resources.getIdentifier(
+            "status_bar_height",
+            "dimen",
+            "android"
+        )
+        if (resourceId > 0) {
+            height = AnimationEx.mApplication.resources.getDimensionPixelSize(resourceId)
+        }
+        return height
     }
 }

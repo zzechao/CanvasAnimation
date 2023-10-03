@@ -3,18 +3,17 @@ package com.base.animation.item
 import android.graphics.Canvas
 import android.graphics.Paint
 import androidx.annotation.CallSuper
-import com.base.animation.IAnimView
+import androidx.core.graphics.withSave
 import com.base.animation.IDisplayItem
 import com.base.animation.cache.IRecycle
 import java.util.concurrent.atomic.AtomicLong
-import kotlin.reflect.KClass
 
 /**
  * @author:zhouzechao
  * @date: 2020/12/8
  * description：display模块
  */
-abstract class BaseDisplayItem constructor(paint: Paint) : IDisplayItem, IRecycle {
+abstract class BaseDisplayItem constructor(val paint: Paint) : IDisplayItem, IRecycle {
 
     open var displayHeight: Int = 0
     open var displayWidth: Int = 0
@@ -26,8 +25,6 @@ abstract class BaseDisplayItem constructor(paint: Paint) : IDisplayItem, IRecycl
 
     override var height: Int = 0
 
-    protected val mPaint: Paint = paint
-
     override fun attachView(width: Int, height: Int) {
         this.width = width
         this.height = height
@@ -37,16 +34,18 @@ abstract class BaseDisplayItem constructor(paint: Paint) : IDisplayItem, IRecycl
         canvas: Canvas, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float,
         rotation: Float
     ) {
-        canvas.save()
-        canvas.scale(scaleX, scaleY, x + getScalePX(scaleX), y + getScalePY(scaleY))
-        canvas.rotate(
-            rotation, x + getRotatePX(rotation, scaleX),
-            y + getRotatePY(rotation, scaleY)
-        )
-
-        draw(canvas, x, y, alpha, scaleX, scaleY)
-
-        canvas.restore()
+        canvas.withSave {
+            if (scaleX != 1f || scaleY != 1f) {
+                canvas.scale(scaleX, scaleY, x + getScalePX(scaleX), y + getScalePY(scaleY))
+            }
+            if (rotation != 0f) {
+                canvas.rotate(
+                    rotation, x + getRotatePX(rotation, scaleX),
+                    y + getRotatePY(rotation, scaleY)
+                )
+            }
+            draw(canvas, x, y, alpha, scaleX, scaleY)
+        }
     }
 
 

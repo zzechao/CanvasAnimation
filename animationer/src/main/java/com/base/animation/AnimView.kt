@@ -90,4 +90,16 @@ class AnimView @JvmOverloads constructor(
     override fun getView(): View {
         return this
     }
+
+    override fun getViewByAnimName(name: String): View? {
+        val id =
+            AnimationEx.mApplication.resources.getIdentifier(
+                name,
+                "id",
+                AnimationEx.mApplication.packageName
+            )
+        return this.findFragmentOfGivenView()?.let {
+            it.view?.findViewById<View>(id)
+        } ?: this.getFragmentActivity()?.findViewById(id)
+    }
 }

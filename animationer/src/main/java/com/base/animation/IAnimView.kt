@@ -1,5 +1,6 @@
 package com.base.animation
 
+import android.annotation.SuppressLint
 import android.view.View
 import com.base.animation.item.BaseDisplayItem
 import com.base.animation.model.AnimPathObject
@@ -35,6 +36,10 @@ interface IAnimView {
     fun removeClickIntercept(iClickIntercept: IClickIntercept?)
 
     fun getView(): View? {
+        return null
+    }
+
+    fun getViewByAnimName(name: String): View? {
         return null
     }
 }

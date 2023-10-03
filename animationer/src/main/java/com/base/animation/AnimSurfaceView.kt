@@ -14,10 +14,10 @@ import com.base.animation.item.BaseDisplayItem
 import com.base.animation.model.AnimPathObject
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
-import kotlin.reflect.KClass
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlin.reflect.KClass
 
 /**
  * @author:zhouzechao
@@ -120,6 +120,18 @@ class AnimSurfaceView @JvmOverloads constructor(
 
     override fun getView(): View {
         return this
+    }
+
+    override fun getViewByAnimName(name: String): View? {
+        val id =
+            AnimationEx.mApplication.resources.getIdentifier(
+                name,
+                "id",
+                AnimationEx.mApplication.packageName
+            )
+        return this.findFragmentOfGivenView()?.let {
+            it.view?.findViewById<View>(id)
+        } ?: this.getFragmentActivity()?.findViewById(id)
     }
 
     private fun drawAnim(canvas: Canvas?) {

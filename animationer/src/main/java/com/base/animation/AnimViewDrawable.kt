@@ -7,6 +7,10 @@ import android.graphics.drawable.Drawable
 
 class AnimViewDrawable(var drawable: (Canvas) -> Unit) : Drawable() {
 
+    init {
+        isFilterBitmap = true
+    }
+
     override fun draw(canvas: Canvas) {
         //canvas.drawColor(Color.TRANSPARENT) // 设置画布的背景为透明
         drawable.invoke(canvas)

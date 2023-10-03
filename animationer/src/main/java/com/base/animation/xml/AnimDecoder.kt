@@ -57,18 +57,20 @@ object AnimDecoder {
                         val bitmapHeight = bitmap.height
                         val displayWidth = it.displayHeightSize * bitmapWidth / bitmapHeight
                         BitmapDisplayItem.of(bitmap).apply {
-                            setDisplaySize(displayWidth, it.displayHeightSize)
+                            if (displayWidth != 0) {
+                                setDisplaySize(displayWidth, it.displayHeightSize)
+                            }
                         }
                     }
 
-                    val start = it.decode(id)
+                    val start = it.decode(id, anim)
                     val path = AnimPathObject.Inner.with(
                         displayObject.build(), true
                     ).beginAnimPath(start)
                     var preNext: PathObject? = null
                     it.getNodes().forEach {
                         if (it is EndNode) {
-                            val next = it.decode(id)
+                            val next = it.decode(id, anim)
                             preNext?.let {
                                 path.beginNextAnimPath(it)
                             }
@@ -77,7 +79,7 @@ object AnimDecoder {
                         }
                         if (it is EndNodeContainer) {
                             val nextList = it.getNodes().map {
-                                it.decode(id)
+                                it.decode(id, anim)
                             }.filterNotNull()
                             preNext?.let {
                                 path.beginNextAnimPath(it)
