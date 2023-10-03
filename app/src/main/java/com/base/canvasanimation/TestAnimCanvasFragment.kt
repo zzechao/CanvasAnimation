@@ -53,9 +53,9 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
 
     private val xml = "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>" +
             "<anim>" +
-            "    <startAnim alpha=\"255\" displaySize=\"150\" startId=\"test1\" startL='{\"x\":0.0,\"y\":0.0}' rotation=\"0.0\" scaleX=\"0\" scaleY=\"0\" url=\"https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png\">" +
-            "        <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"1\" endId=\"test2\" endL='{\"x\":0.0,\"y\":0.0}' rotation=\"0.0\" scaleX=\"2.0\" scaleY=\"2.0\" url=\"\" />" +
-            "        <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"0\" endId=\"test3\" endL='{\"x\":0.0,\"y\":0.0}' rotation=\"0.0\" scaleX=\"0\" scaleY=\"0\" url=\"\" />" +
+            "    <startAnim alpha=\"255\" displaySize=\"150\" startIdName=\"test1\" startL='{\"x\":0.0,\"y\":0.0}' rotation=\"0.0\" scaleX=\"0\" scaleY=\"0\" url=\"https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png\">" +
+            "        <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"1\" endIdName=\"test2\" endL='{\"x\":0.0,\"y\":0.0}' rotation=\"0.0\" scaleX=\"2.0\" scaleY=\"2.0\" url=\"\" />" +
+            "        <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"0\" endIdName=\"test3\" endL='{\"x\":0.0,\"y\":0.0}' rotation=\"0.0\" scaleX=\"0\" scaleY=\"0\" url=\"\" />" +
             "    </startAnim>" +
             "</anim>"
 
