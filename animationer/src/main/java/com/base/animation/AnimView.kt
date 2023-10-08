@@ -67,10 +67,6 @@ class AnimView @JvmOverloads constructor(
         endAnimation()
     }
 
-    override fun hasDisplayItem(key: String, clazz: KClass<out BaseDisplayItem>): Boolean {
-        return helper.hasDisplayItem(key, clazz)
-    }
-
     override fun addAnimListener(iAnimListener: IAnimListener) {
         helper.addAnimListener(iAnimListener)
     }

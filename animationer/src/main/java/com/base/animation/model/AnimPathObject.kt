@@ -1,5 +1,6 @@
 package com.base.animation.model
 
+import android.util.Log
 import com.base.animation.item.BaseDisplayItem
 import java.util.concurrent.atomic.AtomicLong
 
@@ -33,7 +34,6 @@ data class AnimPathObject @JvmOverloads constructor(
          */
         private var position = 0
         private var animPathMap = mutableMapOf<Int, PathObjectsWithDer>()
-        private var displayItems: MutableList<BaseDisplayItem> = mutableListOf()
         private var pathCache: Boolean = false
 
         private var isInit = false
@@ -41,36 +41,12 @@ data class AnimPathObject @JvmOverloads constructor(
 
         companion object {
             @JvmStatic
-            fun with(displayItem: BaseDisplayItem, pathCache: Boolean = false): Inner {
-                return Inner(displayItem).apply {
-                    this.pathCache = pathCache
-                }
-            }
-
-            @JvmStatic
-            fun with(displayItems: List<BaseDisplayItem>, pathCache: Boolean = false): Inner {
-                return Inner(displayItems).apply {
-                    this.pathCache = pathCache
-                }
-            }
-
-            @JvmStatic
-            fun with(pathCache: Boolean = false): Inner {
-                return Inner().apply {
-                    this.pathCache = pathCache
-                }
+            fun with(): Inner {
+                return Inner()
             }
         }
 
         private constructor()
-
-        private constructor(displayItem: BaseDisplayItem) {
-            displayItems.add(displayItem)
-        }
-
-        private constructor(displayItems: List<BaseDisplayItem>) {
-            this.displayItems.addAll(displayItems)
-        }
 
         /**
          * 开始位置
@@ -90,23 +66,6 @@ data class AnimPathObject @JvmOverloads constructor(
             return this
         }
 
-        /**
-         * 多个开始位置
-         */
-        fun beginAnimPaths(
-            pathObject: MutableList<PathObject>
-        ): Inner {
-            if (!isSetStart) {
-                return this
-            }
-            isInit = true
-            isSetStart = false
-            beginPathObjects.clear()
-            animPathMap.clear()
-            position = 0
-            beginPathObjects[position] = pathObject
-            return this
-        }
 
         fun beginNextAnimPath(pathObject: PathObject): Inner {
             if (!isInit) {
@@ -117,18 +76,6 @@ data class AnimPathObject @JvmOverloads constructor(
             }
             isSetStart = false
             beginPathObjects[position] = mutableListOf(pathObject)
-            return this
-        }
-
-        fun beginNextAnimPaths(pathObject: MutableList<PathObject>): Inner {
-            if (!isInit) {
-                throw IllegalStateException("please run beginAnimPath,next run beginNextAnimPath")
-            }
-            if (!isSetStart) {
-                return this
-            }
-            isSetStart = false
-            beginPathObjects[position] = pathObject
             return this
         }
 
@@ -165,13 +112,14 @@ data class AnimPathObject @JvmOverloads constructor(
         /**
          * 轨迹创建
          */
-        fun build(): AnimPathObject {
+        fun build(displayItems: List<BaseDisplayItem>): AnimPathObject {
             if (!isInit) {
                 throw IllegalStateException("please run beginAnimPath,next run beginNextAnimPath")
             }
             if (beginPathObjects.isEmpty()) throw IllegalStateException("please set beginAnimPath")
             if (animPathMap.isEmpty()) throw IllegalStateException("please add doNextAnimPath")
             val displayItem = displayItems.associateBy { it.displayItemId }.toMutableMap()
+            Log.i("zzc","$beginPathObjects \n $animPathMap \n $displayItem")
             return AnimPathObject(
                 beginPathObjects, animPathMap, displayItem, pathCache = pathCache
             )

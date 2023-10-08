@@ -6,7 +6,6 @@ import android.graphics.PointF
 import android.os.Handler
 import android.os.Looper
 import android.view.MotionEvent
-import android.view.View
 import android.view.WindowManager
 import com.base.animation.helper.PathObjectDeal
 import com.base.animation.item.BaseDisplayItem
@@ -90,9 +89,6 @@ class AnimViewHelper(context: Context, private val doFrame: () -> Unit) : IAnimV
         pathObjectDeal.removeAnimId(animId)
     }
 
-    override fun hasDisplayItem(key: String, clazz: KClass<out BaseDisplayItem>): Boolean {
-        return pathObjectDeal.hasDisplayItem(key, clazz)
-    }
 
     override fun addAnimListener(iAnimListener: IAnimListener) {
         checkInMainThread {

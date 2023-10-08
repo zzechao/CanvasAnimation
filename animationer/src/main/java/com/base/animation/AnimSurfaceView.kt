@@ -98,10 +98,6 @@ class AnimSurfaceView @JvmOverloads constructor(
         holder.surface.release()
     }
 
-    override fun hasDisplayItem(key: String, clazz: KClass<out BaseDisplayItem>): Boolean {
-        return helper.hasDisplayItem(key, clazz)
-    }
-
     override fun addAnimListener(iAnimListener: IAnimListener) {
         helper.addAnimListener(iAnimListener)
     }

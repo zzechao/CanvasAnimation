@@ -1,7 +1,6 @@
 package com.base.animation
 
 import android.util.Log
-import android.view.View
 import com.base.animation.item.BaseDisplayItem
 import java.security.MessageDigest
 import kotlin.reflect.KClass
@@ -11,32 +10,27 @@ import kotlin.reflect.KClass
  * @date: 3/31/21
  * description：处理是否要重新获取bitmap
  */
-class DisplayObject private constructor(private val animView: IAnimView) {
+class DisplayObject private constructor() {
 
     private val displayItems = mutableListOf<BaseDisplayItem>()
 
     companion object {
         @JvmStatic
         fun with(
-            animView: IAnimView
         ): DisplayObject {
-            return DisplayObject(animView)
+            return DisplayObject()
         }
     }
 
     fun <T : BaseDisplayItem> add(
         key: String, displayWidth: Int, displayHeight: Int, kClass:
-        KClass<out BaseDisplayItem>, roomView: View? = null, create: () -> T
+        KClass<out BaseDisplayItem>, create: () -> T?
     ): String {
         val md5Key = getDisPlayItemKey(key, displayWidth, displayHeight, kClass)
-        if (!animView.hasDisplayItem(md5Key, kClass)) {
-            val displayItem = create().apply {
+        if (!AnimCache.displayItemCache.hasDisplayItem(md5Key)) {
+            val displayItem = create()?.apply {
                 displayItemId = md5Key
-                roomView?.let {
-                    attachView(roomView.width, roomView.height)
-                }
-                setDisplaySize(displayWidth, displayHeight)
-            }
+            } ?: return ""
             displayItems.add(displayItem)
         }
         return md5Key
@@ -44,17 +38,13 @@ class DisplayObject private constructor(private val animView: IAnimView) {
 
     suspend fun <T : BaseDisplayItem> suspendAdd(
         key: String, displayWidth: Int, displayHeight: Int, kClass:
-        KClass<out BaseDisplayItem>, roomView: View? = null, create: suspend () -> T
+        KClass<out BaseDisplayItem>, create: suspend () -> T?
     ): String {
         val md5Key = getDisPlayItemKey(key, displayWidth, displayHeight, kClass)
-        if (!animView.hasDisplayItem(md5Key, kClass)) {
-            val displayItem = create().apply {
+        if (!AnimCache.displayItemCache.hasDisplayItem(md5Key)) {
+            val displayItem = create()?.apply {
                 displayItemId = md5Key
-                roomView?.let {
-                    attachView(roomView.width, roomView.height)
-                }
-                setDisplaySize(displayWidth, displayHeight)
-            }
+            } ?: return ""
             displayItems.add(displayItem)
         }
         return md5Key
@@ -63,18 +53,14 @@ class DisplayObject private constructor(private val animView: IAnimView) {
     fun <T : BaseDisplayItem> add(
         key: String,
         kClass: KClass<out BaseDisplayItem>,
-        roomView: View? = null,
-        create: () -> T
+        create: () -> T?
     ): String {
         val md5Key = getDisPlayItemKey(key, kClass = kClass)
-        if (!animView.hasDisplayItem(md5Key, kClass)) {
+        if (!AnimCache.displayItemCache.hasDisplayItem(md5Key)) {
             Log.i("ttt", "hasDisplayItem")
-            val displayItem = create().apply {
+            val displayItem = create()?.apply {
                 displayItemId = md5Key
-                roomView?.let {
-                    attachView(roomView.width, roomView.height)
-                }
-            }
+            } ?: return ""
             displayItems.add(displayItem)
         }
         return md5Key
@@ -83,17 +69,13 @@ class DisplayObject private constructor(private val animView: IAnimView) {
     suspend fun <T : BaseDisplayItem> suspendAdd(
         key: String,
         kClass: KClass<out BaseDisplayItem>,
-        roomView: View? = null,
-        create: suspend () -> T
+        create: suspend () -> T?
     ): String {
         val md5Key = getDisPlayItemKey(key, kClass = kClass)
-        if (!animView.hasDisplayItem(md5Key, kClass)) {
-            val displayItem = create().apply {
+        if (!AnimCache.displayItemCache.hasDisplayItem(md5Key)) {
+            val displayItem = create()?.apply {
                 displayItemId = md5Key
-                roomView?.let {
-                    attachView(roomView.width, roomView.height)
-                }
-            }
+            } ?: return ""
             displayItems.add(displayItem)
         }
         return md5Key

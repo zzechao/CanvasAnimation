@@ -1,7 +1,6 @@
 package com.base.animation.item
 
 import android.graphics.Canvas
-import android.graphics.Paint
 import androidx.annotation.CallSuper
 import androidx.core.graphics.withSave
 import com.base.animation.IDisplayItem
@@ -13,22 +12,13 @@ import java.util.concurrent.atomic.AtomicLong
  * @date: 2020/12/8
  * description：display模块
  */
-abstract class BaseDisplayItem constructor(val paint: Paint) : IDisplayItem, IRecycle {
+abstract class BaseDisplayItem() : IDisplayItem, IRecycle {
 
     open var displayHeight: Int = 0
     open var displayWidth: Int = 0
     private var itemId = animDisplayId.incrementAndGet()
 
     override var displayItemId: String = itemId.toString()
-
-    override var width: Int = 0
-
-    override var height: Int = 0
-
-    override fun attachView(width: Int, height: Int) {
-        this.width = width
-        this.height = height
-    }
 
     override fun draw(
         canvas: Canvas, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float,
@@ -62,8 +52,6 @@ abstract class BaseDisplayItem constructor(val paint: Paint) : IDisplayItem, IRe
     override fun recycle() {
         displayWidth = 0
         displayHeight = 0
-        width = 0
-        height = 0
     }
 
     override fun setDisplaySize(displayWidth: Int, displayHeight: Int) {

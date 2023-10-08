@@ -22,10 +22,6 @@ class StartNode : IAnimNode {
     @JvmField
     var layoutIdName: String = ""
 
-    @AnimAttributeName("url", UrlAttributeCoder::class)
-    @JvmField
-    var url: String = ""
-
     @AnimAttributeName("scaleX", DefaultAttributeCoder::class)
     @JvmField
     var scaleX = 1f
@@ -41,10 +37,6 @@ class StartNode : IAnimNode {
     @AnimAttributeName("rotation", DefaultAttributeCoder::class)
     @JvmField
     var rotation = 0f
-
-    @AnimAttributeName("displaySize", DefaultAttributeCoder::class)
-    @JvmField
-    var displayHeightSize = 80
 
     private val childNodes by lazy(LazyThreadSafetyMode.NONE) {
         mutableListOf<IAnimNode>()

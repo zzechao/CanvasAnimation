@@ -11,16 +11,7 @@ import com.base.animation.model.AnimDrawObject
  */
 interface IDisplayItem {
 
-    var width: Int
-
-    var height: Int
-
     var displayItemId: String
-
-    /**
-     * 接触view的大小后
-     */
-    fun attachView(width: Int, height: Int)
 
     fun getScalePX(scaleX: Float): Float
 

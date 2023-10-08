@@ -4,7 +4,6 @@ import com.base.animation.Animer
 import com.base.animation.item.BaseDisplayItem
 import com.google.common.cache.CacheBuilder
 import java.util.concurrent.TimeUnit
-import kotlin.reflect.KClass
 
 /**
  * @author:zhouzechao
@@ -19,14 +18,14 @@ class DisplayItemCache {
     private val caches: com.google.common.cache.Cache<String, BaseDisplayItem> =
         CacheBuilder.newBuilder()
             .concurrencyLevel(4)
-            .maximumSize(10)
+            .maximumSize(50)
             .initialCapacity(5)
-            .expireAfterAccess(5, TimeUnit.SECONDS)
-            .removalListener<String, BaseDisplayItem> {}
+            .expireAfterWrite(60, TimeUnit.SECONDS)
+            .expireAfterAccess(60, TimeUnit.SECONDS)
             .build()
 
 
-    fun <T : BaseDisplayItem> putDisplayItems(displayItems: MutableMap<String, T>) {
+    fun putDisplayItems(displayItems: MutableMap<String, out BaseDisplayItem>) {
         Animer.log.i(TAG, "putDisplayItems displayItems:${displayItems.size}")
         displayItems.map {
             caches.put(it.key, it.value)
@@ -43,7 +42,7 @@ class DisplayItemCache {
     /**
      * 是否含有对应的key和clazz
      */
-    fun hasDisplayItem(key: String, clazz: KClass<out BaseDisplayItem>): Boolean {
+    fun hasDisplayItem(key: String): Boolean {
         return caches.getIfPresent(key) != null
     }
 

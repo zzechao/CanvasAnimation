@@ -7,7 +7,6 @@ import android.graphics.PointF
 import android.graphics.Rect
 import android.graphics.RectF
 import android.util.Log
-import com.base.animation.Animer
 import com.base.animation.IClickIntercept
 import com.base.animation.cache.AteDisplayItem
 import com.base.animation.model.AnimDrawObject
@@ -20,11 +19,15 @@ import com.base.animation.model.AnimDrawObject
 private const val TAG = "BitmapDisplayItem"
 
 @AteDisplayItem(usePoolCache = true)
-class BitmapDisplayItem private constructor() :
-    BaseDisplayItem(Paint().apply {
-        isAntiAlias = false
-        isFilterBitmap = true
-    }) {
+class BitmapDisplayItem constructor() :
+    BaseDisplayItem() {
+
+    private val paint by lazy {
+        Paint().apply {
+            isAntiAlias = false
+            isFilterBitmap = true
+        }
+    }
 
     private var bitmapWidth: Int = 50
     private var bitmapHeight: Int = 50
@@ -39,23 +42,6 @@ class BitmapDisplayItem private constructor() :
             bitmapHeight = value?.height ?: 50
             Log.i(TAG, "$bitmapWidth - $bitmapHeight")
         }
-
-    companion object {
-        fun of(bitmap: Bitmap): BitmapDisplayItem {
-            return BitmapDisplayItem().apply {
-                Animer.log.i(TAG, "of this:$this")
-                mBitmap = bitmap
-                reInit()
-            }
-        }
-    }
-
-    override fun reInit() {
-        super.reInit()
-        mBitmapRect = null
-        mDisplayRect = null
-        displaySizeSet = false
-    }
 
     override fun draw(
         canvas: Canvas, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float

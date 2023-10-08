@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.PointF
 import android.os.Bundle
 import android.util.Log
@@ -26,6 +27,7 @@ import com.base.animation.model.AnimDrawObject
 import com.base.animation.model.AnimPathObject
 import com.base.animation.model.PathObject
 import com.base.animation.xml.AnimDecoder
+import com.base.animation.xml.AnimDecoder2
 import com.base.animation.xml.AnimEncoder
 import com.base.animation.xml.buildAnimNode
 import com.base.animation.xml.buildString
@@ -84,9 +86,9 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
         super.onViewCreated(view, savedInstanceState)
         anim_1?.setOnClickListener {
             lifecycleScope.launch {
-                repeat(200) {
-                    startSingleAnim3()
-                    delay(50)
+                repeat(50) {
+                    startSingleAnim2()
+                    delay(100)
                 }
             }
         }
@@ -172,16 +174,17 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
     private fun startSingleAnim() {
         val size = 80
 
-        val displayObject = DisplayObject.with(animView = anim_surface)
+        val displayObject = DisplayObject.with()
         val displayItemId1 = displayObject.add(
-            key = "xin_startSingleAnim", kClass = BitmapDisplayItem::class, roomView = anim_surface
+            key = "xin_startSingleAnim", kClass = BitmapDisplayItem::class
         ) {
             val bitmap =
                 BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, size, size)
             val bitmapWidth = bitmap.width
             val bitmapHeight = bitmap.height
             val displayWidth = size * bitmapWidth / bitmapHeight
-            return@add BitmapDisplayItem.of(bitmap).apply {
+            return@add BitmapDisplayItem().apply {
+                mBitmap = bitmap
                 setDisplaySize(displayWidth, size)
             }
         }
@@ -220,11 +223,10 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
         )
         anim_surface?.addAnimDisplay(
             AnimPathObject.Inner.with(
-                displayObject.build(), true
             ).beginAnimPath(start).doAnimPath(1000, next).beginNextAnimPath(next)
                 .doAnimPath(1000, next1).beginNextAnimPath(next1).doAnimPath(200, next2)
                 .beginNextAnimPath(next2)
-                .doAnimPath(200, next3).build()
+                .doAnimPath(200, next3).build(displayObject.build())
         )
     }
 
@@ -232,39 +234,130 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
         val size = 80
         val url = "https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png"
         AnimEncoder().buildAnimNode {
-            startNode {
+            imageNode {
                 this.url = url
-                point = PointF(0f, 0f)
-                scaleX = 0.5f
-                scaleY = 0.5f
-                displayHeightSize = 80
-                endNode {
+                this.displayHeightSize = size
+                startNode {
+                    point = PointF(0f, 0f)
+                    scaleX = 0.5f
+                    scaleY = 0.5f
+                    endNode {
+                        point = PointF(
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                                .toFloat() / 2 - size / 2,
+                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                                .toFloat() / 2 - size / 2
+                        )
+                        scaleX = 2f
+                        scaleY = 2f
+                        durTime = 1000
+                        interpolator = InterpolatorEnum.Accelerate.type
+                    }
+                    txtNode {
+                        this.txt = "测试数据"
+                        this.color = Color.BLUE
+                        this.fontSize = 20
+                        startNode {
+                            point = PointF(
+                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                                    .toFloat() / 2 - size / 2,
+                                size / 2f
+                            )
+                            scaleX = 0f
+                            scaleY = 0f
+                            endNode {
+                                point = PointF(
+                                    0f,
+                                    DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                                        .toFloat() / 2 - size / 2
+                                )
+                                scaleX = 3f
+                                scaleY = 3f
+                                durTime = 1000
+                                interpolator = InterpolatorEnum.Accelerate.type
+                            }
+                        }
+                    }
+                    layoutNode {
+                        this.layoutIdName = "view_test_layout"
+                        endNode {
+                            point = PointF(
+                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                                    .toFloat() / 2 - size / 2,
+                                DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                                    .toFloat() - size / 2
+                            )
+                            scaleX = 2f
+                            scaleY = 2f
+                            durTime = 1000
+                            interpolator = InterpolatorEnum.Linear.type
+                        }
+                    }
+                    endNode {
+                        point = PointF(
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                                .toFloat() - size / 2,
+                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                                .toFloat() / 2 - size / 2
+                        )
+                        scaleX = 2f
+                        scaleY = 2f
+                        durTime = 1000
+                        interpolator = InterpolatorEnum.Decelerate.type
+                    }
+                    layoutNode {
+                        this.layoutIdName = "view_test_layout"
+                        endNode {
+                            point = PointF(
+                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                                    .toFloat() / 2 - size / 2,
+                                size / 2f
+                            )
+                            scaleX = 0f
+                            scaleY = 0f
+                            durTime = 1000
+                            interpolator = InterpolatorEnum.Linear.type
+                        }
+                    }
+                }
+            }
+            layoutNode {
+                this.layoutIdName = "view_test_layout"
+                startNode {
                     point = PointF(
                         DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
                             .toFloat() / 2 - size / 2,
-                        DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
-                            .toFloat() / 2 - size / 2
+                        size / 2f
                     )
-                    scaleX = 2f
-                    scaleY = 2f
-                    durTime = 1000
-                    interpolator = InterpolatorEnum.Accelerate.type
-                }
-                endNode {
-                    point = PointF(
-                        DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
-                            .toFloat() / 2 - size / 2, 9f
-                    )
-                    scaleX = 0.5f
-                    scaleY = 0.5f
-                    durTime = 1000
+                    scaleX = 0f
+                    scaleY = 0f
+                    endNode {
+                        point = PointF(
+                            0f,
+                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                                .toFloat() / 2 - size / 2
+                        )
+                        scaleX = 3f
+                        scaleY = 3f
+                        durTime = 1000
+                        interpolator = InterpolatorEnum.Accelerate.type
+                    }
                 }
             }
         }.apply {
             Log.i("tttt2", this.buildString())
             lifecycleScope.launch(Dispatchers.IO) {
-                AnimDecoder.suspendPlayAnimWithNode(url, anim_surface, this@apply) {
-                    BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, 100, 100)
+                AnimDecoder2.suspendPlayAnimWithAnimNode(
+                    anim_surface,
+                    this@apply,
+                ) { node, displayItem ->
+                    when (displayItem) {
+                        is BitmapDisplayItem -> {
+                            displayItem.mBitmap =
+                                BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, 100, 100)
+                        }
+                    }
+                    displayItem
                 }
             }
         }
@@ -292,16 +385,17 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
     private fun startMoreAnim() {
         val size = 80
 
-        val displayObject = DisplayObject.with(animView = anim_surface)
+        val displayObject = DisplayObject.with()
         val displayItemId = displayObject.add(
-            key = "xin_startMoreAnim", kClass = BitmapDisplayItem::class, roomView = anim_surface
+            key = "xin_startMoreAnim", kClass = BitmapDisplayItem::class
         ) {
             val bitmap =
                 BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, size, size)
             val bitmapWidth = bitmap.width
             val bitmapHeight = bitmap.height
             val displayWidth = size * bitmapWidth / bitmapHeight
-            return@add BitmapDisplayItem.of(bitmap).apply {
+            return@add BitmapDisplayItem().apply {
+                mBitmap = bitmap
                 setDisplaySize(displayWidth, size)
             }
         }
@@ -347,10 +441,11 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
             )
         )
         anim_surface?.addAnimDisplay(
-            AnimPathObject.Inner.with(displayObject.build(), true).beginAnimPath(start)
+            AnimPathObject.Inner.with().beginAnimPath(start)
                 .doAnimPath(1500, next)
                 .beginNextAnimPath(next)
-                .doAnimPaths(1500, mutableListOf(next1, next2, next3, next4)).build()
+                .doAnimPaths(1500, mutableListOf(next1, next2, next3, next4))
+                .build(displayObject.build())
         )
     }
 
@@ -359,11 +454,9 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
         val url = "https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png"
         AnimEncoder().buildAnimNode {
             startNode {
-                this.url = url
                 point = PointF(0f, 0f)
                 scaleX = 0.5f
                 scaleY = 0.5f
-                displayHeightSize = 80
                 endNode {
                     point = PointF(
                         DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
@@ -431,16 +524,17 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
      */
     private fun startAnimRain() {
         val size = 80
-        val displayObject = DisplayObject.with(animView = anim_surface)
+        val displayObject = DisplayObject.with()
         val displayItemId = displayObject.add(
-            key = "xin_startMoreAnim", kClass = BitmapDisplayItem::class, roomView = anim_surface
+            key = "xin_startMoreAnim", kClass = BitmapDisplayItem::class
         ) {
             val bitmap =
                 BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, size, size)
             val bitmapWidth = bitmap.width
             val bitmapHeight = bitmap.height
             val displayWidth = size * bitmapWidth / bitmapHeight
-            return@add BitmapDisplayItem.of(bitmap).apply {
+            return@add BitmapDisplayItem().apply {
+                mBitmap = bitmap
                 setDisplaySize(displayWidth, size)
             }
         }
@@ -469,8 +563,8 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                 )
             val time = (1000L..10000L).random()
             anim_surface?.addAnimDisplay(
-                AnimPathObject.Inner.with(displayObject.build()).beginAnimPath(start)
-                    .doAnimPath(time, next).build()
+                AnimPathObject.Inner.with().beginAnimPath(start)
+                    .doAnimPath(time, next).build(displayObject.build())
                     .apply {
                         clickable = true
                         expand = "rain"
@@ -481,7 +575,7 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
     override fun intercept(animId: Long, animDrawObject: AnimDrawObject, touchPointF: PointF) {
         Toast.makeText(this@TestAnimCanvasFragment.context, "$animId", Toast.LENGTH_SHORT).show()
         anim_surface?.removeAnimId(animId)
-        startSingleAnim()
+        //startSingleAnim()
     }
 
     override fun onDestroyView() {

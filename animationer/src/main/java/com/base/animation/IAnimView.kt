@@ -25,8 +25,6 @@ interface IAnimView {
 
     fun removeAnimId(animId: Long)
 
-    fun hasDisplayItem(key: String, clazz: KClass<out BaseDisplayItem>): Boolean
-
     fun addAnimListener(iAnimListener: IAnimListener)
 
     fun removeAnimListener(iAnimListener: IAnimListener?)

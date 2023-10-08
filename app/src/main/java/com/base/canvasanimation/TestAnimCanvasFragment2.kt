@@ -97,16 +97,17 @@ class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
     private fun startSingleAnim() {
         val size = 80
 
-        val displayObject = DisplayObject.with(animView = anim_surface)
+        val displayObject = DisplayObject.with()
         val displayItemId1 = displayObject.add(
-            key = "xin_startSingleAnim", kClass = BitmapDisplayItem::class, roomView = anim_surface
+            key = "xin_startSingleAnim", kClass = BitmapDisplayItem::class
         ) {
             val bitmap =
                 BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, size, size)
             val bitmapWidth = bitmap.width
             val bitmapHeight = bitmap.height
             val displayWidth = size * bitmapWidth / bitmapHeight
-            return@add BitmapDisplayItem.of(bitmap).apply {
+            return@add BitmapDisplayItem().apply {
+                mBitmap = bitmap
                 setDisplaySize(displayWidth, size)
             }
         }
@@ -145,11 +146,10 @@ class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
         )
         anim_surface?.addAnimDisplay(
             AnimPathObject.Inner.with(
-                displayObject.build(), true
             ).beginAnimPath(start).doAnimPath(1000, next).beginNextAnimPath(next)
                 .doAnimPath(1000, next1).beginNextAnimPath(next1).doAnimPath(200, next2)
                 .beginNextAnimPath(next2)
-                .doAnimPath(200, next3).build()
+                .doAnimPath(200, next3).build(displayObject.build())
         )
     }
 
@@ -158,7 +158,6 @@ class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
         val url = "https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png"
         AnimEncoder().buildAnimNode {
             startNode {
-                this.url = url
                 point = PointF(0f, 0f)
                 scaleX = 0.5f
                 scaleY = 0.5f
@@ -206,11 +205,9 @@ class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
         val url = "https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png"
         AnimEncoder().buildAnimNode {
             startNode {
-                this.url = url
                 point = PointF(0f, 0f)
                 scaleX = 0.5f
                 scaleY = 0.5f
-                displayHeightSize = 80
                 endNode {
                     point = PointF(
                         DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment2.context)
@@ -278,16 +275,17 @@ class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
     private fun startMoreAnim() {
         val size = 80
 
-        val displayObject = DisplayObject.with(animView = anim_surface)
+        val displayObject = DisplayObject.with()
         val displayItemId = displayObject.add(
-            key = "xin_startMoreAnim", kClass = BitmapDisplayItem::class, roomView = anim_surface
+            key = "xin_startMoreAnim", kClass = BitmapDisplayItem::class
         ) {
             val bitmap =
                 BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, size, size)
             val bitmapWidth = bitmap.width
             val bitmapHeight = bitmap.height
             val displayWidth = size * bitmapWidth / bitmapHeight
-            return@add BitmapDisplayItem.of(bitmap).apply {
+            return@add BitmapDisplayItem().apply {
+                mBitmap = bitmap
                 setDisplaySize(displayWidth, size)
             }
         }
@@ -333,10 +331,11 @@ class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
             )
         )
         anim_surface?.addAnimDisplay(
-            AnimPathObject.Inner.with(displayObject.build(), true).beginAnimPath(start)
+            AnimPathObject.Inner.with().beginAnimPath(start)
                 .doAnimPath(1500, next)
                 .beginNextAnimPath(next)
-                .doAnimPaths(1500, mutableListOf(next1, next2, next3, next4)).build()
+                .doAnimPaths(1500, mutableListOf(next1, next2, next3, next4))
+                .build(displayObject.build())
         )
     }
 
@@ -345,16 +344,17 @@ class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
      */
     private fun startAnimRain() {
         val size = 80
-        val displayObject = DisplayObject.with(animView = anim_surface)
+        val displayObject = DisplayObject.with()
         val displayItemId = displayObject.add(
-            key = "xin_startMoreAnim", kClass = BitmapDisplayItem::class, roomView = anim_surface
+            key = "xin_startMoreAnim", kClass = BitmapDisplayItem::class
         ) {
             val bitmap =
                 BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, size, size)
             val bitmapWidth = bitmap.width
             val bitmapHeight = bitmap.height
             val displayWidth = size * bitmapWidth / bitmapHeight
-            return@add BitmapDisplayItem.of(bitmap).apply {
+            return@add BitmapDisplayItem().apply {
+                mBitmap = bitmap
                 setDisplaySize(displayWidth, size)
             }
         }
@@ -383,8 +383,8 @@ class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
                 )
             val time = (1000L..10000L).random()
             anim_surface?.addAnimDisplay(
-                AnimPathObject.Inner.with(displayObject.build()).beginAnimPath(start)
-                    .doAnimPath(time, next).build()
+                AnimPathObject.Inner.with().beginAnimPath(start)
+                    .doAnimPath(time, next).build(displayObject.build())
                     .apply {
                         clickable = true
                         expand = "rain"

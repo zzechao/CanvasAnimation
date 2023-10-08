@@ -4,7 +4,10 @@ import android.util.Log
 import com.base.animation.node.AnimNode
 import com.base.animation.node.EndNode
 import com.base.animation.node.EndNodeContainer
+import com.base.animation.node.ImageNode
+import com.base.animation.node.LayoutNode
 import com.base.animation.node.StartNode
+import com.base.animation.node.TextNode
 import com.base.animation.xml.node.XmlBaseAnimNode
 
 private const val TAG = "AnimEncoder"
@@ -36,6 +39,42 @@ class AnimEncoder {
 
     fun endContainer(onInit: EndNodeContainer.(encoder: AnimEncoder) -> Unit) {
         curNode.addNode(EndNodeContainer().apply {
+            val lastNode = curNode
+            try {
+                curNode = this
+                onInit(this, this@AnimEncoder)
+            } finally {
+                curNode = lastNode
+            }
+        })
+    }
+
+    fun imageNode(onInit: ImageNode.(encoder: AnimEncoder) -> Unit) {
+        curNode.addNode(ImageNode().apply {
+            val lastNode = curNode
+            try {
+                curNode = this
+                onInit(this, this@AnimEncoder)
+            } finally {
+                curNode = lastNode
+            }
+        })
+    }
+
+    fun txtNode(onInit: TextNode.(encoder: AnimEncoder) -> Unit){
+        curNode.addNode(TextNode().apply {
+            val lastNode = curNode
+            try {
+                curNode = this
+                onInit(this, this@AnimEncoder)
+            } finally {
+                curNode = lastNode
+            }
+        })
+    }
+
+    fun layoutNode(onInit: LayoutNode.(encoder: AnimEncoder) -> Unit){
+        curNode.addNode(LayoutNode().apply {
             val lastNode = curNode
             try {
                 curNode = this

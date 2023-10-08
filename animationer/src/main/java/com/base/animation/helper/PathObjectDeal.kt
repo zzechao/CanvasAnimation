@@ -1,6 +1,7 @@
 package com.base.animation.helper
 
 import android.graphics.PointF
+import com.base.animation.AnimCache
 import com.base.animation.Animer
 import com.base.animation.IAnimListener
 import com.base.animation.IAnimView
@@ -25,7 +26,6 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
 import kotlin.math.ceil
-import kotlin.reflect.KClass
 
 /**
  * @author:zhouzechao
@@ -62,11 +62,6 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
     private val animDrawIds: CopyOnWriteArrayList<Long> = CopyOnWriteArrayList()
 
     /**
-     * 画布缓存
-     */
-    private val displayItemCache = DisplayItemCache()
-
-    /**
      * 路径缓存
      */
     private val pathCacheMap: com.google.common.cache.Cache<String,
@@ -75,6 +70,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
             .concurrencyLevel(4)
             .maximumSize(10)
             .initialCapacity(5)
+            .expireAfterWrite(5, TimeUnit.SECONDS)
             .expireAfterAccess(5, TimeUnit.SECONDS)
             .build()
 
@@ -113,7 +109,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
                 launch(coroutineContext) {
                     Animer.log.i("tttt1", "calculation start")
                     if (animPath.displayItemsMap.isNotEmpty()) {
-                        displayItemCache.putDisplayItems(animPath.displayItemsMap)
+                        AnimCache.displayItemCache.putDisplayItems(animPath.displayItemsMap)
                     }
                     val cacheKey = pathCachePools.conventKey(intervalDeal, animPath)
                     val drawsMap = mutableMapOf<Int, MutableList<AnimDrawObject>>()
@@ -266,7 +262,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
      * 获取显示的displayItem
      */
     fun getDisplayItem(displayItemId: String): BaseDisplayItem? {
-        return displayItemCache.getDisplayItem(displayItemId)
+        return AnimCache.displayItemCache.getDisplayItem(displayItemId)
     }
 
     /**
@@ -282,7 +278,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
      */
     fun release() {
         animDrawObjects.clear()
-        displayItemCache.clear()
+        AnimCache.displayItemCache.clear()
         clickIntercepts.clear()
         animListeners.clear()
         animDrawIds.clear()
@@ -296,12 +292,6 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
         return animDrawIds.isNotEmpty()
     }
 
-    /**
-     * 是否有对应画布
-     */
-    fun hasDisplayItem(key: String, clazz: KClass<out BaseDisplayItem>): Boolean {
-        return displayItemCache.hasDisplayItem(key, clazz)
-    }
 
     /**
      * 清空执行中ids

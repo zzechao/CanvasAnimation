@@ -1,11 +1,15 @@
 package com.base.animation.node
 
+import com.base.animation.item.BaseDisplayItem
 import com.base.animation.xml.XmlWriterHelper
-import com.base.animation.xml.node.AnimNodeName
+import com.base.animation.xml.node.AnimAttributeName
+import com.base.animation.xml.node.coder.DefaultAttributeCoder
+import kotlin.reflect.KClass
 
-@AnimNodeName(name = "anim")
-class AnimNode : IAnimNode {
-    
+open class IXmlDrawableNode : IAnimNode {
+
+    open var displayItem: KClass<out BaseDisplayItem> = BaseDisplayItem::class
+
     private val childNodes by lazy(LazyThreadSafetyMode.NONE) {
         mutableListOf<IAnimNode>()
     }
