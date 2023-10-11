@@ -25,8 +25,11 @@ class PathCache {
         }
         endPointsMap.map {
             key += "_"
-            key += it.value.pathObjects.map {
-                "end_${it.alpha}_${it.point.x}_${it.point.y}_${it.rotation}_${it.scaleX}_${it.scaleY}_${it.interpolator
+            key += it.value.map {
+                val pathObject = it.pathObject
+                "end_${pathObject.alpha}_${pathObject.point.x}_${pathObject.point.y}_" +
+                        "${pathObject.rotation}_${pathObject.scaleX}_${pathObject.scaleY}" +
+                        "_${pathObject.interpolator
                     .javaClass.name}"
             }
         }

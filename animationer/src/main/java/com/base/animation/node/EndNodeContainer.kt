@@ -9,17 +9,9 @@ import com.base.animation.xml.node.coder.UrlAttributeCoder
 @AnimNodeName("endContainer")
 class EndNodeContainer : IAnimNode {
 
-    @AnimAttributeName("url", UrlAttributeCoder::class)
-    @JvmField
-    var url: String = ""
-
-    @AnimAttributeName("displaySize", DefaultAttributeCoder::class)
-    @JvmField
-    var displayHeightSize = 0
-
     @AnimAttributeName("durTime", DefaultAttributeCoder::class)
     @JvmField
-    var durTime: Long = 1000
+    var durTime: Long = 0
 
     private val childNodes by lazy(LazyThreadSafetyMode.NONE) {
         mutableListOf<IAnimNode>()

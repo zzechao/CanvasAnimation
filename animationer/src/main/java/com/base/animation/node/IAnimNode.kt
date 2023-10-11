@@ -105,6 +105,7 @@ interface IAnimNode : XmlBaseAnimNode, IXmlObjNodeParser {
                         field.set(this, it)
                     }
                 }
+                Log.i("zzc", "parseAndSetField ${annotation.name} $name $value ${field.get(this)}")
                 return true
             }
         } catch (e: Exception) {

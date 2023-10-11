@@ -40,7 +40,7 @@ class EndNode : IAnimNode {
 
     @AnimAttributeName("durTime", DefaultAttributeCoder::class)
     @JvmField
-    var durTime: Long = 1000
+    var durTime: Long = 0
 
     @AnimAttributeName("interpolator", InterpolatorAttributeCoder::class)
     @JvmField

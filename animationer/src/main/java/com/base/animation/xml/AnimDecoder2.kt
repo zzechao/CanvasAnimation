@@ -19,8 +19,25 @@ import com.base.animation.node.LayoutNode
 import com.base.animation.node.StartNode
 import com.base.animation.node.TextNode
 import com.base.animation.xml.node.AnimNodeChain
+import com.base.animation.xml.node.coder.IAttributeCoder
 
 object AnimDecoder2 {
+
+    private val decoder by lazy {
+        XmlObjectDecoder().apply {
+            registerNodeCreatetor(AnimNode::class.java)
+            registerNodeCreatetor(StartNode::class.java)
+            registerNodeCreatetor(EndNode::class.java)
+            registerNodeCreatetor(EndNodeContainer::class.java)
+            registerNodeCreatetor(ImageNode::class.java)
+            registerNodeCreatetor(TextNode::class.java)
+            registerNodeCreatetor(LayoutNode::class.java)
+        }
+    }
+
+    val mapNodeAttributeCoderMap by lazy {
+        mutableMapOf<String, IAttributeCoder<out Any>>()
+    }
 
     suspend fun suspendPlayAnimWithAnimNode(
         anim: IAnimView,
@@ -58,7 +75,8 @@ object AnimDecoder2 {
         displayObject: DisplayObject,
         animNode: IAnimNode,
         chain: AnimNodeChain,
-        dealDisplayItem: DealDisplayItem
+        dealDisplayItem: DealDisplayItem,
+        isContainer: Boolean = false
     ) {
         when (animNode) {
             is ImageNode -> {
@@ -82,7 +100,7 @@ object AnimDecoder2 {
                 if (displayId.isNotEmpty()) {
                     chain.curDisplayId = displayId
                 }
-                Log.i("zzc", "ImageNode $displayId")
+                if (isContainer) return
                 animNode.getNodes().forEach {
                     if (it is EndNode || it is EndNodeContainer || it is StartNode) {
                         dealAnim(displayObject, it, chain, dealDisplayItem)
@@ -98,7 +116,11 @@ object AnimDecoder2 {
                     kClass = StringDisplayItem::class
                 ) {
                     val stringDisplayItem =
-                        StringDisplayItem(animNode.fontSize, animNode.txt, animNode.color)
+                        StringDisplayItem(
+                            animNode.fontSize,
+                            animNode.txt,
+                            animNode.color
+                        )
                     dealDisplayItem.invoke(
                         animNode,
                         stringDisplayItem
@@ -107,7 +129,7 @@ object AnimDecoder2 {
                 if (displayId.isNotEmpty()) {
                     chain.curDisplayId = displayId
                 }
-                Log.i("zzc", "TextNode $displayId")
+                if (isContainer) return
                 animNode.getNodes().forEach {
                     if (it is EndNode || it is EndNodeContainer || it is StartNode) {
                         dealAnim(displayObject, it, chain, dealDisplayItem)
@@ -143,7 +165,7 @@ object AnimDecoder2 {
                 if (displayId.isNotEmpty()) {
                     chain.curDisplayId = displayId
                 }
-                Log.i("zzc", "LayoutNode $displayId")
+                if (isContainer) return
                 animNode.getNodes().forEach {
                     if (it is EndNode || it is EndNodeContainer || it is StartNode) {
                         dealAnim(displayObject, it, chain, dealDisplayItem)
@@ -157,54 +179,79 @@ object AnimDecoder2 {
                     if (chain.isBeginPointSet) {
                         chain.nextStart = start
                     } else {
-                        chain.isBeginPointSet = true
-                        chain.path?.beginAnimPath(start)
+                        chain.start = start
                     }
                     val displayObjectId = chain.curDisplayId
                     animNode.getNodes().forEach {
-                        if (it is EndNode) {
-                            val next = if (displayObjectId.isNotEmpty()) {
-                                Log.i("zzc", "StartNode EndNode $displayObjectId")
-                                it.decode(displayObjectId, chain.anim)
-                            } else {
-                                Log.i("zzc", "StartNode EndNode2 ${chain.curDisplayId}")
-                                it.decode(chain.curDisplayId, chain.anim)
+                        when (it) {
+                            is EndNode -> {
+                                chain.curDisplayId = displayObjectId
+                                dealAnim(displayObject, it, chain, dealDisplayItem)
                             }
-                            chain.nextStart?.let {
-                                it.displayItemId = next.displayItemId
-                                chain.path?.beginNextAnimPath(it)
+
+                            is EndNodeContainer, is IXmlDrawableNode -> {
+                                dealAnim(displayObject, it, chain, dealDisplayItem)
                             }
-                            chain.path?.doAnimPath(it.durTime, next)
-                            chain.nextStart = next
-                        } else if (it is EndNodeContainer) {
-                            dealAnim(displayObject, it, chain, dealDisplayItem)
-                        } else if (it is IXmlDrawableNode) {
-                            dealAnim(displayObject, it, chain, dealDisplayItem)
                         }
                     }
                 }
             }
 
             is EndNode -> {
-                Log.i("zzc", "EndNode ${chain.curDisplayId}")
                 val next = animNode.decode(chain.curDisplayId, chain.anim)
-                chain.nextStart?.let {
-                    chain.nextStart?.displayItemId = next.displayItemId
-                    chain.path?.beginNextAnimPath(it)
-                }
-                chain.path?.doAnimPath(animNode.durTime, next)
-                chain.nextStart = next
+                chain.buildAnim(next, animNode.durTime)
             }
 
             is EndNodeContainer -> {
-                val nextList = animNode.getNodes().map {
-                    it.decode(chain.curDisplayId, chain.anim)
-                }.filterNotNull()
-                chain.nextStart?.let {
-                    chain.path?.beginNextAnimPath(it)
+                val displayId = chain.curDisplayId
+                animNode.getNodes().forEach {
+                    when (it) {
+                        is EndNode -> {
+                            val next = it.decode(displayId, chain.anim)
+                            val durTime = if (it.durTime == 0L) {
+                                animNode.durTime
+                            } else {
+                                it.durTime
+                            }
+                            chain.recordAnimContainer(next, durTime)
+                        }
+
+                        is IXmlDrawableNode -> {
+                            dealAnim(displayObject, it, chain, dealDisplayItem, true)
+                            it.getNodes().firstOrNull()?.let {
+                                if (it is EndNode) {
+                                    val next = it.decode(chain.curDisplayId, chain.anim)
+                                    val durTime = if (it.durTime == 0L) {
+                                        animNode.durTime
+                                    } else {
+                                        it.durTime
+                                    }
+                                    chain.recordAnimContainer(next, durTime)
+                                }
+                            }
+                        }
+                    }
                 }
-                chain.path?.doAnimPaths(animNode.durTime, nextList)
+                chain.buildAnimContainer()
             }
+        }
+    }
+
+    suspend fun suspendPlayAnimWithXml(
+        anim: IAnimView,
+        xml: String,
+        dealDisplayItem: DealDisplayItem
+    ) {
+        dealStarAnimXml(anim, xml, dealDisplayItem)
+    }
+
+    private suspend fun dealStarAnimXml(
+        anim: IAnimView,
+        xml: String,
+        dealDisplayItem: DealDisplayItem
+    ) {
+        (decoder.createObject(xml) as? AnimNode)?.let {
+            dealAnim(anim, it, dealDisplayItem)
         }
     }
 }

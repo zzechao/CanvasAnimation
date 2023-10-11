@@ -120,7 +120,11 @@ object AnimDecoder {
                     kClass = StringDisplayItem::class
                 ) {
                     val stringDisplayItem =
-                        StringDisplayItem(animNode.fontSize, animNode.txt, animNode.color)
+                        StringDisplayItem(
+                            animNode.fontSize,
+                            animNode.txt,
+                            animNode.color
+                        )
                     dealDisplayItem.invoke(
                         animNode,
                         stringDisplayItem
@@ -259,7 +263,11 @@ object AnimDecoder {
                         key = key,
                         kClass = StringDisplayItem::class
                     ) {
-                        StringDisplayItem(80, "测试数据", Color.BLUE)
+                        StringDisplayItem(
+                            80,
+                            "测试数据",
+                            Color.BLUE
+                        )
                     }
 
                     val start = it.decode(id, anim)

@@ -7,6 +7,7 @@ import android.graphics.PointF
 import android.graphics.Rect
 import android.graphics.RectF
 import android.util.Log
+import androidx.core.graphics.withSave
 import com.base.animation.IClickIntercept
 import com.base.animation.cache.AteDisplayItem
 import com.base.animation.model.AnimDrawObject
@@ -42,6 +43,46 @@ class BitmapDisplayItem constructor() :
             bitmapHeight = value?.height ?: 50
             Log.i(TAG, "$bitmapWidth - $bitmapHeight")
         }
+
+    override fun draw(
+        canvas: Canvas,
+        x: Float,
+        y: Float,
+        alpha: Int,
+        scaleX: Float,
+        scaleY: Float,
+        rotation: Float
+    ) {
+        canvas.withSave {
+            if (displaySizeSet) {
+                val drawX = x - (displayWidth / scaleX / 2f)
+                val drawY = y - (displayHeight / scaleY / 2f)
+
+                if (rotation != 0f) {
+                    canvas.rotate(
+                        rotation, drawX + getRotatePX(rotation, scaleX),
+                        drawY + getRotatePY(rotation, scaleY)
+                    )
+                }
+            } else {
+                val drawX = x - (bitmapWidth / 2 / scaleX)
+                val drawY = y - (bitmapHeight / 2 / scaleY)
+                if (rotation != 0f) {
+                    canvas.rotate(
+                        rotation, drawX + getRotatePX(rotation, scaleX),
+                        drawY + getRotatePY(rotation, scaleY)
+                    )
+                }
+            }
+
+
+            if (scaleX != 1f || scaleY != 1f) {
+                canvas.scale(scaleX, scaleY, x + getScalePX(scaleX), y + getScalePY(scaleY))
+            }
+
+            draw(canvas, x, y, alpha, scaleX, scaleY)
+        }
+    }
 
     override fun draw(
         canvas: Canvas, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float
@@ -87,18 +128,20 @@ class BitmapDisplayItem constructor() :
     }
 
     override fun getRotatePX(rotation: Float, scaleX: Float): Float {
+        Log.i("zzc2", "getRotatePX:$displaySizeSet displayWidth:$displayWidth scaleX:$scaleX")
         return if (displaySizeSet) {
-            displayWidth * 1f / 2
+            displayWidth / scaleX / 2f
         } else {
-            bitmapWidth * 1f / 2
+            bitmapWidth / scaleX / 2f
         }
     }
 
     override fun getRotatePY(rotation: Float, scaleY: Float): Float {
+        Log.i("zzc2", "getRotatePY:$displaySizeSet displayWidth:$displayWidth $scaleY")
         return if (displaySizeSet) {
-            displayHeight * 1f / 2
+            displayHeight / scaleY / 2f
         } else {
-            bitmapHeight * 1f / 2
+            bitmapHeight / scaleY / 2f
         }
     }
 

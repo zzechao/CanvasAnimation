@@ -25,8 +25,6 @@ class PathObject(
 ) {
     val tag = "PathObject"
 
-    var parentPointPosition = FIRST_START_POSITION
-
     var itemX = 0f
     var itemY = 0f
     var itemAlpha = 0
@@ -66,5 +64,12 @@ class PathObject(
                 "scaleY=$scaleY, rotation=$rotation, interpolator=$interpolator, tag='$tag', " +
                 "itemX=$itemX, itemY=$itemY, itemAlpha=$itemAlpha, itemScaleX=$itemScaleX, " +
                 "itemScaleY=$itemScaleY, itemRotation=$itemRotation, isInitItem=$isInitItem)"
+    }
+
+    fun copy(): PathObject {
+        return PathObject(
+            this.displayItemId, point, alpha, scaleX,
+            scaleY, rotation, interpolator, pointPosition
+        )
     }
 }

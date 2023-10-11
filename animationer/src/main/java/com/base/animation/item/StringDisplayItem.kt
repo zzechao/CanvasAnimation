@@ -7,6 +7,7 @@ import android.os.Build
 import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
+import android.util.Log
 import com.base.animation.IClickIntercept
 import com.base.animation.model.AnimDrawObject
 
@@ -24,7 +25,7 @@ class StringDisplayItem(
         }
     }
 
-    private var myStaticLayout: StaticLayout? = null
+    private var txtStaticLayout: StaticLayout? = null
 
     init {
         displayWidth = displayHeight * message.length
@@ -39,8 +40,9 @@ class StringDisplayItem(
         scaleY: Float,
         rotation: Float
     ) {
-        if (myStaticLayout == null) {
-            myStaticLayout = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (txtStaticLayout == null) {
+            Log.i("zzc2", "$displayWidth ${canvas.width} displayHeight:$displayHeight")
+            txtStaticLayout = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 StaticLayout.Builder.obtain(
                     message,
                     0,
@@ -71,9 +73,9 @@ class StringDisplayItem(
         scaleX: Float,
         scaleY: Float
     ) {
-        myStaticLayout?.paint?.alpha = alpha
+        txtStaticLayout?.paint?.alpha = alpha
         canvas.translate(x, y)
-        myStaticLayout?.draw(canvas)
+        txtStaticLayout?.draw(canvas)
     }
 
     override fun getScalePX(scaleX: Float): Float {

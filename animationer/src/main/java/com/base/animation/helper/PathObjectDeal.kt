@@ -6,13 +6,11 @@ import com.base.animation.Animer
 import com.base.animation.IAnimListener
 import com.base.animation.IAnimView
 import com.base.animation.IClickIntercept
-import com.base.animation.cache.DisplayItemCache
 import com.base.animation.cache.PathCache
 import com.base.animation.item.BaseDisplayItem
 import com.base.animation.model.AnimDrawObject
 import com.base.animation.model.AnimPathObject
 import com.base.animation.model.DrawObject
-import com.base.animation.model.FIRST_START_POSITION
 import com.base.animation.model.toAnimDrawObject
 import com.google.common.cache.CacheBuilder
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -139,17 +137,11 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
                             var startPosition = position
                             if (starts.isNotEmpty()) {
                                 animPath.animPathMap[index]?.apply {
-                                    val duringTime = during
-                                    val times = ceil(duringTime / intervalDeal.toDouble()).toInt()
-                                    pathObjects.forEachIndexed { index, pathObject ->
-                                        val start =
-                                            if (pathObject.parentPointPosition == FIRST_START_POSITION) {
-                                                starts.first()
-                                            } else {
-                                                starts.firstOrNull() {
-                                                    it.pointPosition == pathObject.parentPointPosition
-                                                } ?: starts.first()
-                                            }
+                                    this.forEachIndexed { index, pathObjectWithDer ->
+                                        val duringTime = pathObjectWithDer.during
+                                        val times =
+                                            ceil(duringTime / intervalDeal.toDouble()).toInt()
+                                        val start = starts.getOrNull(index) ?: return@forEachIndexed
                                         drawsMap[startPosition]?.map {
                                             it.displayItemId = start.displayItemId
                                         }
@@ -162,7 +154,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
                                             }
                                         }
                                         // 当索引为这轮终点的长度时，如果是进入下一轮计算，否则继续执行这一轮的计算，从这轮的那个position开始计算
-                                        if (index == pathObjects.size - 1) {
+                                        if (index == this.size - 1) {
                                             position = startPosition
                                             position++
                                         } else {
@@ -182,17 +174,11 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
                             var startPosition = position
                             if (starts.isNotEmpty()) {
                                 animPath.animPathMap[index]?.apply {
-                                    val duringTime = during
-                                    val times = ceil(duringTime / intervalDeal.toDouble()).toInt()
-                                    pathObjects.forEachIndexed { index, pathObject ->
-                                        val start =
-                                            if (pathObject.parentPointPosition == FIRST_START_POSITION) {
-                                                starts.first()
-                                            } else {
-                                                starts.firstOrNull() {
-                                                    it.pointPosition == pathObject.parentPointPosition
-                                                } ?: starts.first()
-                                            }
+                                    this.forEachIndexed { index, pathObjectWithDer ->
+                                        val duringTime = pathObjectWithDer.during
+                                        val times =
+                                            ceil(duringTime / intervalDeal.toDouble()).toInt()
+                                        val start = starts.getOrNull(index) ?: return@forEachIndexed
                                         if (drawsMap[startPosition] == null) {
                                             drawsMap[startPosition] = mutableListOf()
                                         }
@@ -202,6 +188,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
                                                 animPath.expand
                                             )
                                         )
+                                        val pathObject = pathObjectWithDer.pathObject
                                         pathObject.getItem(start)
                                         for (i in 0..times) {
                                             startPosition++
@@ -235,7 +222,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
                                             drawsMap[startPosition]?.add(animDrawObject)
                                         }
                                         // 当索引为这轮终点的长度时，如果是进入下一轮计算，否则继续执行这一轮的计算，从这轮的那个position开始计算
-                                        if (index == pathObjects.size - 1) {
+                                        if (index == this.size - 1) {
                                             position = startPosition
                                             position++
                                         } else {

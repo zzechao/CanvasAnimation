@@ -11,6 +11,7 @@ class DefaultAttributeCoder : IAttributeCoder<Any> {
                 String::class -> value
                 Float::class -> value.toFloat()
                 Double::class -> value.toDouble()
+                Long::class -> value.toLong()
                 Boolean::class -> value.equals("true", true)
                 else -> null
             }

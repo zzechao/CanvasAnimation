@@ -23,7 +23,7 @@ class TextNode : IXmlDrawableNode() {
 
     @AnimAttributeName("fontSize", DefaultAttributeCoder::class)
     @JvmField
-    var fontSize = 20
+    var fontSize = 10
 
     override var displayItem: KClass<out BaseDisplayItem> = StringDisplayItem::class
 }
