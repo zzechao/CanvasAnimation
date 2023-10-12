@@ -7,7 +7,7 @@ import androidx.annotation.CallSuper
 import com.base.animation.AnimationEx
 import com.base.animation.IAnimView
 import com.base.animation.model.PathObject
-import com.base.animation.xml.AnimDecoder
+import com.base.animation.xml.AnimDecoder2
 import com.base.animation.xml.XmlWriterHelper
 import com.base.animation.xml.node.AnimAttributeName
 import com.base.animation.xml.node.AnimNodeName
@@ -30,12 +30,12 @@ interface IAnimNode : XmlBaseAnimNode, IXmlObjNodeParser {
             val fieldValue = field.get(this) ?: return
             val animNodeName = javaClass.getAnnotation(AnimNodeName::class.java)?.name ?: return
             val key = "${animNodeName}_${annotation.name}"
-            AnimDecoder.mapNodeAttributeCoderMap[key]?.let {
+            AnimDecoder2.mapNodeAttributeCoderMap[key]?.let {
                 val value = it.attributeEncode(fieldValue) ?: return
                 write.atttibute(annotation.name, value)
             } ?: kotlin.run {
                 val attributeCoder = annotation.coder.java.newInstance()
-                AnimDecoder.mapNodeAttributeCoderMap[key] = attributeCoder
+                AnimDecoder2.mapNodeAttributeCoderMap[key] = attributeCoder
                 val value = attributeCoder.attributeEncode(fieldValue) ?: return
                 write.atttibute(
                     attriName = annotation.name,
@@ -94,13 +94,13 @@ interface IAnimNode : XmlBaseAnimNode, IXmlObjNodeParser {
             val annotation = field.getAnnotation(AnimAttributeName::class.java) ?: return false
             val key = "${animNodeName}_${annotation.name}"
             if (annotation.name.equals(name, true)) {
-                AnimDecoder.mapNodeAttributeCoderMap[key]?.let {
+                AnimDecoder2.mapNodeAttributeCoderMap[key]?.let {
                     it.attributeDecode(field.type.kotlin, value)?.let {
                         field.set(this, it)
                     }
                 } ?: kotlin.run {
                     val attributeCoder = annotation.coder.java.newInstance()
-                    AnimDecoder.mapNodeAttributeCoderMap[key] = attributeCoder
+                    AnimDecoder2.mapNodeAttributeCoderMap[key] = attributeCoder
                     attributeCoder.attributeDecode(field.type.kotlin, value)?.let {
                         field.set(this, it)
                     }

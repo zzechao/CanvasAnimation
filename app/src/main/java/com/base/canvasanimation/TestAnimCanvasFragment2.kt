@@ -1,13 +1,12 @@
 package com.base.canvasanimation
 
-import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.PointF
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -20,9 +19,10 @@ import com.base.animation.item.BitmapDisplayItem
 import com.base.animation.model.AnimDrawObject
 import com.base.animation.model.AnimPathObject
 import com.base.animation.model.PathObject
-import com.base.animation.xml.AnimDecoder
+import com.base.animation.xml.AnimDecoder2
 import com.base.animation.xml.AnimEncoder
 import com.base.animation.xml.buildAnimNode
+import com.base.animation.xml.buildString
 import com.base.animation.xml.node.coder.InterpolatorEnum
 import kotlinx.android.synthetic.main.fragment_anim_canvas2.anim_1
 import kotlinx.android.synthetic.main.fragment_anim_canvas2.anim_2
@@ -43,13 +43,12 @@ import kotlinx.coroutines.launch
 @ObsoleteCoroutinesApi
 class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
 
-    private val xml = "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>" +
-            "<anim>" +
-            "    <startAnim alpha=\"255\" displaySize=\"100\" startIdName=\"test1\" startL='{\"x\":0.0,\"y\":0.0}' rotation=\"0.0\" scaleX=\"0.5\" scaleY=\"0.5\" url=\"https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png\">" +
-            "        <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"1\" endIdName=\"test2\" endL='{\"x\":0.0,\"y\":0.0}' rotation=\"0.0\" scaleX=\"2.0\" scaleY=\"2.0\" url=\"\" />" +
-            "        <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"0\" endIdName=\"test3\" endL='{\"x\":0.0,\"y\":0.0}' rotation=\"0.0\" scaleX=\"0\" scaleY=\"0\" url=\"\" />" +
-            "    </startAnim>" +
-            "</anim>"
+    private val xml =
+        "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>\n" + "<anim>\n" + "    <imageNode displaySize=\"80\" url=\"https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png\">\n" + "        <startAnim alpha=\"255\" startIdName=\"\" startL='{\"x\":0.0,\"y\":0.0}' rotation=\"0.0\" scaleX=\"0.5\" scaleY=\"0.5\">\n" + "            <endAnim alpha=\"255\" durTime=\"1000\" interpolator=\"1\" endIdName=\"\" endL='{\"x\":680.0,\"y\":1463.5}' rotation=\"0.0\" scaleX=\"2.0\" scaleY=\"2.0\" url=\"\" />\n" + "            <txtNode txtColor=\"#ff0000ff\" fontSize=\"40\" txt=\"测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据\">\n" + "                <startAnim alpha=\"255\" startIdName=\"\" startL='{\"x\":680.0,\"y\":40.0}' rotation=\"0.0\" scaleX=\"1.0\" scaleY=\"1.0\">\n" + "                    <endAnim alpha=\"255\" durTime=\"5000\" interpolator=\"1\" endIdName=\"\" endL='{\"x\":0.0,\"y\":1463.5}' rotation=\"0.0\" scaleX=\"1.0\" scaleY=\"1.0\" url=\"\" />\n" + "                </startAnim>\n" + "            </txtNode>\n" + "            <layoutNode data=\"\" layoutIdName=\"view_test_layout\" versionCode=\"version_1.0\">\n" + "                <endAnim alpha=\"255\" durTime=\"1000\" interpolator=\"0\" endIdName=\"\" endL='{\"x\":680.0,\"y\":2967.0}' rotation=\"0.0\" scaleX=\"2.0\" scaleY=\"2.0\" url=\"\" />\n" + "            </layoutNode>\n" + "            <endAnim alpha=\"255\" durTime=\"1000\" interpolator=\"2\" endIdName=\"\" endL='{\"x\":1400.0,\"y\":1463.5}' rotation=\"0.0\" scaleX=\"2.0\" scaleY=\"2.0\" url=\"\" />\n" + "            <layoutNode data=\"\" layoutIdName=\"view_test_layout\" versionCode=\"version_1.0\">\n" + "                <endAnim alpha=\"255\" durTime=\"1000\" interpolator=\"0\" endIdName=\"\" endL='{\"x\":680.0,\"y\":40.0}' rotation=\"0.0\" scaleX=\"0.0\" scaleY=\"0.0\" url=\"\" />\n" + "            </layoutNode>\n" + "        </startAnim>\n" + "    </imageNode>\n" + "    <layoutNode data=\"\" layoutIdName=\"view_test_layout\" versionCode=\"version_1.0\">\n" + "        <startAnim alpha=\"255\" startIdName=\"\" startL='{\"x\":680.0,\"y\":40.0}' rotation=\"0.0\" scaleX=\"0.0\" scaleY=\"0.0\">\n" + "            <endAnim alpha=\"255\" durTime=\"1000\" interpolator=\"1\" endIdName=\"\" endL='{\"x\":0.0,\"y\":1463.5}' rotation=\"0.0\" scaleX=\"3.0\" scaleY=\"3.0\" url=\"\" />\n" + "        </startAnim>\n" + "    </layoutNode>\n" + "</anim>\n"
+
+    private val xmlMore =
+        "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>\n" + "<anim>\n" + "    <startAnim alpha=\"255\" displaySize=\"80\" startId=\"0\" startL='{\"x\":0.0,\"y\":0.0}' rotation=\"0.0\" scaleX=\"0.5\" scaleY=\"0.5\" url=\"https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png\">\n" + "        <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"2\" endId=\"0\" endL='{\"x\":680.0,\"y\":1463.5}' rotation=\"0.0\" scaleX=\"2.0\" scaleY=\"2.0\" url=\"\" />\n" + "        <endContainer displaySize=\"0\" durTime=\"1500\" url=\"\">\n" + "            <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"0\" endId=\"0\" endL='{\"x\":680.0,\"y\":0.0}' rotation=\"360.0\" scaleX=\"1.0\" scaleY=\"1.0\" url=\"\" />\n" + "            <endAnim alpha=\"0\" displaySize=\"0\" durTime=\"1000\" interpolator=\"0\" endId=\"0\" endL='{\"x\":0.0,\"y\":1463.5}' rotation=\"0.0\" scaleX=\"1.0\" scaleY=\"1.0\" url=\"\" />\n" + "            <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"0\" endId=\"0\" endL='{\"x\":680.0,\"y\":3007.0}' rotation=\"0.0\" scaleX=\"0.0\" scaleY=\"0.0\" url=\"\" />\n" + "            <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"0\" endId=\"0\" endL='{\"x\":1440.0,\"y\":1463.5}' rotation=\"0.0\" scaleX=\"0.0\" scaleY=\"0.0\" url=\"\" />\n" + "        </endContainer>\n" + "    </startAnim>\n" + "</anim>"
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -91,111 +90,158 @@ class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
         anim_surface?.pause()
     }
 
-    /**
-     * 单个动画
-     */
-    private fun startSingleAnim() {
-        val size = 80
-
-        val displayObject = DisplayObject.with()
-        val displayItemId1 = displayObject.add(
-            key = "xin_startSingleAnim", kClass = BitmapDisplayItem::class
-        ) {
-            val bitmap =
-                BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, size, size)
-            val bitmapWidth = bitmap.width
-            val bitmapHeight = bitmap.height
-            val displayWidth = size * bitmapWidth / bitmapHeight
-            return@add BitmapDisplayItem().apply {
-                mBitmap = bitmap
-                setDisplaySize(displayWidth, size)
-            }
-        }
-
-        val start = PathObject(
-            displayItemId1,
-            point = PointF(0f, 0f),
-            interpolator = DecelerateInterpolator(),
-            scaleX = 0.5f,
-            scaleY = 0.5f
-        )
-        val next = PathObject(
-            displayItemId1, point = PointF(
-                DisplayUtils.getScreenWidth(this.activity).toFloat() / 2 - size / 2,
-                DisplayUtils.getScreenHeight(this.activity).toFloat() / 2 - size / 2
-            ), interpolator = AccelerateDecelerateInterpolator(), scaleX = 2.0f,
-            scaleY = 2.0f
-        )
-        val next1 = PathObject(
-            displayItemId1,
-            point = PointF(DisplayUtils.getScreenWidth(this.activity).toFloat() / 2 - size / 2, 9f),
-            scaleX = 0.5f,
-            scaleY = 0.5f
-        )
-        val next2 = PathObject(
-            displayItemId1,
-            point = PointF(DisplayUtils.getScreenWidth(this.activity).toFloat() / 2 - size / 2, 9f),
-            scaleX = 1.0f,
-            scaleY = 1.0f
-        )
-        val next3 = PathObject(
-            displayItemId1,
-            point = PointF(DisplayUtils.getScreenWidth(this.activity).toFloat() / 2 - size / 2, 9f),
-            scaleX = 0.5f,
-            scaleY = 0.5f
-        )
-        anim_surface?.addAnimDisplay(
-            AnimPathObject.Inner.with(
-            ).beginAnimPath(start).doAnimPath(1000, next).beginNextAnimPath(next)
-                .doAnimPath(1000, next1).beginNextAnimPath(next1).doAnimPath(200, next2)
-                .beginNextAnimPath(next2)
-                .doAnimPath(200, next3).build(displayObject.build())
-        )
-    }
-
     private fun startSingleAnim2() {
         val size = 80
         val url = "https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png"
         AnimEncoder().buildAnimNode {
-            startNode {
-                point = PointF(0f, 0f)
-                scaleX = 0.5f
-                scaleY = 0.5f
-                endNode {
-                    point = PointF(
-                        DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment2.context)
-                            .toFloat() / 2 - size / 2,
-                        DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment2.context)
-                            .toFloat() / 2 - size / 2
-                    )
-                    scaleX = 2f
-                    scaleY = 2f
-                    durTime = 1000
-                    interpolator = InterpolatorEnum.Accelerate.type
-                }
-                endNode {
-                    point = PointF(
-                        DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment2.context)
-                            .toFloat() / 2 - size / 2, 9f
-                    )
+            imageNode {
+                this.url = url
+                this.displayHeightSize = size
+                startNode {
+                    point = PointF(0f, 0f)
                     scaleX = 0.5f
                     scaleY = 0.5f
-                    durTime = 1000
+                    endNode {
+                        point = PointF(
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment2.context)
+                                .toFloat() / 2 - size / 2,
+                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment2.context)
+                                .toFloat() / 2 - size / 2
+                        )
+                        scaleX = 2f
+                        scaleY = 2f
+                        durTime = 1000
+                        interpolator = InterpolatorEnum.Accelerate.type
+                    }
+                    txtNode {
+                        this.txt = "测试数据"
+                        this.color = Color.BLUE
+                        this.fontSize = 20
+                        startNode {
+                            point = PointF(
+                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment2.context)
+                                    .toFloat() / 2 - size / 2, size / 2f
+                            )
+                            scaleX = 1f
+                            scaleY = 1f
+                            endNode {
+                                point = PointF(
+                                    0f,
+                                    DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment2.context)
+                                        .toFloat() / 2 - size / 2
+                                )
+                                scaleX = 3f
+                                scaleY = 3f
+                                durTime = 2000
+                                interpolator = InterpolatorEnum.Accelerate.type
+                            }
+
+                        }
+                    }
+                    layoutNode {
+                        this.layoutIdName = "view_test_layout"
+                        endNode {
+                            point = PointF(
+                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment2.context)
+                                    .toFloat() / 2 - size / 2, size / 2f
+                            )
+                            scaleX = 1f
+                            scaleY = 1f
+                            durTime = 2000
+                            interpolator = InterpolatorEnum.Accelerate.type
+                        }
+                        endNode {
+                            point = PointF(
+                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment2.context)
+                                    .toFloat() / 2 - size / 2,
+                                DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment2.context)
+                                    .toFloat() - size / 2
+                            )
+                            scaleX = 2f
+                            scaleY = 2f
+                            durTime = 1000
+                            interpolator = InterpolatorEnum.Linear.type
+                        }
+                    }
+                    endNode {
+                        point = PointF(
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment2.context)
+                                .toFloat() - size / 2,
+                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment2.context)
+                                .toFloat() / 2 - size / 2
+                        )
+                        scaleX = 2f
+                        scaleY = 2f
+                        durTime = 1000
+                        interpolator = InterpolatorEnum.Decelerate.type
+                    }
+                    layoutNode {
+                        this.layoutIdName = "view_test_layout"
+                        endNode {
+                            point = PointF(
+                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment2.context)
+                                    .toFloat() / 2 - size / 2, size / 2f
+                            )
+                            scaleX = 0f
+                            scaleY = 0f
+                            durTime = 1000
+                            interpolator = InterpolatorEnum.Linear.type
+                        }
+                    }
+                }
+            }
+            layoutNode {
+                this.layoutIdName = "view_test_layout"
+                startNode {
+                    point = PointF(
+                        DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment2.context)
+                            .toFloat() / 2 - size / 2, size / 2f
+                    )
+                    scaleX = 0f
+                    scaleY = 0f
+                    endNode {
+                        point = PointF(
+                            0f,
+                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment2.context)
+                                .toFloat() / 2 - size / 2
+                        )
+                        scaleX = 3f
+                        scaleY = 3f
+                        durTime = 1000
+                        interpolator = InterpolatorEnum.Accelerate.type
+                    }
                 }
             }
         }.apply {
+            Log.i("tttt2", this.buildString())
             lifecycleScope.launch(Dispatchers.IO) {
-                AnimDecoder.suspendPlayAnimWithNode(url, anim_surface, this@apply) {
-                    BitmapFactory.decodeResource(resources, R.mipmap.xin)
+                AnimDecoder2.suspendPlayAnimWithAnimNode(
+                    anim_surface,
+                    this@apply,
+                ) { node, displayItem ->
+                    when (displayItem) {
+                        is BitmapDisplayItem -> {
+                            displayItem.mBitmap =
+                                BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, 100, 100)
+                        }
+                    }
+                    displayItem
                 }
             }
         }
     }
 
+
     private fun startSingleAnim3() {
         lifecycleScope.launch(Dispatchers.IO) {
-            AnimDecoder.suspendPlayAnimWithXml(xml, anim_surface, xml) {
-                BitmapFactory.decodeResource(resources, R.mipmap.xin)
+            AnimDecoder2.suspendPlayAnimWithXml(anim_surface, xml) { node, displayItem ->
+                when (displayItem) {
+                    is BitmapDisplayItem -> {
+                        displayItem.mBitmap =
+                            BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, 100, 100)
+                    }
+                }
+                displayItem
             }
         }
     }
@@ -204,139 +250,88 @@ class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
         val size = 80
         val url = "https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png"
         AnimEncoder().buildAnimNode {
-            startNode {
-                point = PointF(0f, 0f)
-                scaleX = 0.5f
-                scaleY = 0.5f
-                endNode {
-                    point = PointF(
-                        DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment2.context)
-                            .toFloat() / 2 - size / 2,
-                        DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment2.context)
-                            .toFloat() / 2 - size / 2
-                    )
-                    scaleX = 2f
-                    scaleY = 2f
-                    durTime = 1000
-                    interpolator = InterpolatorEnum.Decelerate.type
-                }
-                endContainer {
-                    durTime = 1500
-                    endNode {
-                        rotation = 360f
-                        point = PointF(
-                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment2.context)
-                                .toFloat() / 2 - size / 2,
-                            0f
-                        )
-                    }
-                    endNode {
-                        point = PointF(
-                            0f,
-                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment2.context)
-                                .toFloat() / 2 - size / 2
-                        )
-                        alpha = 0
-                    }
+            imageNode {
+                this.url = url
+                this.displayHeightSize = size
+                startNode {
+                    point = PointF(0f, 0f)
+                    scaleX = 0f
+                    scaleY = 0f
                     endNode {
                         point = PointF(
                             DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment2.context)
                                 .toFloat() / 2 - size / 2,
                             DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment2.context)
-                                .toFloat()
-                        )
-                        scaleX = 0f
-                        scaleY = 0f
-                    }
-                    endNode {
-                        point = PointF(
-                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment2.context)
-                                .toFloat(),
-                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment2.context)
                                 .toFloat() / 2 - size / 2
                         )
-                        scaleX = 0f
-                        scaleY = 0f
+                        scaleX = 2f
+                        scaleY = 2f
+                        durTime = 1000
+                        interpolator = InterpolatorEnum.Decelerate.type
+                    }
+                    endContainer {
+                        durTime = 3000
+                        endNode {
+                            durTime = 1000
+                            rotation = 360f
+                            point = PointF(
+                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment2.context)
+                                    .toFloat() / 2 - size / 2, 0f
+                            )
+                        }
+                        endNode {
+                            point = PointF(
+                                0f,
+                                DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment2.context)
+                                    .toFloat() / 2 - size / 2
+                            )
+                            alpha = 0
+                        }
+                        endNode {
+                            point = PointF(
+                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment2.context)
+                                    .toFloat() / 2 - size / 2,
+                                DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment2.context)
+                                    .toFloat()
+                            )
+                            scaleX = 0f
+                            scaleY = 0f
+                        }
+                        layoutNode {
+                            this.layoutIdName = "view_test_layout"
+                            endNode {
+                                point = PointF(
+                                    DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment2.context)
+                                        .toFloat(),
+                                    DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment2.context)
+                                        .toFloat() / 2 - size / 2
+                                )
+                                durTime = 1000
+                                alpha = 0
+                                rotation = 360f
+                                scaleX = 2f
+                                scaleY = 2f
+                            }
+                        }
                     }
                 }
             }
         }.apply {
+            Log.i("tttt2", this.buildString())
             lifecycleScope.launch {
-                AnimDecoder.suspendPlayAnimWithNode(url, anim_surface, this@apply) {
-                    BitmapFactory.decodeResource(resources, R.mipmap.xin)
+                AnimDecoder2.suspendPlayAnimWithAnimNode(
+                    anim_surface, this@apply
+                ) { node, displayItem ->
+                    when (displayItem) {
+                        is BitmapDisplayItem -> {
+                            displayItem.mBitmap =
+                                BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, 100, 100)
+                        }
+                    }
+                    displayItem
                 }
             }
         }
-    }
-
-    /**
-     * 多个动画
-     */
-    private fun startMoreAnim() {
-        val size = 80
-
-        val displayObject = DisplayObject.with()
-        val displayItemId = displayObject.add(
-            key = "xin_startMoreAnim", kClass = BitmapDisplayItem::class
-        ) {
-            val bitmap =
-                BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, size, size)
-            val bitmapWidth = bitmap.width
-            val bitmapHeight = bitmap.height
-            val displayWidth = size * bitmapWidth / bitmapHeight
-            return@add BitmapDisplayItem().apply {
-                mBitmap = bitmap
-                setDisplaySize(displayWidth, size)
-            }
-        }
-
-        val start = PathObject(
-            displayItemId,
-            point = PointF(0f, 0f),
-            interpolator = DecelerateInterpolator()
-        )
-        val next = PathObject(
-            displayItemId, point = PointF(
-                DisplayUtils.getScreenWidth(this.activity).toFloat() / 2 - size / 2,
-                DisplayUtils.getScreenHeight(this.activity).toFloat() / 2 - size / 2
-            ), interpolator = AccelerateDecelerateInterpolator()
-        )
-        val next1 =
-            PathObject(
-                displayItemId,
-                point = PointF(
-                    DisplayUtils.getScreenWidth(this.activity).toFloat() / 2 - size / 2,
-                    0f
-                ),
-                rotation = 360f
-            )
-        val next2 = PathObject(
-            displayItemId,
-            point = PointF(
-                0f,
-                DisplayUtils.getScreenHeight(this.activity).toFloat() / 2 - size / 2
-            ),
-            alpha = 0
-        )
-        val next3 = PathObject(
-            displayItemId, point = PointF(
-                DisplayUtils.getScreenWidth(this.activity).toFloat() / 2 - size / 2,
-                DisplayUtils.getScreenHeight(this.activity).toFloat()
-            ), scaleX = 0f, scaleY = 0f
-        )
-        val next4 = PathObject(
-            displayItemId, point = PointF(
-                DisplayUtils.getScreenWidth(this.activity).toFloat(),
-                DisplayUtils.getScreenHeight(this.activity).toFloat() / 2 - size / 2
-            )
-        )
-        anim_surface?.addAnimDisplay(
-            AnimPathObject.Inner.with().beginAnimPath(start)
-                .doAnimPath(1500, next)
-                .beginNextAnimPath(next)
-                .doAnimPaths(1500, mutableListOf(next1, next2, next3, next4))
-                .build(displayObject.build())
-        )
     }
 
     /**
@@ -395,7 +390,6 @@ class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
     override fun intercept(animId: Long, animDrawObject: AnimDrawObject, touchPointF: PointF) {
         Toast.makeText(this@TestAnimCanvasFragment2.context, "$animId", Toast.LENGTH_SHORT).show()
         anim_surface?.removeAnimId(animId)
-        startSingleAnim()
     }
 
     override fun onDestroyView() {

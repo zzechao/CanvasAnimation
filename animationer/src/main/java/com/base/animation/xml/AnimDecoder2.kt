@@ -5,6 +5,7 @@ import com.base.animation.AnimationEx
 import com.base.animation.DisplayObject
 import com.base.animation.IAnimView
 import com.base.animation.getFragmentActivity
+import com.base.animation.item.BaseDisplayItem
 import com.base.animation.item.BitmapDisplayItem
 import com.base.animation.item.LayoutDisplayItem
 import com.base.animation.item.StringDisplayItem
@@ -22,6 +23,10 @@ import com.base.animation.node.TextNode
 import com.base.animation.xml.node.AnimNodeChain
 import com.base.animation.xml.node.coder.IAttributeCoder
 
+typealias DealDisplayItem = suspend (
+    IXmlDrawableNode,
+    BaseDisplayItem
+) -> BaseDisplayItem
 
 typealias IDealNodeDealIntercept = suspend (
     displayObject: DisplayObject,
