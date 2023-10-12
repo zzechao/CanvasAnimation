@@ -1,9 +1,8 @@
 package com.base.animation
 
-import android.util.Log
 
 fun <T> tryCatch(
-    catchBlock: (Throwable) -> Unit = { t -> Log.i("TryEx", "tryCatchLogcat print:", t) },
+    catchBlock: (Throwable) -> Unit = { t -> Animer.log.i("TryEx", "tryCatchLogcat print:", t) },
     tryBlock: () -> T
 ): T? {
     try {
@@ -15,7 +14,7 @@ fun <T> tryCatch(
 }
 
 suspend fun <T> tryCatchSuspend(
-    catchBlock: (Throwable) -> Unit = { t -> Log.i("TryEx", "tryCatchLogcat print:", t) },
+    catchBlock: (Throwable) -> Unit = { t -> Animer.log.i("TryEx", "tryCatchLogcat print:", t) },
     tryBlock: suspend () -> T
 ): T? {
     try {

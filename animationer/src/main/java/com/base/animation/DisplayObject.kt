@@ -1,6 +1,5 @@
 package com.base.animation
 
-import android.util.Log
 import com.base.animation.item.BaseDisplayItem
 import java.security.MessageDigest
 import kotlin.reflect.KClass
@@ -57,8 +56,7 @@ class DisplayObject private constructor() {
     ): String {
         val md5Key = getDisPlayItemKey(key, kClass = kClass)
         if (!AnimCache.displayItemCache.hasDisplayItem(md5Key)) {
-            Log.i("ttt", "hasDisplayItem")
-            val displayItem = create()?.apply {
+             val displayItem = create()?.apply {
                 displayItemId = md5Key
             } ?: return ""
             displayItems.add(displayItem)
@@ -88,8 +86,6 @@ class DisplayObject private constructor() {
     private fun md5(str: String): String {
         val digest = MessageDigest.getInstance("MD5")
         val result = digest.digest(str.toByteArray())
-        //没转16进制之前是16位
-        println("result${result.size}")
         //转成16进制后是32字节
         return toHex(result)
     }

@@ -3,7 +3,6 @@ package com.base.canvasanimation
 import android.graphics.Color
 import android.graphics.PointF
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,7 +21,6 @@ import com.base.animation.model.PathObject
 import com.base.animation.xml.AnimDecoder2
 import com.base.animation.xml.AnimEncoder
 import com.base.animation.xml.buildAnimNode
-import com.base.animation.xml.buildString
 import com.base.animation.xml.node.coder.InterpolatorEnum
 import kotlinx.android.synthetic.main.fragment_anim_canvas2.anim_1
 import kotlinx.android.synthetic.main.fragment_anim_canvas2.anim_2
@@ -213,7 +211,6 @@ class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
                 }
             }
         }.apply {
-            Log.i("tttt2", this.buildString())
             lifecycleScope.launch(Dispatchers.IO) {
                 AnimDecoder2.suspendPlayAnimWithAnimNode(
                     anim_surface,
@@ -317,7 +314,6 @@ class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
                 }
             }
         }.apply {
-            Log.i("tttt2", this.buildString())
             lifecycleScope.launch {
                 AnimDecoder2.suspendPlayAnimWithAnimNode(
                     anim_surface, this@apply

@@ -1,6 +1,5 @@
 package com.base.animation.xml
 
-import android.util.Log
 import com.base.animation.AnimationEx
 import com.base.animation.DisplayObject
 import com.base.animation.IAnimView
@@ -22,6 +21,7 @@ import com.base.animation.node.StartNode
 import com.base.animation.node.TextNode
 import com.base.animation.xml.node.AnimNodeChain
 import com.base.animation.xml.node.coder.IAttributeCoder
+
 
 typealias DealDisplayItem = suspend (
     IXmlDrawableNode,
@@ -74,13 +74,6 @@ object AnimDecoder2 {
             dealAnim(displayObject, it, chain, dealDisplayItem)
 
             val data = displayObject.build()
-            Log.i(
-                "zzc", "${
-                    data.associateBy {
-                        it.displayItemId
-                    }
-                }"
-            )
             chain.anim.addAnimDisplay(path.build(data))
         }
     }

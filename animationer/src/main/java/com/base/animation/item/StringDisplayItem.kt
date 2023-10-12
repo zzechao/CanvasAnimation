@@ -7,7 +7,6 @@ import android.os.Build
 import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
-import android.util.Log
 import com.base.animation.IClickIntercept
 import com.base.animation.model.AnimDrawObject
 
@@ -46,7 +45,6 @@ class StringDisplayItem(
         rotation: Float
     ) {
         if (txtStaticLayout == null) {
-            Log.i("zzc2", "$displayWidth ${canvas.width} displayHeight:$displayHeight")
             txtStaticLayout = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 StaticLayout.Builder.obtain(
                     message,

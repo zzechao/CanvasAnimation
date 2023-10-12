@@ -1,10 +1,10 @@
 package com.base.animation.xml
 
-import android.util.Log
+
 import android.util.Xml
+import com.base.animation.Animer
 import com.base.animation.node.IAnimNode
 import com.base.animation.xml.node.AnimNodeName
-import com.base.animation.xml.node.coder.IAttributeCoder
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
@@ -27,7 +27,7 @@ open class XmlObjectDecoder {
             onSkipHead(parser)
             return createObject(null, parser)
         } catch (e: Exception) {
-            Log.e(TAG, "->createObject:$e")
+            Animer.log.e(TAG, "->createObject:$e")
         }
         return null
     }
@@ -46,12 +46,12 @@ open class XmlObjectDecoder {
         var obj: IAnimNode? = null
         var eventType = parser.eventType
         val depth = parser.depth
-        Log.i(TAG, "[createObject$recursiveCallLevel] current depth=$depth eventType=$eventType")
+        Animer.log.i(TAG, "[createObject$recursiveCallLevel] current depth=$depth eventType=$eventType")
         if (eventType != XmlPullParser.START_TAG) return parent
         while (eventType != XmlPullParser.END_TAG) {
             when (eventType) {
                 XmlPullParser.START_TAG -> {
-                    Log.i(
+                    Animer.log.i(
                         TAG,
                         "[createObject$recursiveCallLevel] START_TAG ${parser.name} ${parser.depth}"
                     )
@@ -70,7 +70,7 @@ open class XmlObjectDecoder {
                             //设置属性
                             var k = 0
                             while (k < parser.attributeCount) {
-                                Log.i(
+                                Animer.log.i(
                                     TAG, "attribute ${parser.getAttributeName(k)}- ${
                                         parser.getAttributeValue(k)
                                     }"
@@ -89,7 +89,7 @@ open class XmlObjectDecoder {
                 }
 
                 XmlPullParser.TEXT -> {
-                    Log.i(
+                    Animer.log.i(
                         TAG, "[createObject$recursiveCallLevel]" +
                                 " TEXT ${parser.text} $depth with=${parser.isWhitespace}"
                     )
@@ -116,7 +116,7 @@ open class XmlObjectDecoder {
     }
 
     protected open fun onSetAttribute(objnode: IAnimNode, name: String, value: String) {
-        Log.i(TAG, "onSetAttribute name:$name value:$value")
+        Animer.log.i(TAG, "onSetAttribute name:$name value:$value")
         objnode.setAttribute(name, value)
     }
 

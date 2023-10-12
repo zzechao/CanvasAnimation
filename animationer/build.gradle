@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 //apply plugin: 'maven'
-apply plugin: 'net.researchgate.release'
+//apply plugin: 'net.researchgate.release'
 //apply plugin: 'architecture-lint'
 //apply from: 'https://git.duowan.com/ci_team/build-snippet/raw/master/gradlebuild/publish-aar-551.gradle'
 
@@ -24,14 +24,10 @@ android {
 
     lintOptions { abortOnError false }
 
-    release {
-        failOnUnversionedFiles = false
-        failOnUpdateNeeded = false
-        buildTasks = []
-        //git仓库,需要加上git相关配置且gradle-release版本使用2.4.0以上
-        git {
-            requireBranch = 'master|.*_maint'
-            pushToRemote = 'origin'
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }

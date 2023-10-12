@@ -1,7 +1,6 @@
 package com.base.animation.xml.node.coder
 
 import android.graphics.Color
-import android.util.Log
 import kotlin.reflect.KClass
 
 
@@ -16,7 +15,6 @@ class ColorAttributeCoder : IAttributeCoder<String> {
 
     override fun attributeEncode(value: Any?): String? {
         return if (value is Int) {
-            Log.i("zzc", "$value")
             var alpha = Integer.toHexString(Color.alpha(value))
             var red = Integer.toHexString(Color.red(value))
             var green = Integer.toHexString(Color.green(value))

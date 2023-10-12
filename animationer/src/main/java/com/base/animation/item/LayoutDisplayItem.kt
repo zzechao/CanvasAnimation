@@ -9,15 +9,7 @@ import android.view.View
 import androidx.core.graphics.withSave
 import com.base.animation.IClickIntercept
 import com.base.animation.model.AnimDrawObject
-import kotlin.math.acos
-import kotlin.math.acosh
-import kotlin.math.asin
-import kotlin.math.asinh
-import kotlin.math.atan
-import kotlin.math.cos
-import kotlin.math.cosh
-import kotlin.math.round
-import kotlin.math.tanh
+
 
 /**
  * @author:zhouzechao
@@ -50,6 +42,10 @@ class LayoutDisplayItem(val context: Context, private val layout: Int) : BaseDis
             view.measure(widthSpec, heightSpec)
             displayWidth = view.measuredWidth
             displayHeight = view.measuredHeight
+            Log.i(
+                "zzc3",
+                "rotation "
+            )
             view.layout(0, 0, view.measuredWidth, view.measuredHeight)
         }
         canvas.withSave {
@@ -61,15 +57,6 @@ class LayoutDisplayItem(val context: Context, private val layout: Int) : BaseDis
                 canvas.scale(scaleX, scaleY, x + getScalePX(scaleX), y + getScalePY(scaleY))
             }
             if (rotation != 0f) {
-                Log.i(
-                    "zzc3",
-                    "rotation ${drawX + getRotatePX(rotation, scaleX)}--${
-                        drawY + getRotatePY(
-                            rotation,
-                            scaleY
-                        )
-                    }-${cos(round(rotation))}-${round(rotation)}"
-                )
                 canvas.rotate(
                     rotation, drawX + getRotatePX(rotation, scaleX),
                     drawY + getRotatePY(rotation, scaleY)
@@ -104,11 +91,11 @@ class LayoutDisplayItem(val context: Context, private val layout: Int) : BaseDis
     }
 
     override fun getRotatePX(rotation: Float, scaleX: Float): Float {
-        return displayWidth   / 2f
+        return displayWidth / 2f
     }
 
     override fun getRotatePY(rotation: Float, scaleY: Float): Float {
-        return displayHeight  / 2f
+        return displayHeight / 2f
     }
 
     override fun touch(

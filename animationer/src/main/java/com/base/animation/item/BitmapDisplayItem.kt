@@ -6,12 +6,11 @@ import android.graphics.Paint
 import android.graphics.PointF
 import android.graphics.Rect
 import android.graphics.RectF
-import android.util.Log
 import androidx.core.graphics.withSave
 import com.base.animation.IClickIntercept
 import com.base.animation.cache.AteDisplayItem
 import com.base.animation.model.AnimDrawObject
-import com.base.animation.xml.AnimDecoder2
+
 
 /**
  * @author:zhouzechao
@@ -42,7 +41,6 @@ open class BitmapDisplayItem : BaseDisplayItem() {
             field = value
             bitmapWidth = value?.width ?: 50
             bitmapHeight = value?.height ?: 50
-            Log.i(TAG, "$bitmapWidth - $bitmapHeight")
         }
 
     open fun setBitmap(bitmap: Bitmap) {

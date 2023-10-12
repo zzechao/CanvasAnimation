@@ -1,10 +1,10 @@
 package com.base.animation.node
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.View
 import androidx.annotation.CallSuper
 import com.base.animation.AnimationEx
+import com.base.animation.Animer
 import com.base.animation.IAnimView
 import com.base.animation.model.PathObject
 import com.base.animation.xml.AnimDecoder2
@@ -43,7 +43,7 @@ interface IAnimNode : XmlBaseAnimNode, IXmlObjNodeParser {
                 )
             }
         } catch (e: Exception) {
-            Log.e(TAG, "[parseAndGetField]:${e}")
+            Animer.log.e(TAG, "[parseAndGetField]:${e}")
         }
     }
 
@@ -56,12 +56,12 @@ interface IAnimNode : XmlBaseAnimNode, IXmlObjNodeParser {
                 try {
                     val javaClass = this@IAnimNode.javaClass
                     val fields = this@IAnimNode.javaClass.fields
-                    Log.i(TAG, "[encode]:${this@IAnimNode.javaClass} ${fields.size} $javaClass")
+                    Animer.log.i(TAG, "[encode]:${this@IAnimNode.javaClass} ${fields.size} $javaClass")
                     for (i in fields.indices) {
                         parseAndGetField(this, fields[i])
                     }
                 } catch (e: Exception) {
-                    Log.e(TAG, "[encode]:${e}")
+                    Animer.log.e(TAG, "[encode]:${e}")
                 }
                 encodeSelf(this)
             }
@@ -82,8 +82,7 @@ interface IAnimNode : XmlBaseAnimNode, IXmlObjNodeParser {
             for (i in fields.indices) {
                 if (parseAndSetField(fields[i], name, value)) return
             }
-        } catch (e: Exception) {
-            Log.e("ttt", "[setAttribute]:${e}")
+        } catch (_: Exception) {
         }
     }
 
@@ -105,11 +104,9 @@ interface IAnimNode : XmlBaseAnimNode, IXmlObjNodeParser {
                         field.set(this, it)
                     }
                 }
-                Log.i("zzc", "parseAndSetField ${annotation.name} $name $value ${field.get(this)}")
                 return true
             }
         } catch (e: Exception) {
-            Log.e("ttt", "[parseAndSetField]:${e}")
         }
         return false
     }

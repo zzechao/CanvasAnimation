@@ -2,7 +2,6 @@ package com.base.canvasanimation
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.util.Log
 import com.base.animation.AnimCache
 import com.base.animation.item.BitmapDisplayItem
 import kotlin.random.Random
@@ -49,7 +48,6 @@ class BitmapDouDisplay(val rocation: Int, val bitmapKey: String) : BitmapDisplay
             }
         }
         current += i
-        Log.i("zzc", "draw current:$current max:$rocation $i")
         super.draw(canvas, x, y, alpha, scaleX, scaleY)
     }
 }

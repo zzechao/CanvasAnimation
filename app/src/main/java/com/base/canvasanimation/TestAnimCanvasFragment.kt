@@ -1,12 +1,10 @@
 package com.base.canvasanimation
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PointF
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,12 +12,13 @@ import android.view.animation.LinearInterpolator
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.base.animation.AnimCache
+import com.base.animation.Animer
 import com.base.animation.BitmapLoader
 import com.base.animation.DisplayObject
 import com.base.animation.IAnimListener
 import com.base.animation.IClickIntercept
 import com.base.animation.item.BitmapDisplayItem
+import com.base.animation.item.LayoutDisplayItem
 import com.base.animation.model.AnimDrawObject
 import com.base.animation.model.AnimPathObject
 import com.base.animation.model.PathObject
@@ -31,7 +30,6 @@ import com.base.animation.xml.buildString
 import com.base.animation.xml.node.coder.InterpolatorEnum
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_1
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_2
@@ -44,7 +42,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
-import kotlin.random.Random
 
 
 /**
@@ -89,7 +86,7 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
         }
 
         anim_3?.setOnClickListener {
-            startAnimRain()
+            startImageDouAnim3()
         }
         anim_surface?.addAnimListener(this)
         anim_surface?.addClickIntercept(this)
@@ -228,7 +225,6 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                 }
             }
         }.apply {
-            Log.i("tttt2", this.buildString())
             lifecycleScope.launch(Dispatchers.IO) {
                 AnimDecoder2.suspendPlayAnimWithAnimNode(
                     anim_surface,
@@ -341,7 +337,7 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                 }
             }
         }.apply {
-            Log.i("tttt2", this.buildString())
+            Animer.log.i("tttt2", this.buildString())
             lifecycleScope.launch {
                 AnimDecoder2.suspendPlayAnimWithAnimNode(
                     anim_surface, this@apply
@@ -416,7 +412,6 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                 }
             }
         }.apply {
-            Log.i("tttt2", this.buildString())
             lifecycleScope.launch {
                 AnimDecoder2.suspendPlayAnimWithAnimNode(
                     anim_surface, this@apply
@@ -438,6 +433,60 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                                     resources, R.mipmap.xin, 1, 100, 100
                                 )
                             )
+                        }
+                    }
+                    displayItem
+                }
+            }
+        }
+    }
+
+    private fun startImageDouAnim3() {
+        AnimEncoder().buildAnimNode {
+            layoutNode {
+                layoutIdName = "view_liuguang"
+                startNode {
+                    scaleX = 1f
+                    scaleY = 1f
+                    point = PointF(
+                        DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                            .toFloat(),
+                        DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                            .toFloat() / 2
+                    )
+                    endNode {
+                        scaleX = 1f
+                        scaleY = 1f
+                        point = PointF(
+                            0f,
+                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                                .toFloat() / 2
+                        )
+                        durTime = 1500
+                        interpolator = InterpolatorEnum.Decelerate.type
+                    }
+
+                    endNode {
+                        scaleX = 1f
+                        scaleY = 1f
+                        point = PointF(
+                            0f,
+                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                                .toFloat() / 2
+                        )
+                        durTime = 500
+                        interpolator = InterpolatorEnum.Decelerate.type
+                    }
+                }
+            }
+        }.apply {
+            lifecycleScope.launch {
+                AnimDecoder2.suspendPlayAnimWithAnimNode(
+                    anim_surface, this@apply
+                ) { node, displayItem ->
+                    when (displayItem) {
+                        is LayoutDisplayItem -> {
+
                         }
                     }
                     displayItem

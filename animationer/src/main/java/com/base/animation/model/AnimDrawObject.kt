@@ -2,7 +2,6 @@ package com.base.animation.model
 
 import android.graphics.Canvas
 import android.graphics.PointF
-import android.util.Log
 import com.base.animation.helper.PathObjectDeal
 import com.base.animation.item.BaseDisplayItem
 

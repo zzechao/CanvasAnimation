@@ -3,7 +3,6 @@ package com.base.animation
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
 
 object BitmapLoader {
     fun decodeBitmapFrom(
@@ -30,9 +29,7 @@ object BitmapLoader {
             // Calculate inSampleSize
             inSampleSize = mSampleSize
             inMutable = true
-            return BitmapFactory.decodeResource(res, id, this).apply {
-                Log.i("ttt", this.toString())
-            }
+            return BitmapFactory.decodeResource(res, id, this)
         }
 
     private fun calculate(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {

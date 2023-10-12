@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mGiftLayout"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    tools:visibility="visible"
+    android:layout_width="wrap_content"
+    android:layout_height="50dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginTop="280dp"
+    android:visibility="gone">
+
+    <ImageView
+        android:layout_width="298dp"
+        android:layout_height="42dp"
+        android:layout_alignParentBottom="true"
+        android:src="@drawable/common_img_continuous_click_gift_bg" />
+
+    <ImageView
+        android:id="@+id/mAvatarIv"
+        android:src="@drawable/xin"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:id="@+id/mUserNameTv"
+        tools:text="用户昵称adfafdsdfasfd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="13dp"
+        android:layout_toEndOf="@+id/mAvatarIv"
+        android:ellipsize="end"
+        android:lines="1"
+        android:maxWidth="92dp"
+        android:textColor="@color/white"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/mSendToTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/mUserNameTv"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="4dp"
+        android:text="Send to"
+        android:textColor="#BFFFFFFF"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/mReceiverUserNameTv"
+        android:text="用户昵称adfafdsdfasfd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/mSendToTv"
+        android:layout_marginStart="4dp"
+        android:layout_toEndOf="@+id/mSendToTv"
+        android:ellipsize="end"
+        android:lines="1"
+        android:maxWidth="48dp"
+        android:textColor="#FFF240"
+        android:textSize="12sp" />
+
+    <ImageView
+        android:id="@+id/mGiftIcon"
+        android:src="@drawable/common_icon_gift_continuous_click_tag"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="5dp"
+        android:layout_toEndOf="@+id/mUserNameTv" />
+
+    <TextView
+        android:id="@+id/mGiftNum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="4dp"
+        android:layout_toEndOf="@+id/mGiftIcon" />
+
+</RelativeLayout>

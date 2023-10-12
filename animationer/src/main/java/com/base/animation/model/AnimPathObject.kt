@@ -1,6 +1,5 @@
 package com.base.animation.model
 
-import android.util.Log
 import com.base.animation.item.BaseDisplayItem
 import java.util.concurrent.atomic.AtomicLong
 
@@ -107,7 +106,7 @@ data class AnimPathObject @JvmOverloads constructor(
         fun doAnimPath(
             during: Long, pathObject: PathObject
         ): Inner {
-            Log.i("zzc", "doAnimPath $during")
+
             if (!isInit) {
                 throw IllegalStateException("please run beginAnimPath,next run beginNextAnimPath")
             }
@@ -163,7 +162,7 @@ data class AnimPathObject @JvmOverloads constructor(
             if (beginPathObjects.isEmpty()) throw IllegalStateException("please set beginAnimPath")
             if (animPathMap.isEmpty()) throw IllegalStateException("please add doNextAnimPath")
             val displayItem = displayItems.associateBy { it.displayItemId }.toMutableMap()
-            Log.i("zzc", "$beginPathObjects \n $animPathMap \n $displayItem")
+
             return AnimPathObject(
                 beginPathObjects, animPathMap, displayItem, pathCache = pathCache
             )

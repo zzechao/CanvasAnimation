@@ -66,7 +66,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
             MutableMap<Int, MutableList<AnimDrawObject>>> =
         CacheBuilder.newBuilder()
             .concurrencyLevel(4)
-            .maximumSize(10)
+            .maximumSize(20)
             .initialCapacity(5)
             .expireAfterWrite(5, TimeUnit.SECONDS)
             .expireAfterAccess(5, TimeUnit.SECONDS)
@@ -105,7 +105,6 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
         supervisorScope {
             for (animPath in this@actor) {
                 launch(coroutineContext) {
-                    Animer.log.i("tttt1", "calculation start")
                     if (animPath.displayItemsMap.isNotEmpty()) {
                         AnimCache.displayItemCache.putDisplayItems(animPath.displayItemsMap)
                     }
@@ -167,9 +166,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
                         drawObject.animDraws = drawsMap
                         animDrawObjects[drawObject.animId] = drawObject
                         animDrawIds.add(drawObject.animId)
-                        Animer.log.i("tttt1", "calculation end")
                     } else {
-                        Animer.log.i(TAG, "no cache used")
                         for ((index, starts) in animPath.startPoints) {
                             var startPosition = position
                             if (starts.isNotEmpty()) {
@@ -238,7 +235,6 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
                         drawObject.animDraws = drawsMap
                         animDrawObjects[drawObject.animId] = drawObject
                         animDrawIds.add(drawObject.animId)
-                        Animer.log.i("tttt1", "calculation end")
                     }
                 }
             }

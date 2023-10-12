@@ -1,6 +1,6 @@
 package com.base.animation.xml.node.coder
 
-import android.util.Log
+import com.base.animation.Animer
 import kotlin.reflect.KClass
 
 class DefaultAttributeCoder : IAttributeCoder<Any> {
@@ -16,7 +16,7 @@ class DefaultAttributeCoder : IAttributeCoder<Any> {
                 else -> null
             }
         } catch (e: Exception) {
-            Log.e("DefaultAttributeCoder", "[attributeDecode]:$e")
+            Animer.log.e("DefaultAttributeCoder", "[attributeDecode]:$e")
             null
         }
     }

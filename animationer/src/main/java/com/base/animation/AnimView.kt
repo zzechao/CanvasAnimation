@@ -22,7 +22,6 @@ class AnimView @JvmOverloads constructor(
     private val helper: AnimViewHelper
 
     init {
-        isClickable = true
         helper = AnimViewHelper(context) {
             background.invalidateSelf()
         }

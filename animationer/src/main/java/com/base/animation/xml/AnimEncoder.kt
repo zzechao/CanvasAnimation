@@ -1,6 +1,6 @@
 package com.base.animation.xml
 
-import android.util.Log
+import com.base.animation.Animer
 import com.base.animation.node.AnimNode
 import com.base.animation.node.EndNode
 import com.base.animation.node.EndNodeContainer
@@ -94,7 +94,7 @@ fun AnimEncoder.buildAnimXmlString(onInit: AnimEncoder.() -> Unit): String {
             encode.rootNode.encode(this)
         }
     } catch (e: Exception) {
-        Log.e(TAG, "[buildRichTextXmlString]:${e}")
+        Animer.log.e(TAG, "[buildRichTextXmlString]:${e}")
         ""
     }
 }
