@@ -11,6 +11,7 @@ import androidx.core.graphics.withSave
 import com.base.animation.IClickIntercept
 import com.base.animation.cache.AteDisplayItem
 import com.base.animation.model.AnimDrawObject
+import com.base.animation.xml.AnimDecoder2
 
 /**
  * @author:zhouzechao
@@ -20,8 +21,8 @@ import com.base.animation.model.AnimDrawObject
 private const val TAG = "BitmapDisplayItem"
 
 @AteDisplayItem(usePoolCache = true)
-class BitmapDisplayItem constructor() :
-    BaseDisplayItem() {
+open class BitmapDisplayItem : BaseDisplayItem() {
+
 
     private val paint by lazy {
         Paint().apply {

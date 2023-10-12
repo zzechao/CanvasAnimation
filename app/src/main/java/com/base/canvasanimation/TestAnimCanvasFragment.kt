@@ -20,7 +20,6 @@ import com.base.animation.item.BitmapDisplayItem
 import com.base.animation.model.AnimDrawObject
 import com.base.animation.model.AnimPathObject
 import com.base.animation.model.PathObject
-import com.base.animation.xml.AnimDecoder
 import com.base.animation.xml.AnimDecoder2
 import com.base.animation.xml.AnimEncoder
 import com.base.animation.xml.buildAnimNode
@@ -286,13 +285,13 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
     }
 
 
-    private fun startMoreAnim3() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            AnimDecoder.suspendPlayAnimWithXml(xmlMore, anim_surface, xmlMore) {
-                BitmapFactory.decodeResource(resources, R.mipmap.xin)
-            }
-        }
-    }
+//    private fun startMoreAnim3() {
+//        lifecycleScope.launch(Dispatchers.IO) {
+//            AnimDecoder.suspendPlayAnimWithXml(xmlMore, anim_surface, xmlMore) {
+//                BitmapFactory.decodeResource(resources, R.mipmap.xin)
+//            }
+//        }
+//    }
 
     private fun startMoreAnim2() {
         val size = 80
@@ -303,8 +302,8 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                 this.displayHeightSize = size
                 startNode {
                     point = PointF(0f, 0f)
-                    scaleX = 0.5f
-                    scaleY = 0.5f
+                    scaleX = 0f
+                    scaleY = 0f
                     endNode {
                         point = PointF(
                             DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
@@ -355,10 +354,11 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                                     DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
                                         .toFloat() / 2 - size / 2
                                 )
+                                durTime = 1000
                                 alpha = 0
                                 rotation = 360f
-                                scaleX = 0f
-                                scaleY = 0f
+                                scaleX = 2f
+                                scaleY = 2f
                             }
                         }
                     }

@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
 
 
 @AnimNodeName(name = "imageNode")
-class ImageNode : IXmlDrawableNode() {
+open class ImageNode : IXmlDrawableNode() {
 
     @AnimAttributeName("url", UrlAttributeCoder::class)
     @JvmField

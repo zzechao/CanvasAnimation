@@ -1,9 +1,8 @@
 package com.base.animation.node
 
 import com.base.animation.item.BaseDisplayItem
+import com.base.animation.xml.IDealNodeDealIntercept
 import com.base.animation.xml.XmlWriterHelper
-import com.base.animation.xml.node.AnimAttributeName
-import com.base.animation.xml.node.coder.DefaultAttributeCoder
 import kotlin.reflect.KClass
 
 open class IXmlDrawableNode : IAnimNode {
@@ -27,4 +26,8 @@ open class IXmlDrawableNode : IAnimNode {
     override fun getNodes(): MutableList<IAnimNode> {
         return childNodes
     }
+}
+
+interface IXmlDrawableNodeDealIntercept {
+    val dealIntercept: IDealNodeDealIntercept
 }

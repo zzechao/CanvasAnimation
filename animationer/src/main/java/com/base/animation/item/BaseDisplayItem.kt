@@ -1,10 +1,13 @@
 package com.base.animation.item
 
 import android.graphics.Canvas
+import android.graphics.PointF
 import androidx.annotation.CallSuper
 import androidx.core.graphics.withSave
+import com.base.animation.IClickIntercept
 import com.base.animation.IDisplayItem
 import com.base.animation.cache.IRecycle
+import com.base.animation.model.AnimDrawObject
 import java.util.concurrent.atomic.AtomicLong
 
 /**
@@ -12,7 +15,7 @@ import java.util.concurrent.atomic.AtomicLong
  * @date: 2020/12/8
  * description：display模块
  */
-abstract class BaseDisplayItem() : IDisplayItem, IRecycle {
+abstract class BaseDisplayItem : IDisplayItem, IRecycle {
 
     open var displayHeight: Int = 0
     open var displayWidth: Int = 0
@@ -38,6 +41,13 @@ abstract class BaseDisplayItem() : IDisplayItem, IRecycle {
         }
     }
 
+    override fun touch(
+        animId: Long,
+        iClickIntercepts: MutableList<IClickIntercept>,
+        animDrawObject: AnimDrawObject,
+        touchPoint: MutableList<PointF>
+    ) {
+    }
 
     override fun poolSize(): Int {
         return 20

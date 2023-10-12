@@ -14,12 +14,21 @@ import com.base.animation.node.EndNode
 import com.base.animation.node.EndNodeContainer
 import com.base.animation.node.IAnimNode
 import com.base.animation.node.IXmlDrawableNode
+import com.base.animation.node.IXmlDrawableNodeDealIntercept
 import com.base.animation.node.ImageNode
 import com.base.animation.node.LayoutNode
 import com.base.animation.node.StartNode
 import com.base.animation.node.TextNode
 import com.base.animation.xml.node.AnimNodeChain
 import com.base.animation.xml.node.coder.IAttributeCoder
+
+
+typealias IDealNodeDealIntercept = suspend (
+    displayObject: DisplayObject,
+    animNode: IAnimNode,
+    chain: AnimNodeChain,
+    dealDisplayItem: DealDisplayItem
+) -> String
 
 object AnimDecoder2 {
 
@@ -84,7 +93,7 @@ object AnimDecoder2 {
                 val key = animNode.url + animNode.displayHeightSize + animNode.nodeName
                 val displayId = displayObject.suspendAdd(
                     key = key,
-                    kClass = BitmapDisplayItem::class
+                    kClass = animNode.displayItem
                 ) {
                     val bitmapDisplayItem = BitmapDisplayItem()
                     dealDisplayItem.invoke(
@@ -113,7 +122,7 @@ object AnimDecoder2 {
                 val key = animNode.txt + animNode.fontSize + animNode.color + animNode.nodeName
                 val displayId = displayObject.suspendAdd(
                     key = key,
-                    kClass = StringDisplayItem::class
+                    kClass = animNode.displayItem
                 ) {
                     val stringDisplayItem =
                         StringDisplayItem(
@@ -142,7 +151,7 @@ object AnimDecoder2 {
                 val key = animNode.layoutIdName + animNode.data
                 val displayId = displayObject.suspendAdd(
                     key = key,
-                    kClass = LayoutDisplayItem::class
+                    kClass = animNode.displayItem
                 ) {
                     val layoutId = AnimationEx.mApplication.resources.getIdentifier(
                         animNode.layoutIdName,
@@ -233,6 +242,27 @@ object AnimDecoder2 {
                     }
                 }
                 chain.buildAnimContainer()
+            }
+
+            is IXmlDrawableNodeDealIntercept -> {
+                if (animNode is IXmlDrawableNode) {
+                    if (animNode.getNodes().isEmpty()) return
+                    val displayId = animNode.dealIntercept.invoke(
+                        displayObject,
+                        animNode,
+                        chain,
+                        dealDisplayItem
+                    )
+                    if (displayId.isNotEmpty()) {
+                        chain.curDisplayId = displayId
+                    }
+                    if (isContainer) return
+                    animNode.getNodes().forEach {
+                        if (it is EndNode || it is EndNodeContainer || it is StartNode) {
+                            dealAnim(displayObject, it, chain, dealDisplayItem)
+                        }
+                    }
+                }
             }
         }
     }

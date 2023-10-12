@@ -99,11 +99,11 @@ class LayoutDisplayItem(val context: Context, private val layout: Int) : BaseDis
     }
 
     override fun getRotatePX(rotation: Float, scaleX: Float): Float {
-        return displayWidth  / scaleX / 2
+        return displayWidth   / 2f
     }
 
     override fun getRotatePY(rotation: Float, scaleY: Float): Float {
-        return displayHeight / scaleY / 2
+        return displayHeight  / 2f
     }
 
     override fun touch(
