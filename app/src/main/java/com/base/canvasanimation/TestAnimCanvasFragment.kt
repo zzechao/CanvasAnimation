@@ -35,6 +35,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 
 /**
@@ -357,50 +358,51 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                 this.url = url
                 this.displayHeightSize = size
                 startNode {
-                    point = PointF(
-                        DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
-                            .toFloat() / 2 - size / 2,
-                        DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
-                            .toFloat() - size / 2
-                    )
                     scaleX = 2f
                     scaleY = 2f
+                    point = PointF(
+                        DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                            .toFloat() / 2 - size / scaleX / 2,
+                        DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                            .toFloat() - size / scaleY / 2
+                    )
+
                     endNode {
-                        point = PointF(
-                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
-                                .toFloat() / 2 - size / 2,
-                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
-                                .toFloat() / 2 - size / 2
-                        )
                         scaleX = 2f
                         scaleY = 2f
+                        point = PointF(
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                                .toFloat() / 2 - size / scaleX / 2,
+                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                                .toFloat() / 2 - size / scaleY / 2
+                        )
                         durTime = 1500
                         interpolator = InterpolatorEnum.Decelerate.type
                     }
                     endNode {
-                        point = PointF(
-                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
-                                .toFloat() / 2 - size / 2,
-                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
-                                .toFloat() / 2 - size / 2
-                        )
                         scaleX = 2f
                         scaleY = 2f
-                        durTime = 50
+                        point = PointF(
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                                .toFloat() / 2 - size / scaleX / 2,
+                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                                .toFloat() / 2 - size / scaleY / 2
+                        )
+                        durTime = 100
                         interpolator = InterpolatorEnum.Decelerate.type
                     }
                     imageDouNode {
-                        this.rocation = 10
+                        this.rocation = Random.nextInt(-10, 10)
                         endNode {
-                            point = PointF(
-                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
-                                    .toFloat() / 2 - size / 2,
-                                DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
-                                    .toFloat() - size / 2
-                            )
-                            durTime = 2000
                             scaleX = 2f
                             scaleY = 2f
+                            point = PointF(
+                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                                    .toFloat() / 2 - size / scaleX / 2,
+                                DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                                    .toFloat() - size / scaleY / 2
+                            )
+                            durTime = 2000
                             interpolator = InterpolatorEnum.Accelerate.type
                         }
                     }
@@ -414,16 +416,27 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                 ) { node, displayItem ->
                     when (displayItem) {
                         is BitmapDouDisplay -> {
-                            AnimCache.putBitmapCache(
-                                    displayItem.bitmapKey, BitmapLoader.decodeBitmapFrom(
-                                        resources, R.mipmap.xin, 1, 100, 100
-                                    )
+                            displayItem.setBitmap(
+                                BitmapLoader.decodeBitmapFrom(
+                                    resources,
+                                    R.mipmap.xin,
+                                    1,
+                                    100,
+                                    100
                                 )
+                            )
                         }
 
                         is BitmapDisplayItem -> {
-                            displayItem.mBitmap =
-                                BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, 100, 100)
+                            displayItem.setBitmap(
+                                BitmapLoader.decodeBitmapFrom(
+                                    resources,
+                                    R.mipmap.xin,
+                                    1,
+                                    100,
+                                    100
+                                )
+                            )
                         }
                     }
                     displayItem

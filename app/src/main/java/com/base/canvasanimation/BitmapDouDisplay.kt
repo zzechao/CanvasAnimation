@@ -6,9 +6,11 @@ import com.base.animation.AnimCache
 import com.base.animation.item.BitmapDisplayItem
 
 class BitmapDouDisplay(rocation: Int, val bitmapKey: String) : BitmapDisplayItem() {
-
     override var mBitmap: Bitmap? = null
-        get() = AnimCache.getBitmapCache(bitmapKey)
+        get() = AnimCache.getBitmapCache(bitmapKey).apply {
+            bitmapWidth = this?.width ?: 50
+            bitmapHeight = this?.height ?: 50
+        }
 
     private var current = 0
     private var max = 0
@@ -17,6 +19,12 @@ class BitmapDouDisplay(rocation: Int, val bitmapKey: String) : BitmapDisplayItem
     init {
         current = rocation
         max = current
+    }
+
+    override fun setBitmap(bitmap: Bitmap) {
+        AnimCache.putBitmapCache(
+            bitmapKey, bitmap
+        )
     }
 
     override fun draw(

@@ -31,8 +31,8 @@ open class BitmapDisplayItem : BaseDisplayItem() {
         }
     }
 
-    private var bitmapWidth: Int = 50
-    private var bitmapHeight: Int = 50
+    open var bitmapWidth: Int = 50
+    open var bitmapHeight: Int = 50
     private var mBitmapRect: Rect? = null
     private var mDisplayRect: RectF? = null
     private var displaySizeSet = false
@@ -44,6 +44,10 @@ open class BitmapDisplayItem : BaseDisplayItem() {
             bitmapHeight = value?.height ?: 50
             Log.i(TAG, "$bitmapWidth - $bitmapHeight")
         }
+
+    open fun setBitmap(bitmap: Bitmap) {
+        mBitmap = bitmap
+    }
 
     override fun draw(
         canvas: Canvas,
@@ -61,7 +65,8 @@ open class BitmapDisplayItem : BaseDisplayItem() {
 
                 if (rotation != 0f) {
                     canvas.rotate(
-                        rotation, drawX + getRotatePX(rotation, scaleX),
+                        rotation,
+                        drawX + getRotatePX(rotation, scaleX),
                         drawY + getRotatePY(rotation, scaleY)
                     )
                 }
@@ -70,7 +75,8 @@ open class BitmapDisplayItem : BaseDisplayItem() {
                 val drawY = y - (bitmapHeight / 2 / scaleY)
                 if (rotation != 0f) {
                     canvas.rotate(
-                        rotation, drawX + getRotatePX(rotation, scaleX),
+                        rotation,
+                        drawX + getRotatePX(rotation, scaleX),
                         drawY + getRotatePY(rotation, scaleY)
                     )
                 }
@@ -96,9 +102,7 @@ open class BitmapDisplayItem : BaseDisplayItem() {
                     val drawY = y - (displayHeight / scaleY / 2f)
 
                     mDisplayRect?.set(
-                        drawX, drawY,
-                        drawX + displayWidth,
-                        drawY + displayHeight
+                        drawX, drawY, drawX + displayWidth, drawY + displayHeight
                     )
                     mDisplayRect?.let { rect ->
                         canvas.drawBitmap(it, null, rect, paint)
