@@ -88,6 +88,26 @@ object AnimDecoder2 {
         isContainer: Boolean = false
     ) {
         when (animNode) {
+            is IXmlDrawableNodeDealIntercept -> {
+                if (animNode is IXmlDrawableNode) {
+                    if (animNode.getNodes().isEmpty()) return
+                    val displayId = animNode.dealIntercept.invoke(
+                        displayObject,
+                        animNode,
+                        chain,
+                        dealDisplayItem
+                    )
+                    if (displayId.isNotEmpty()) {
+                        chain.curDisplayId = displayId
+                    }
+                    if (isContainer) return
+                    animNode.getNodes().forEach {
+                        if (it is EndNode || it is EndNodeContainer || it is StartNode) {
+                            dealAnim(displayObject, it, chain, dealDisplayItem)
+                        }
+                    }
+                }
+            }
             is ImageNode -> {
                 if (animNode.getNodes().isEmpty()) return
                 val key = animNode.url + animNode.displayHeightSize + animNode.nodeName
@@ -242,27 +262,6 @@ object AnimDecoder2 {
                     }
                 }
                 chain.buildAnimContainer()
-            }
-
-            is IXmlDrawableNodeDealIntercept -> {
-                if (animNode is IXmlDrawableNode) {
-                    if (animNode.getNodes().isEmpty()) return
-                    val displayId = animNode.dealIntercept.invoke(
-                        displayObject,
-                        animNode,
-                        chain,
-                        dealDisplayItem
-                    )
-                    if (displayId.isNotEmpty()) {
-                        chain.curDisplayId = displayId
-                    }
-                    if (isContainer) return
-                    animNode.getNodes().forEach {
-                        if (it is EndNode || it is EndNodeContainer || it is StartNode) {
-                            dealAnim(displayObject, it, chain, dealDisplayItem)
-                        }
-                    }
-                }
             }
         }
     }

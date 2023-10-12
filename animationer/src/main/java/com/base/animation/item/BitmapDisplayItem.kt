@@ -37,7 +37,7 @@ open class BitmapDisplayItem : BaseDisplayItem() {
     private var mDisplayRect: RectF? = null
     private var displaySizeSet = false
 
-    var mBitmap: Bitmap? = null
+    open var mBitmap: Bitmap? = null
         set(value) {
             field = value
             bitmapWidth = value?.width ?: 50
@@ -129,7 +129,6 @@ open class BitmapDisplayItem : BaseDisplayItem() {
     }
 
     override fun getRotatePX(rotation: Float, scaleX: Float): Float {
-        Log.i("zzc2", "getRotatePX:$displaySizeSet displayWidth:$displayWidth scaleX:$scaleX")
         return if (displaySizeSet) {
             displayWidth / scaleX / 2f
         } else {
@@ -138,7 +137,6 @@ open class BitmapDisplayItem : BaseDisplayItem() {
     }
 
     override fun getRotatePY(rotation: Float, scaleY: Float): Float {
-        Log.i("zzc2", "getRotatePY:$displaySizeSet displayWidth:$displayWidth $scaleY")
         return if (displaySizeSet) {
             displayHeight / scaleY / 2f
         } else {

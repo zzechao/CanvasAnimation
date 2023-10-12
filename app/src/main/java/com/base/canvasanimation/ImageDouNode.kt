@@ -5,6 +5,8 @@ import com.base.animation.item.BaseDisplayItem
 import com.base.animation.node.IAnimNode
 import com.base.animation.node.IXmlDrawableNodeDealIntercept
 import com.base.animation.node.ImageNode
+import com.base.animation.node.StartNode
+import com.base.animation.xml.AnimEncoder
 import com.base.animation.xml.DealDisplayItem
 import com.base.animation.xml.IDealNodeDealIntercept
 import com.base.animation.xml.node.AnimAttributeName
@@ -28,15 +30,15 @@ class ImageDouNode : ImageNode(), IXmlDrawableNodeDealIntercept {
             dealDisplayItem: DealDisplayItem
         ): String {
             if (animNode is ImageDouNode) {
-                val key = animNode.url + animNode.displayHeightSize + animNode.nodeName
+                val key =
+                    animNode.url + animNode.displayHeightSize + animNode.nodeName + System.currentTimeMillis()
+                val bitmapKey = animNode.url + animNode.displayHeightSize + animNode.nodeName
                 val displayId = displayObject.suspendAdd(
-                    key = key,
-                    kClass = animNode.displayItem
+                    key = key, kClass = animNode.displayItem
                 ) {
-                    val bitmapDisplayItem = BitmapDouDisplay()
+                    val bitmapDisplayItem = BitmapDouDisplay(rocation, bitmapKey)
                     dealDisplayItem.invoke(
-                        animNode,
-                        bitmapDisplayItem
+                        animNode, bitmapDisplayItem
                     ) // 代理出去处理图片的加载方式
                     val bitmapWidth = bitmapDisplayItem.mBitmap?.width ?: return@suspendAdd null
                     val bitmapHeight = bitmapDisplayItem.mBitmap?.height ?: return@suspendAdd null
@@ -49,4 +51,16 @@ class ImageDouNode : ImageNode(), IXmlDrawableNodeDealIntercept {
             return ""
         }
     }
+}
+
+fun AnimEncoder.imageDouNode(onInit: ImageDouNode.(encoder: AnimEncoder) -> Unit) {
+    curNode.addNode(ImageDouNode().apply {
+        val lastNode = curNode
+        try {
+            curNode = this
+            onInit(this, this@imageDouNode)
+        } finally {
+            curNode = lastNode
+        }
+    })
 }

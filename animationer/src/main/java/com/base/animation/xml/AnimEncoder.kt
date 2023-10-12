@@ -17,7 +17,7 @@ class AnimEncoder {
     val rootNode: AnimNode by lazy {
         AnimNode()
     }
-    private var curNode: XmlBaseAnimNode = rootNode
+    var curNode: XmlBaseAnimNode = rootNode
 
     fun startNode(onInit: StartNode.(encoder: AnimEncoder) -> Unit) {
         curNode.addNode(StartNode().apply {

@@ -113,7 +113,7 @@ class DisplayObject private constructor() {
     /**
      * 获取display的md5信息
      */
-    private fun getDisPlayItemKey(
+    fun getDisPlayItemKey(
         key: String, displayWidth: Int = 0, displayHeight: Int = 0, kClass: KClass<out
         BaseDisplayItem>
     ): String {
