@@ -2,10 +2,12 @@ package com.base.canvasanimation
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.util.Log
 import com.base.animation.AnimCache
 import com.base.animation.item.BitmapDisplayItem
+import kotlin.random.Random
 
-class BitmapDouDisplay(rocation: Int, val bitmapKey: String) : BitmapDisplayItem() {
+class BitmapDouDisplay(val rocation: Int, val bitmapKey: String) : BitmapDisplayItem() {
     override var mBitmap: Bitmap? = null
         get() = AnimCache.getBitmapCache(bitmapKey).apply {
             bitmapWidth = this?.width ?: 50
@@ -13,12 +15,15 @@ class BitmapDouDisplay(rocation: Int, val bitmapKey: String) : BitmapDisplayItem
         }
 
     private var current = 0
-    private var max = 0
     private var i = 1
 
     init {
-        current = rocation
-        max = current
+        current = if (Random.nextBoolean()) {
+            rocation
+        } else {
+            rocation * -1
+        }
+        Log.i("zzc", "$current $i")
     }
 
     override fun setBitmap(bitmap: Bitmap) {
@@ -37,12 +42,15 @@ class BitmapDouDisplay(rocation: Int, val bitmapKey: String) : BitmapDisplayItem
             drawX + getRotatePX(current.toFloat(), scaleX),
             drawY + getRotatePY(current.toFloat(), scaleY)
         )
-        if (current == max * -1) {
-            i = 1
-        } else if (current == max) {
-            i = -1
+        if (current == rocation * i) {
+            i = if (i < 0) {
+                1
+            } else {
+                -1
+            }
         }
         current += i
+        Log.i("zzc", "draw current:$current max:$rocation $i")
         super.draw(canvas, x, y, alpha, scaleX, scaleY)
     }
 }

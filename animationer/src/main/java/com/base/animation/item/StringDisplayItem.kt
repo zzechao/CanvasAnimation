@@ -11,6 +11,11 @@ import android.util.Log
 import com.base.animation.IClickIntercept
 import com.base.animation.model.AnimDrawObject
 
+/**
+ * @author:zhouzechao
+ * @date: 2020/12/23
+ * description：单个view的绘制item
+ */
 class StringDisplayItem(
     override var displayHeight: Int,
     val message: String,

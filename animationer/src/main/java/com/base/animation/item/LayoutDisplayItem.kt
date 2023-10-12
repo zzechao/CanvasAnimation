@@ -19,6 +19,11 @@ import kotlin.math.cosh
 import kotlin.math.round
 import kotlin.math.tanh
 
+/**
+ * @author:zhouzechao
+ * @date: 2020/12/23
+ * description：单个view的绘制item
+ */
 class LayoutDisplayItem(val context: Context, private val layout: Int) : BaseDisplayItem() {
 
     private val view: View by lazy {

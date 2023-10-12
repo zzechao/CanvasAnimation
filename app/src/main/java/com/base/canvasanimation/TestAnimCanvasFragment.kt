@@ -71,12 +71,7 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
         }
 
         anim_2?.setOnClickListener {
-            lifecycleScope.launch {
-                repeat(50) {
-                    startImageDouAnim2()
-                    delay(200)
-                }
-            }
+            startImageDouAnim2()
         }
 
         anim_3?.setOnClickListener {
@@ -354,7 +349,8 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
         val size = 80
         val url = "https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png"
         AnimEncoder().buildAnimNode {
-            imageNode {
+            imageDouNode {
+                this.rocation = 10
                 this.url = url
                 this.displayHeightSize = size
                 startNode {
@@ -388,23 +384,20 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                             DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
                                 .toFloat() / 2 - size / scaleY / 2
                         )
-                        durTime = 100
-                        interpolator = InterpolatorEnum.Decelerate.type
+                        durTime = 50
+                        interpolator = InterpolatorEnum.Linear.type
                     }
-                    imageDouNode {
-                        this.rocation = Random.nextInt(-10, 10)
-                        endNode {
-                            scaleX = 2f
-                            scaleY = 2f
-                            point = PointF(
-                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
-                                    .toFloat() / 2 - size / scaleX / 2,
-                                DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
-                                    .toFloat() - size / scaleY / 2
-                            )
-                            durTime = 2000
-                            interpolator = InterpolatorEnum.Accelerate.type
-                        }
+                    endNode {
+                        scaleX = 2f
+                        scaleY = 2f
+                        point = PointF(
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                                .toFloat() / 2 - size / scaleX / 2,
+                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                                .toFloat() - size / scaleY / 2
+                        )
+                        durTime = 2000
+                        interpolator = InterpolatorEnum.Accelerate.type
                     }
                 }
             }
