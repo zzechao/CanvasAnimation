@@ -9,4 +9,8 @@ object AnimationEx {
     fun init(application: Application) {
         mApplication = application
     }
+
+    fun init(application: Application, displayMaxCacheSize: Long) {
+        AnimCache.displayItemCache.displayMaxCacheSize = displayMaxCacheSize
+    }
 }

@@ -10,7 +10,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        AnimationEx.init(this.application)
+        AnimationEx.init(this.application, 200)
 
         setContentView(R.layout.activity_main)
         bt1.setOnClickListener {

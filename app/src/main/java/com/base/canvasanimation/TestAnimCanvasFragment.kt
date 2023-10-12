@@ -1,8 +1,10 @@
 package com.base.canvasanimation
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PointF
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -21,11 +23,16 @@ import com.base.animation.item.BitmapDisplayItem
 import com.base.animation.model.AnimDrawObject
 import com.base.animation.model.AnimPathObject
 import com.base.animation.model.PathObject
+import com.base.animation.node.ImageNode
 import com.base.animation.xml.AnimDecoder2
 import com.base.animation.xml.AnimEncoder
 import com.base.animation.xml.buildAnimNode
 import com.base.animation.xml.buildString
 import com.base.animation.xml.node.coder.InterpolatorEnum
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_1
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_2
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_3
@@ -35,6 +42,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 import kotlin.random.Random
 
 
@@ -71,7 +80,12 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
         }
 
         anim_2?.setOnClickListener {
-            startImageDouAnim2()
+            lifecycleScope.launch {
+                repeat(50) {
+                    startImageDouAnim2()
+                    delay(200)
+                }
+            }
         }
 
         anim_3?.setOnClickListener {
@@ -346,8 +360,8 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
 
 
     private fun startImageDouAnim2() {
-        val size = 80
-        val url = "https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png"
+        val size = 150
+        val url = "http://imgs.pago.tv/gifts/69753013-38d8-44de-8a14-286cf4f81083.png"
         AnimEncoder().buildAnimNode {
             imageDouNode {
                 this.rocation = 10
@@ -409,25 +423,19 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                 ) { node, displayItem ->
                     when (displayItem) {
                         is BitmapDouDisplay -> {
-                            displayItem.setBitmap(
-                                BitmapLoader.decodeBitmapFrom(
-                                    resources,
-                                    R.mipmap.xin,
-                                    1,
-                                    100,
-                                    100
-                                )
-                            )
+                            loadImage(
+                                fragment = this@TestAnimCanvasFragment,
+                                (node as ImageNode).url,
+                                node.displayHeightSize
+                            )?.let {
+                                displayItem.setBitmap(it)
+                            }
                         }
 
                         is BitmapDisplayItem -> {
                             displayItem.setBitmap(
                                 BitmapLoader.decodeBitmapFrom(
-                                    resources,
-                                    R.mipmap.xin,
-                                    1,
-                                    100,
-                                    100
+                                    resources, R.mipmap.xin, 1, 100, 100
                                 )
                             )
                         }
@@ -502,5 +510,24 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
     }
 
     override fun endAnim(animId: Long) {
+    }
+}
+
+suspend fun loadImage(fragment: Fragment, url: String, size: Int): Bitmap? {
+    return suspendCancellableCoroutine {
+        Glide.with(fragment).asBitmap()
+            .load(url).into(object : CustomTarget<Bitmap>(
+                size, size
+            ) {
+                override fun onResourceReady(
+                    resource: Bitmap, transition: Transition<in Bitmap>?
+                ) {
+                    it.resume(resource)
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {
+                    it.resume(null)
+                }
+            })
     }
 }

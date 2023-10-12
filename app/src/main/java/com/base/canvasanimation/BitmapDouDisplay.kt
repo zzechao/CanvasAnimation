@@ -23,7 +23,6 @@ class BitmapDouDisplay(val rocation: Int, val bitmapKey: String) : BitmapDisplay
         } else {
             rocation * -1
         }
-        Log.i("zzc", "$current $i")
     }
 
     override fun setBitmap(bitmap: Bitmap) {

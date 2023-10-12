@@ -16,14 +16,18 @@ private const val TAG = "DisplayItemCache"
 
 class DisplayItemCache {
 
-    private val caches: com.google.common.cache.Cache<String, BaseDisplayItem> =
+    var displayMaxCacheSize: Long = 200L
+
+    private val caches: com.google.common.cache.Cache<String, BaseDisplayItem> by lazy {
         CacheBuilder.newBuilder()
             .concurrencyLevel(4)
-            .maximumSize(50)
-            .initialCapacity(5)
+            .maximumSize(displayMaxCacheSize)
+            .initialCapacity(10)
             .expireAfterWrite(60, TimeUnit.SECONDS)
             .expireAfterAccess(60, TimeUnit.SECONDS)
             .build()
+    }
+
 
     val bitmapCache: com.google.common.cache.Cache<String, Bitmap> =
         CacheBuilder.newBuilder().concurrencyLevel(4)
