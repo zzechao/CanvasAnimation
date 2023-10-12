@@ -78,10 +78,7 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
 
         anim_2?.setOnClickListener {
             lifecycleScope.launch {
-                repeat(50) {
-                    startImageDouAnim2()
-                    delay(200)
-                }
+                startImageDouAnim2()
             }
         }
 
@@ -372,7 +369,6 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                         DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
                             .toFloat() - size / scaleY / 2
                     )
-
                     endNode {
                         scaleX = 2f
                         scaleY = 2f
@@ -382,20 +378,8 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                             DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
                                 .toFloat() / 2 - size / scaleY / 2
                         )
-                        durTime = 1500
+                        durTime = 1000
                         interpolator = InterpolatorEnum.Decelerate.type
-                    }
-                    endNode {
-                        scaleX = 2f
-                        scaleY = 2f
-                        point = PointF(
-                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
-                                .toFloat() / 2 - size / scaleX / 2,
-                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
-                                .toFloat() / 2 - size / scaleY / 2
-                        )
-                        durTime = 50
-                        interpolator = InterpolatorEnum.Linear.type
                     }
                     endNode {
                         scaleX = 2f

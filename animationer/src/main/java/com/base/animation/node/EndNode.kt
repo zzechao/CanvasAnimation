@@ -1,6 +1,7 @@
 package com.base.animation.node
 
 import android.graphics.PointF
+import android.util.Log
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
@@ -72,25 +73,19 @@ class EndNode : IAnimNode {
                 LinearInterpolator()
             }
         }
-        val pointF = if ((point?.x ?: 0f) == 0f && (point?.y ?: 0f) == 0f
-            && layoutIdName.isNotEmpty()
-        ) {
-            anim.getViewByAnimName(layoutIdName)?.let { it ->
-                getCenterOfViewLocationInWindow(it).let {
-                    PointF(it[0].toFloat(), it[1].toFloat())
-                }
-            } ?: PointF()
-        } else {
-            point ?: PointF()
-        }
+        Log.i("zzc2", "interpolator:$interpolator")
+        val pointF =
+            if ((point?.x ?: 0f) == 0f && (point?.y ?: 0f) == 0f && layoutIdName.isNotEmpty()) {
+                anim.getViewByAnimName(layoutIdName)?.let { it ->
+                    getCenterOfViewLocationInWindow(it).let {
+                        PointF(it[0].toFloat(), it[1].toFloat())
+                    }
+                } ?: PointF()
+            } else {
+                point ?: PointF()
+            }
         return PathObject(
-            id,
-            pointF,
-            alpha,
-            scaleX,
-            scaleY,
-            rotation,
-            interpolator = interpolatorObject
+            id, pointF, alpha, scaleX, scaleY, rotation, interpolator = interpolatorObject
         )
     }
 }

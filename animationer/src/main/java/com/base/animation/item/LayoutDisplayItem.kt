@@ -42,10 +42,10 @@ class LayoutDisplayItem(val context: Context, private val layout: Int) : BaseDis
             view.measure(widthSpec, heightSpec)
             displayWidth = view.measuredWidth
             displayHeight = view.measuredHeight
-            Log.i(
-                "zzc3",
-                "rotation "
-            )
+//            Log.i(
+//                "zzc3",
+//                "displayWidth:$displayWidth displayHeight:$displayHeight"
+//            )
             view.layout(0, 0, view.measuredWidth, view.measuredHeight)
         }
         canvas.withSave {

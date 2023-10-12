@@ -18,11 +18,15 @@ class AnimNodeChain(val anim: IAnimView) {
         if (isBeginPointSet) {
             nextStart?.let {
                 it.displayItemId = nextPathObject.displayItemId
+                it.interpolator = nextPathObject.interpolator
                 path?.beginNextAnimPath(it)
             }
         } else {
             isBeginPointSet = true
-            start?.let { path?.beginAnimPath(it) }
+            start?.let {
+                it.interpolator = nextPathObject.interpolator
+                path?.beginAnimPath(it)
+            }
         }
         path?.doAnimPath(delayed, nextPathObject)
         nextStart = nextPathObject
@@ -33,12 +37,14 @@ class AnimNodeChain(val anim: IAnimView) {
             nextStart?.let {
                 val start = it.copy()
                 start.displayItemId = nextPathObject.displayItemId
+                start.interpolator = nextPathObject.interpolator
                 pathObjectStartEndContainer.put(ContainerEnd(nextPathObject, delayed), start)
             }
         } else {
             start?.let {
                 val start = it.copy()
                 start.displayItemId = nextPathObject.displayItemId
+                start.interpolator = nextPathObject.interpolator
                 pathObjectStartEndContainer.put(ContainerEnd(nextPathObject, delayed), start)
             }
         }
