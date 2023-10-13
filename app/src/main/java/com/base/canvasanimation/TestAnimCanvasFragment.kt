@@ -459,7 +459,19 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                                 .toFloat() / 3
                         )
                         durTime = 500
-                        interpolator = InterpolatorEnum.Decelerate.type
+                        interpolator = InterpolatorEnum.Linear.type
+                    }
+                    endNode {
+                        scaleX = 1f
+                        scaleY = 1f
+                        point = PointF(
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                                .toFloat() * -1,
+                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                                .toFloat() / 3
+                        )
+                        durTime = 1000
+                        interpolator = InterpolatorEnum.Linear.type
                     }
                 }
             }

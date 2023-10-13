@@ -3,7 +3,6 @@ package com.base.animation.item
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.PointF
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.graphics.withSave
@@ -42,10 +41,6 @@ class LayoutDisplayItem(val context: Context, private val layout: Int) : BaseDis
             view.measure(widthSpec, heightSpec)
             displayWidth = view.measuredWidth
             displayHeight = view.measuredHeight
-//            Log.i(
-//                "zzc3",
-//                "displayWidth:$displayWidth displayHeight:$displayHeight"
-//            )
             view.layout(0, 0, view.measuredWidth, view.measuredHeight)
         }
         canvas.withSave {
@@ -74,9 +69,8 @@ class LayoutDisplayItem(val context: Context, private val layout: Int) : BaseDis
         scaleX: Float,
         scaleY: Float
     ) {
-        val drawX = x - (displayWidth / scaleX / 2f)
         val drawY = y - (displayHeight / scaleY / 2f)
-        canvas.translate(drawX, drawY)
+        canvas.translate(x, drawY)
         view.alpha = alpha.toFloat()
         view.draw(canvas)
     }

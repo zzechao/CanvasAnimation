@@ -1,6 +1,7 @@
 package com.base.animation.helper
 
 import android.graphics.PointF
+import android.util.Log
 import com.base.animation.AnimCache
 import com.base.animation.Animer
 import com.base.animation.IAnimListener
@@ -189,21 +190,18 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
                                         pathObject.getItem(start)
                                         for (i in 0..times) {
                                             startPosition++
-                                            var p = i * intervalDeal.toFloat() / duringTime
-                                            if (p > 1f) {
-                                                p = 1f
-                                            }
+                                            val p = i * intervalDeal.toFloat() / duringTime
                                             val interP = start.interpolator.getInterpolation(p)
+                                            val inPoint =  PointF(
+                                                start.point.x + pathObject.itemX * interP,
+                                                start.point.y + pathObject.itemY * interP
+                                            )
                                             val animDrawObject = AnimDrawObject(
                                                 start.displayItemId,
                                                 clickable = animPath.clickable,
                                                 expand = animPath.expand
                                             ).apply {
-                                                point =
-                                                    PointF(
-                                                        start.point.x + pathObject.itemX * interP,
-                                                        start.point.y + pathObject.itemY * interP
-                                                    )
+                                                point = inPoint
                                                 alpha =
                                                     start.alpha + (pathObject.itemAlpha * interP).toInt()
                                                 scaleX =
