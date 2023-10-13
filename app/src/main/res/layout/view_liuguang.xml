@@ -14,14 +14,14 @@
         android:layout_height="42dp"
         android:src="@drawable/common_img_continuous_click_gift_bg"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
         android:id="@+id/mAvatarIv"
         android:layout_width="34dp"
         android:layout_height="34dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="4dp"
         android:layout_marginBottom="4dp"
         android:src="@drawable/xin" />
@@ -32,7 +32,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginTop="13dp"
-        android:layout_toEndOf="@+id/mAvatarIv"
+        app:layout_constraintStart_toEndOf="@+id/mAvatarIv"
+        app:layout_constraintTop_toTopOf="parent"
         android:ellipsize="end"
         android:lines="1"
         android:maxWidth="92dp"
@@ -44,8 +45,8 @@
         android:id="@+id/mSendToTv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/mUserNameTv"
-        android:layout_alignParentBottom="true"
+        app:layout_constraintStart_toStartOf="@+id/mUserNameTv"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="4dp"
         android:text="Send to"
         android:textColor="#BFFFFFFF"
@@ -55,9 +56,9 @@
         android:id="@+id/mReceiverUserNameTv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/mSendToTv"
+        app:layout_constraintBottom_toBottomOf="@+id/mSendToTv"
+        app:layout_constraintStart_toEndOf="@+id/mSendToTv"
         android:layout_marginStart="4dp"
-        android:layout_toEndOf="@+id/mSendToTv"
         android:ellipsize="end"
         android:lines="1"
         android:maxWidth="48dp"
@@ -69,18 +70,18 @@
         android:id="@+id/mGiftIcon"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_alignParentBottom="true"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginStart="5dp"
-        android:layout_toEndOf="@+id/mUserNameTv"
+        app:layout_constraintStart_toEndOf="@+id/mUserNameTv"
         android:src="@drawable/common_icon_gift_continuous_click_tag" />
 
     <TextView
         android:id="@+id/mGiftNum"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="4dp"
-        android:layout_marginBottom="4dp"
-        android:layout_toEndOf="@+id/mGiftIcon" />
+        app:layout_constraintStart_toEndOf="@+id/mGiftIcon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

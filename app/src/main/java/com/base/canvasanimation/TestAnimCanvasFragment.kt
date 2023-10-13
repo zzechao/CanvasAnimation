@@ -436,7 +436,7 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                         DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
                             .toFloat(),
                         DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
-                            .toFloat() / 2
+                            .toFloat() / 3
                     )
                     endNode {
                         scaleX = 1f
@@ -444,7 +444,7 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                         point = PointF(
                             0f,
                             DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
-                                .toFloat() / 2
+                                .toFloat() / 3
                         )
                         durTime = 1500
                         interpolator = InterpolatorEnum.Decelerate.type
@@ -456,7 +456,7 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                         point = PointF(
                             0f,
                             DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
-                                .toFloat() / 2
+                                .toFloat() / 3
                         )
                         durTime = 500
                         interpolator = InterpolatorEnum.Decelerate.type
