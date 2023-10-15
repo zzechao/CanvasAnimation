@@ -1,6 +1,8 @@
 package com.base.animation
 
+import android.content.Context
 import android.view.Choreographer
+import android.view.WindowManager
 
 /**
  * @author:zhouzechao
@@ -11,6 +13,14 @@ object CanvasHandler {
 
     private val mCanvasCallbacks = ArrayList<CanvasFrameCallback>()
     private var mProvider: CanvasFrameCallbackProvider? = null
+
+    val fpsTime: Float by lazy {
+        val wm = AnimationEx.mApplication.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
+        val display = wm?.defaultDisplay
+        val rate = display?.refreshRate ?: 60f
+        1000 * 1f / rate
+    }
+
 
     var lastTime = 0L
 

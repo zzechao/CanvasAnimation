@@ -1,9 +1,9 @@
 package com.base.animation.helper
 
 import android.graphics.PointF
-import android.util.Log
 import com.base.animation.AnimCache
 import com.base.animation.Animer
+import com.base.animation.CanvasHandler
 import com.base.animation.IAnimListener
 import com.base.animation.IAnimView
 import com.base.animation.IClickIntercept
@@ -11,6 +11,7 @@ import com.base.animation.cache.PathCache
 import com.base.animation.item.BaseDisplayItem
 import com.base.animation.model.AnimDrawObject
 import com.base.animation.model.AnimPathObject
+import com.base.animation.model.BaseAnimDrawObject
 import com.base.animation.model.DrawObject
 import com.base.animation.model.toAnimDrawObject
 import com.google.common.cache.CacheBuilder
@@ -24,29 +25,23 @@ import kotlinx.coroutines.supervisorScope
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
-import kotlin.math.ceil
 
 /**
  * @author:zhouzechao
  * @date: 2020/12/9
  * description：处理animPathObject转每一帧的绘制点
  */
-private const val TAG = "PathObjectDeal"
+const val TAG = "PathObjectDeal"
 
 @ObsoleteCoroutinesApi
-class PathObjectDeal(private val iAnimView: IAnimView) {
-
-    /**
-     * 每帧时间
-     */
-    var intervalDeal: Long = 0L
+class PathObjectDeal(private val iAnimView: IAnimView) : IPathObjectDeal {
 
     private val animDisplayScope = CoroutineScope(Animer.calculationDispatcher)
 
     /**
      * 路径坐标
      */
-    val animDrawObjects: MutableMap<Long, DrawObject> = ConcurrentHashMap()
+    override val animDrawObjects: MutableMap<Long, BaseAnimDrawObject> = ConcurrentHashMap()
 
     /**
      * 点击事件列表
@@ -73,11 +68,6 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
             .expireAfterAccess(5, TimeUnit.SECONDS)
             .build()
 
-    /**
-     * 画布缓存时间策略
-     */
-    @Volatile
-    var lastCacheTime = 0L
     var cacheTime = 10 * 1000L
         set(value) {
             field = if (value < 10) {
@@ -109,7 +99,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
                     if (animPath.displayItemsMap.isNotEmpty()) {
                         AnimCache.displayItemCache.putDisplayItems(animPath.displayItemsMap)
                     }
-                    val cacheKey = pathCachePools.conventKey(intervalDeal, animPath)
+                    val cacheKey = pathCachePools.conventKey(CanvasHandler.fpsTime, animPath)
                     val drawsMap = mutableMapOf<Int, MutableList<AnimDrawObject>>()
                     var position = 0
                     val drawObject = DrawObject(animPath.animId)
@@ -139,13 +129,12 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
                                 animPath.animPathMap[index]?.apply {
                                     this.forEachIndexed { index, pathObjectWithDer ->
                                         val duringTime = pathObjectWithDer.during
-                                        val times =
-                                            ceil(duringTime / intervalDeal.toDouble()).toInt()
+                                        val times = duringTime * 1f / CanvasHandler.fpsTime
                                         val start = starts.getOrNull(index) ?: return@forEachIndexed
                                         drawsMap[startPosition]?.map {
                                             it.displayItemId = start.displayItemId
                                         }
-                                        for (i in 0..times) {
+                                        for (i in 0..times.toInt()) {
                                             startPosition++
                                             drawsMap[startPosition]?.map {
                                                 it.displayItemId = start.displayItemId
@@ -174,8 +163,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
                                 animPath.animPathMap[index]?.apply {
                                     this.forEachIndexed { index, pathObjectWithDer ->
                                         val duringTime = pathObjectWithDer.during
-                                        val times =
-                                            ceil(duringTime / intervalDeal.toDouble()).toInt()
+                                        val times = duringTime * 1f / CanvasHandler.fpsTime
                                         val start = starts.getOrNull(index) ?: return@forEachIndexed
                                         if (drawsMap[startPosition] == null) {
                                             drawsMap[startPosition] = mutableListOf()
@@ -188,11 +176,11 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
                                         )
                                         val pathObject = pathObjectWithDer.pathObject
                                         pathObject.getItem(start)
-                                        for (i in 0..times) {
+                                        for (i in 0..times.toInt()) {
                                             startPosition++
-                                            val p = i * intervalDeal.toFloat() / duringTime
+                                            val p = i * CanvasHandler.fpsTime / duringTime
                                             val interP = start.interpolator.getInterpolation(p)
-                                            val inPoint =  PointF(
+                                            val inPoint = PointF(
                                                 start.point.x + pathObject.itemX * interP,
                                                 start.point.y + pathObject.itemY * interP
                                             )
@@ -227,7 +215,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
                                 }
                             }
                         }
-                        if (animPath.pathCache && cacheKey.isNotEmpty()) {
+                        if (cacheKey.isNotEmpty()) {
                             pathCacheMap.put(cacheKey, drawsMap)
                         }
                         drawObject.animDraws = drawsMap
@@ -239,37 +227,25 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
         }
     }
 
+
     /**
      * 获取显示的displayItem
      */
-    fun getDisplayItem(displayItemId: String): BaseDisplayItem? {
+    override fun getDisplayItem(displayItemId: String): BaseDisplayItem? {
         return AnimCache.displayItemCache.getDisplayItem(displayItemId)
     }
 
     /**
      * 加入路径，并刷新画布缓存策略的时间
      */
-    fun sendAnimPath(animPathObject: AnimPathObject) {
-        lastCacheTime = cacheTime
+    override fun sendAnimPath(animPathObject: AnimPathObject) {
         animPather.offer(animPathObject)
-    }
-
-    /**
-     * 清除数据
-     */
-    fun release() {
-        animDrawObjects.clear()
-        AnimCache.displayItemCache.clear()
-        clickIntercepts.clear()
-        animListeners.clear()
-        animDrawIds.clear()
-        animPather.close()
     }
 
     /**
      * 是否有任务
      */
-    fun hasTask(): Boolean {
+    override fun hasTask(): Boolean {
         return animDrawIds.isNotEmpty()
     }
 
@@ -277,7 +253,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) {
     /**
      * 清空执行中ids
      */
-    fun removeAnimId(animId: Long) {
+    override fun removeAnimId(animId: Long) {
         animDisplayScope.launch {
             animDrawIds.remove(animId)
             animDrawObjects.remove(animId)

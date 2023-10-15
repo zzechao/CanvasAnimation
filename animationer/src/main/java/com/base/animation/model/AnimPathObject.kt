@@ -14,7 +14,6 @@ data class AnimPathObject @JvmOverloads constructor(
     var startPoints: MutableMap<Int, MutableList<PathObject>>,
     var animPathMap: MutableMap<Int, List<PathObjectWithDer>>,
     var displayItemsMap: MutableMap<String, BaseDisplayItem>,
-    var pathCache: Boolean = false,
     var clickable: Boolean = false,
     var expand: String = ""
 ) {
@@ -33,7 +32,6 @@ data class AnimPathObject @JvmOverloads constructor(
          */
         private var position = 0
         private var animPathMap = mutableMapOf<Int, List<PathObjectWithDer>>()
-        private var pathCache: Boolean = false
 
         private var isInit = false
         private var isSetStart = true
@@ -164,7 +162,7 @@ data class AnimPathObject @JvmOverloads constructor(
             val displayItem = displayItems.associateBy { it.displayItemId }.toMutableMap()
 
             return AnimPathObject(
-                beginPathObjects, animPathMap, displayItem, pathCache = pathCache
+                beginPathObjects, animPathMap, displayItem
             )
         }
     }

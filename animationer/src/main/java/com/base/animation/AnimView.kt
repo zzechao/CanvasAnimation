@@ -3,11 +3,9 @@ package com.base.animation
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import com.base.animation.item.BaseDisplayItem
 import com.base.animation.model.AnimPathObject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlin.reflect.KClass
 
 /**
  * @author:zhouzechao
@@ -22,16 +20,16 @@ class AnimView @JvmOverloads constructor(
     private val helper: AnimViewHelper
 
     init {
-        helper = AnimViewHelper(context) {
+        var frameCount = 0
+        var curFrameTime = 0L
+        helper = AnimViewHelper { framePositionCount, frameTime ->
+            frameCount = framePositionCount
+            curFrameTime = frameTime
             background.invalidateSelf()
         }
         background = AnimViewDrawable {
-            helper.drawAnim(it)
+            helper.drawAnim(it, frameCount, curFrameTime)
         }
-    }
-
-    override fun setCacheTime(cacheTime: Long) {
-        helper.setCacheTime(cacheTime)
     }
 
     override fun resume() {

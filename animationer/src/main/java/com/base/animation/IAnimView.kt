@@ -1,10 +1,7 @@
 package com.base.animation
 
-import android.annotation.SuppressLint
 import android.view.View
-import com.base.animation.item.BaseDisplayItem
 import com.base.animation.model.AnimPathObject
-import kotlin.reflect.KClass
 
 /**
  * @author:zhouzechao
@@ -12,8 +9,6 @@ import kotlin.reflect.KClass
  * description：canvas view的接口类，提供各种信息
  */
 interface IAnimView {
-
-    fun setCacheTime(cacheTime: Long)
 
     fun resume()
 

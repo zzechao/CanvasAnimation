@@ -47,10 +47,10 @@ object Animer {
     }
 
     val animDispatcher = ThreadPoolExecutor(
-        1, 1, 10L, TimeUnit.MILLISECONDS, LinkedBlockingDeque<Runnable>(), animThreadFactory
+        1, 1, 1000L, TimeUnit.MILLISECONDS, LinkedBlockingDeque(), animThreadFactory
     ).asCoroutineDispatcher()
 
     val calculationDispatcher = ThreadPoolExecutor(
-        1, 1, 10L, TimeUnit.MILLISECONDS, LinkedBlockingDeque<Runnable>(), calculationThreadFactory
+        1, 1, 1000L, TimeUnit.MILLISECONDS, LinkedBlockingDeque(), calculationThreadFactory
     ).asCoroutineDispatcher()
 }

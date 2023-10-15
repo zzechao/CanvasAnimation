@@ -10,14 +10,12 @@ import android.util.AttributeSet
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
-import com.base.animation.item.BaseDisplayItem
 import com.base.animation.model.AnimPathObject
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import kotlin.reflect.KClass
 
 /**
  * @author:zhouzechao
@@ -48,21 +46,17 @@ class AnimSurfaceView @JvmOverloads constructor(
         setZOrderOnTop(true)
         holder.setFormat(PixelFormat.TRANSPARENT)
         isFocusableInTouchMode = true
-        helper = AnimViewHelper(context) {
+        helper = AnimViewHelper { framePositionCount, frameTime ->
             animScope.launch {
                 val canvas = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     holder.lockHardwareCanvas()
                 } else {
                     holder.lockCanvas()
                 }
-                drawAnim(canvas)
+                drawAnim(canvas, framePositionCount, frameTime)
                 holder.unlockCanvasAndPost(canvas)
             }
         }
-    }
-
-    override fun setCacheTime(cacheTime: Long) {
-        helper.setCacheTime(cacheTime)
     }
 
     override fun resume() {
@@ -130,9 +124,9 @@ class AnimSurfaceView @JvmOverloads constructor(
         } ?: this.getFragmentActivity()?.findViewById(id)
     }
 
-    private fun drawAnim(canvas: Canvas?) {
+    private fun drawAnim(canvas: Canvas?, framePositionCount: Int, frameTime: Long) {
         canvas?.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR) // 设置画布的背景为透明
-        helper.drawAnim(canvas)
+        helper.drawAnim(canvas, framePositionCount, frameTime)
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {

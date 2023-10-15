@@ -1,54 +1,37 @@
 package com.base.animation
 
-import android.content.Context
 import android.graphics.Canvas
 import android.graphics.PointF
 import android.os.Handler
 import android.os.Looper
 import android.view.MotionEvent
-import android.view.WindowManager
 import com.base.animation.helper.PathObjectDeal
-import com.base.animation.item.BaseDisplayItem
+import com.base.animation.helper.PathObjectDeal2
 import com.base.animation.model.AnimPathObject
-import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.math.roundToInt
-import kotlin.reflect.KClass
 import kotlinx.coroutines.ObsoleteCoroutinesApi
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Time:2022/4/15 12:36 下午
  * Author:
  * Description:
  */
+typealias DoFrameFps = (framePositionCount: Int, frameTime: Long) -> Unit
+
 @ObsoleteCoroutinesApi
-class AnimViewHelper(context: Context, private val doFrame: () -> Unit) : IAnimView,
+class AnimViewHelper(private val doFrame: DoFrameFps) : IAnimView,
     CanvasHandler.CanvasFrameCallback {
     private val TAG = "AnimViewHelper"
 
     private val mainHandler: Handler = Handler(Looper.getMainLooper())
 
-    private var mFramePositionCount: Int = 1
     private var isResume = AtomicBoolean(false)
-    private var mFrameDuringTime = 16L // 每一帧的时间
     private var mTouchPointFList: MutableList<PointF> = mutableListOf()
 
     /**
      * pathObject转化
      */
-    private val pathObjectDeal = PathObjectDeal(this).apply {
-        val wm = context.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
-        val display = wm?.defaultDisplay
-        var rate = display?.refreshRate ?: 60f
-        if (rate < 30f) {
-            rate = 60f
-        }
-        mFrameDuringTime = 1000L / rate.roundToInt()
-        intervalDeal = mFrameDuringTime
-    }
-
-    override fun setCacheTime(cacheTime: Long) {
-        pathObjectDeal.cacheTime = cacheTime
-    }
+    private val pathObjectDeal = PathObjectDeal2(this)
 
     override fun resume() {
         Animer.log.i(TAG, "resume hasTask:${pathObjectDeal.hasTask()} isResume:$isResume")
@@ -61,7 +44,6 @@ class AnimViewHelper(context: Context, private val doFrame: () -> Unit) : IAnimV
         if (isResume.compareAndSet(false, true)) {
             Animer.log.i(TAG, "onResume")
             checkInMainThread {
-                mFramePositionCount = 1
                 CanvasHandler.addAnimationFrameCallback(this)
             }
         }
@@ -71,7 +53,6 @@ class AnimViewHelper(context: Context, private val doFrame: () -> Unit) : IAnimV
         if (isResume.compareAndSet(true, false)) {
             checkInMainThread {
                 CanvasHandler.removeCallback(this)
-                mFramePositionCount = 1
             }
         }
     }
@@ -127,18 +108,21 @@ class AnimViewHelper(context: Context, private val doFrame: () -> Unit) : IAnimV
     }
 
     override fun doCanvasFrame(frameTime: Long): Boolean {
-        mFramePositionCount = if (frameTime == 0L) {
+        val framePositionCount = if (frameTime == 0L) {
             1
         } else {
-            val framePositionCount = frameTime / mFrameDuringTime
-            if (framePositionCount <= 0L) {
+            val framePositionCount = frameTime / CanvasHandler.fpsTime
+            if (framePositionCount <= 1) {
                 1
             } else {
                 framePositionCount.toInt()
             }
         }
-        Animer.log.i(TAG, "doCanvasFrame mFramePositionCount:$mFramePositionCount")
-        doFrame.invoke()
+        Animer.log.i(
+            TAG,
+            "doCanvasFrame mFramePositionCount:$framePositionCount frameTime:$frameTime"
+        )
+        doFrame.invoke(framePositionCount, frameTime)
         return true
     }
 
@@ -155,10 +139,10 @@ class AnimViewHelper(context: Context, private val doFrame: () -> Unit) : IAnimV
         return false
     }
 
-    fun drawAnim(canvas: Canvas?) {
+    fun drawAnim(canvas: Canvas?, framePositionCount: Int, frameTime: Long) {
         canvas ?: return
         pathObjectDeal.animDrawObjects.map {
-            it.value.draw(canvas, pathObjectDeal, mFramePositionCount, mTouchPointFList)
+            it.value.draw(canvas, pathObjectDeal, framePositionCount, frameTime, mTouchPointFList)
         }
         mTouchPointFList.clear()
     }

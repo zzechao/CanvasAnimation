@@ -2,6 +2,7 @@ package com.base.animation.model
 
 import android.graphics.Canvas
 import android.graphics.PointF
+import com.base.animation.helper.IPathObjectDeal
 import com.base.animation.helper.PathObjectDeal
 import com.base.animation.item.BaseDisplayItem
 
@@ -12,7 +13,7 @@ import com.base.animation.item.BaseDisplayItem
  */
 private const val TAG = "DrawObject"
 
-class DrawObject(val animId: Long) {
+class DrawObject(val animId: Long) : BaseAnimDrawObject() {
 
     var animDraws: MutableMap<Int, MutableList<AnimDrawObject>> = mutableMapOf()
 
@@ -20,64 +21,77 @@ class DrawObject(val animId: Long) {
 
     var status: Status = Status.INIT
 
-    fun draw(
+    override fun draw(
         canvas: Canvas,
-        pathObjectDeal: PathObjectDeal,
+        pathObjectDeal: IPathObjectDeal,
         framePositionCount: Int,
-        touchPoint: MutableList<PointF>? = null
+        frameTime: Long,
+        touchPoint: MutableList<PointF>?
     ) {
-        if (currencyPosition >= animDraws.size - 1) {
-            currencyPosition = animDraws.size - 1
-            status = Status.STOP
-            pathObjectDeal.animListeners.forEach {
-                it?.endAnim(animId)
-            }
-            pathObjectDeal.removeAnimId(animId)
-            return
-        } else {
-            if (currencyPosition == 0) {
-                status = Status.START
+        if ((pathObjectDeal is PathObjectDeal)) {
+            if (currencyPosition >= animDraws.size - 1) {
+                currencyPosition = animDraws.size - 1
+                status = Status.STOP
                 pathObjectDeal.animListeners.forEach {
-                    it?.startAnim(animId)
+                    it?.endAnim(animId)
                 }
-            } else if (status == Status.START) {
-                status = Status.DRAWING
-                pathObjectDeal.animListeners.forEach {
-                    it?.runningAnim(animId)
-                }
-            }
-            var curDisplayItemId = ""
-            var displayItem: BaseDisplayItem? = null
-            animDraws[currencyPosition]?.forEach { drawObject ->
-                if (drawObject.displayItemId != curDisplayItemId || displayItem == null) {
-                    curDisplayItemId = drawObject.displayItemId
-                    displayItem = pathObjectDeal.getDisplayItem(drawObject.displayItemId)
-                    displayItem?.apply {
-                        draw(
-                            canvas, drawObject.point.x, drawObject.point.y, drawObject.alpha,
-                            drawObject.scaleX, drawObject.scaleY, drawObject.rotation
-                        )
-                        if (drawObject.clickable && !touchPoint.isNullOrEmpty()
-                            && pathObjectDeal.clickIntercepts.isNotEmpty()
-                        ) {
-                            touch(animId, pathObjectDeal.clickIntercepts, drawObject, touchPoint)
-                        }
+                pathObjectDeal.removeAnimId(animId)
+                return
+            } else {
+                if (currencyPosition == 0) {
+                    status = Status.START
+                    pathObjectDeal.animListeners.forEach {
+                        it?.startAnim(animId)
                     }
-                } else {
-                    displayItem?.apply {
-                        draw(
-                            canvas, drawObject.point.x, drawObject.point.y, drawObject.alpha,
-                            drawObject.scaleX, drawObject.scaleY, drawObject.rotation
-                        )
-                        if (drawObject.clickable && !touchPoint.isNullOrEmpty()
-                            && pathObjectDeal.clickIntercepts.isNotEmpty()
-                        ) {
-                            touch(animId, pathObjectDeal.clickIntercepts, drawObject, touchPoint)
-                        }
+                } else if (status == Status.START) {
+                    status = Status.DRAWING
+                    pathObjectDeal.animListeners.forEach {
+                        it?.runningAnim(animId)
                     }
                 }
+                var curDisplayItemId = ""
+                var displayItem: BaseDisplayItem? = null
+                animDraws[currencyPosition]?.forEach { drawObject ->
+                    if (drawObject.displayItemId != curDisplayItemId || displayItem == null) {
+                        curDisplayItemId = drawObject.displayItemId
+                        displayItem = pathObjectDeal.getDisplayItem(drawObject.displayItemId)
+                        displayItem?.apply {
+                            draw(
+                                canvas, drawObject.point.x, drawObject.point.y, drawObject.alpha,
+                                drawObject.scaleX, drawObject.scaleY, drawObject.rotation
+                            )
+                            if (drawObject.clickable && !touchPoint.isNullOrEmpty()
+                                && pathObjectDeal.clickIntercepts.isNotEmpty()
+                            ) {
+                                touch(
+                                    animId,
+                                    pathObjectDeal.clickIntercepts,
+                                    drawObject,
+                                    touchPoint
+                                )
+                            }
+                        }
+                    } else {
+                        displayItem?.apply {
+                            draw(
+                                canvas, drawObject.point.x, drawObject.point.y, drawObject.alpha,
+                                drawObject.scaleX, drawObject.scaleY, drawObject.rotation
+                            )
+                            if (drawObject.clickable && !touchPoint.isNullOrEmpty()
+                                && pathObjectDeal.clickIntercepts.isNotEmpty()
+                            ) {
+                                touch(
+                                    animId,
+                                    pathObjectDeal.clickIntercepts,
+                                    drawObject,
+                                    touchPoint
+                                )
+                            }
+                        }
+                    }
+                }
+                currencyPosition += framePositionCount
             }
-            currencyPosition += framePositionCount
         }
     }
 }
@@ -89,8 +103,8 @@ data class AnimDrawObject(
     var scaleX: Float = 1.0f,
     var scaleY: Float = 1.0f,
     var rotation: Float = 0.0f,
-    var clickable: Boolean,
-    var expand: String
+    var clickable: Boolean = false,
+    var expand: String = ""
 )
 
 /**
@@ -106,6 +120,17 @@ fun PathObject.toAnimDrawObject(clickable: Boolean, expand: String): AnimDrawObj
         rotation,
         clickable = clickable,
         expand = expand
+    )
+}
+
+fun PathObject.toAnimDrawObject2(): AnimDrawObject {
+    return AnimDrawObject(
+        displayItemId,
+        point,
+        alpha,
+        scaleX,
+        scaleY,
+        rotation
     )
 }
 
