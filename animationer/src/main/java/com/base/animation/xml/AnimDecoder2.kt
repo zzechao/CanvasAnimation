@@ -24,15 +24,11 @@ import com.base.animation.xml.node.coder.IAttributeCoder
 
 
 typealias DealDisplayItem = suspend (
-    IXmlDrawableNode,
-    BaseDisplayItem
+    IXmlDrawableNode, BaseDisplayItem
 ) -> BaseDisplayItem
 
 typealias IDealNodeDealIntercept = suspend (
-    displayObject: DisplayObject,
-    animNode: IAnimNode,
-    chain: AnimNodeChain,
-    dealDisplayItem: DealDisplayItem
+    displayObject: DisplayObject, animNode: IAnimNode, chain: AnimNodeChain, dealDisplayItem: DealDisplayItem
 ) -> String
 
 object AnimDecoder2 {
@@ -54,18 +50,15 @@ object AnimDecoder2 {
     }
 
     suspend fun suspendPlayAnimWithAnimNode(
-        anim: IAnimView,
-        animNode: AnimNode,
-        dealDisplayItem: DealDisplayItem
-    ) {
-        dealAnim(anim, animNode, dealDisplayItem)
+        anim: IAnimView, animNode: AnimNode, dealDisplayItem: DealDisplayItem
+    ): List<Long> {
+        return dealAnim(anim, animNode, dealDisplayItem)
     }
 
     private suspend fun dealAnim(
-        anim: IAnimView,
-        animNode: AnimNode,
-        dealDisplayItem: DealDisplayItem
-    ) {
+        anim: IAnimView, animNode: AnimNode, dealDisplayItem: DealDisplayItem
+    ): List<Long> {
+        val listAnimIds = mutableListOf<Long>()
         val displayObject = DisplayObject.with()
         animNode.getNodes().forEach {
             val chain = AnimNodeChain(anim)
@@ -74,8 +67,11 @@ object AnimDecoder2 {
             dealAnim(displayObject, it, chain, dealDisplayItem)
 
             val data = displayObject.build()
-            chain.anim.addAnimDisplay(path.build(data))
+            chain.anim.addAnimDisplay(path.build(data).apply {
+                listAnimIds.add(this.animId)
+            })
         }
+        return listAnimIds
     }
 
     private suspend fun dealAnim(
@@ -90,10 +86,7 @@ object AnimDecoder2 {
                 if (animNode is IXmlDrawableNode) {
                     if (animNode.getNodes().isEmpty()) return
                     val displayId = animNode.dealIntercept.invoke(
-                        displayObject,
-                        animNode,
-                        chain,
-                        dealDisplayItem
+                        displayObject, animNode, chain, dealDisplayItem
                     )
                     if (displayId.isNotEmpty()) {
                         chain.curDisplayId = displayId
@@ -106,17 +99,16 @@ object AnimDecoder2 {
                     }
                 }
             }
+
             is ImageNode -> {
                 if (animNode.getNodes().isEmpty()) return
                 val key = animNode.url + animNode.displayHeightSize + animNode.nodeName
                 val displayId = displayObject.suspendAdd(
-                    key = key,
-                    kClass = animNode.displayItem
+                    key = key, kClass = animNode.displayItem
                 ) {
                     val bitmapDisplayItem = BitmapDisplayItem()
                     dealDisplayItem.invoke(
-                        animNode,
-                        bitmapDisplayItem
+                        animNode, bitmapDisplayItem
                     ) // 代理出去处理图片的加载方式
                     val bitmapWidth = bitmapDisplayItem.mBitmap?.width ?: return@suspendAdd null
                     val bitmapHeight = bitmapDisplayItem.mBitmap?.height ?: return@suspendAdd null
@@ -139,18 +131,13 @@ object AnimDecoder2 {
                 if (animNode.getNodes().isEmpty()) return
                 val key = animNode.txt + animNode.fontSize + animNode.color + animNode.nodeName
                 val displayId = displayObject.suspendAdd(
-                    key = key,
-                    kClass = animNode.displayItem
+                    key = key, kClass = animNode.displayItem
                 ) {
-                    val stringDisplayItem =
-                        StringDisplayItem(
-                            animNode.fontSize,
-                            animNode.txt,
-                            animNode.color
-                        )
+                    val stringDisplayItem = StringDisplayItem(
+                        animNode.fontSize, animNode.txt, animNode.color
+                    )
                     dealDisplayItem.invoke(
-                        animNode,
-                        stringDisplayItem
+                        animNode, stringDisplayItem
                     )
                 }
                 if (displayId.isNotEmpty()) {
@@ -168,21 +155,17 @@ object AnimDecoder2 {
                 if (animNode.getNodes().isEmpty()) return
                 val key = animNode.layoutIdName + animNode.data
                 val displayId = displayObject.suspendAdd(
-                    key = key,
-                    kClass = animNode.displayItem
+                    key = key, kClass = animNode.displayItem
                 ) {
                     val layoutId = AnimationEx.mApplication.resources.getIdentifier(
-                        animNode.layoutIdName,
-                        "layout",
-                        AnimationEx.mApplication.packageName
+                        animNode.layoutIdName, "layout", AnimationEx.mApplication.packageName
                     )
                     if (layoutId > 0) {
                         val activity =
                             chain.anim.getView()?.getFragmentActivity() ?: return@suspendAdd null
                         val layoutDisplayItem = LayoutDisplayItem(activity, layoutId)
                         dealDisplayItem.invoke(
-                            animNode,
-                            layoutDisplayItem
+                            animNode, layoutDisplayItem
                         )
                         return@suspendAdd layoutDisplayItem
                     } else {
@@ -265,20 +248,17 @@ object AnimDecoder2 {
     }
 
     suspend fun suspendPlayAnimWithXml(
-        anim: IAnimView,
-        xml: String,
-        dealDisplayItem: DealDisplayItem
-    ) {
-        dealStarAnimXml(anim, xml, dealDisplayItem)
+        anim: IAnimView, xml: String, dealDisplayItem: DealDisplayItem
+    ): List<Long> {
+        return dealStarAnimXml(anim, xml, dealDisplayItem)
     }
 
     private suspend fun dealStarAnimXml(
-        anim: IAnimView,
-        xml: String,
-        dealDisplayItem: DealDisplayItem
-    ) {
+        anim: IAnimView, xml: String, dealDisplayItem: DealDisplayItem
+    ): List<Long> {
         (decoder.createObject(xml) as? AnimNode)?.let {
-            dealAnim(anim, it, dealDisplayItem)
+            return dealAnim(anim, it, dealDisplayItem)
         }
+        return emptyList()
     }
 }

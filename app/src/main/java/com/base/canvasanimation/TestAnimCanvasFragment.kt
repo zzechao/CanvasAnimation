@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.PointF
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -69,10 +70,7 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
         super.onViewCreated(view, savedInstanceState)
         anim_1?.setOnClickListener {
             lifecycleScope.launch {
-                repeat(50) {
-                    startSingleAnim2()
-                    delay(200)
-                }
+                startSingleAnim2()
             }
         }
 
@@ -196,28 +194,6 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                             durTime = 1000
                             interpolator = InterpolatorEnum.Linear.type
                         }
-                    }
-                }
-            }
-            layoutNode {
-                this.layoutIdName = "view_test_layout"
-                startNode {
-                    point = PointF(
-                        DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
-                            .toFloat() / 2 - size / 2, size / 2f
-                    )
-                    scaleX = 0f
-                    scaleY = 0f
-                    endNode {
-                        point = PointF(
-                            0f,
-                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
-                                .toFloat() / 2 - size / 2
-                        )
-                        scaleX = 3f
-                        scaleY = 3f
-                        durTime = 1000
-                        interpolator = InterpolatorEnum.Accelerate.type
                     }
                 }
             }
@@ -549,12 +525,15 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
     }
 
     override fun startAnim(animId: Long) {
+        Log.i("zzc4","startAnim animId:$animId")
     }
 
     override fun runningAnim(animId: Long) {
+        Log.i("zzc4","runningAnim animId:$animId")
     }
 
     override fun endAnim(animId: Long) {
+        Log.i("zzc4","endAnim animId:$animId")
     }
 }
 

@@ -51,7 +51,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) : IPathObjectDeal {
     /**
      * 动画事件
      */
-    val animListeners = mutableListOf<IAnimListener?>()
+    override val animListeners = mutableListOf<IAnimListener>()
 
     private val animDrawIds: CopyOnWriteArrayList<Long> = CopyOnWriteArrayList()
 

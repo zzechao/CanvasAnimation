@@ -40,7 +40,7 @@ class PathObjectDeal2(private val iAnimView: IAnimView) : IPathObjectDeal {
     /**
      * 动画事件
      */
-    val animListeners = mutableListOf<IAnimListener?>()
+    override val animListeners = mutableListOf<IAnimListener>()
 
     private val animDrawIds: CopyOnWriteArrayList<Long> = CopyOnWriteArrayList()
 
@@ -57,52 +57,54 @@ class PathObjectDeal2(private val iAnimView: IAnimView) : IPathObjectDeal {
     ) {
         supervisorScope {
             for (animPath in this@actor) {
-                if (animPath.displayItemsMap.isNotEmpty()) {
-                    Log.i("zzc", "offer putDisplayItems")
-                    AnimCache.displayItemCache.putDisplayItems(animPath.displayItemsMap)
-                }
-                val drawObject = DrawObject2(animPath.animId)
-                val drawPathProcessMap = mutableMapOf<Int, List<PathProcess>>()
-                for ((index, starts) in animPath.startPoints) {
-                    if (starts.isNotEmpty()) {
-                        val pathProcesses = animPath.animPathMap[index]?.let {
-                            it.mapIndexed { index, pathObjectWithDer ->
-                                val duringTime = pathObjectWithDer.during
-                                val start = starts[index]
-                                val startAnimObject = start.toAnimDrawObject2()
-                                val end = pathObjectWithDer.pathObject
-                                val endAnimObject = end.toAnimDrawObject2()
-                                val totalX = endAnimObject.point.x - startAnimObject.point.x
-                                val totalY = endAnimObject.point.y - startAnimObject.point.y
-                                val totalAlpha = endAnimObject.alpha - startAnimObject.alpha
-                                val totalScaleX = endAnimObject.scaleX - startAnimObject.scaleX
-                                val totalScaleY = endAnimObject.scaleY - startAnimObject.scaleY
-                                val totalRotation =
-                                    endAnimObject.rotation - startAnimObject.rotation
-                                val pathProcessItem =
-                                    PathProcessItem(
-                                        totalX,
-                                        totalY,
-                                        totalAlpha,
-                                        totalScaleX,
-                                        totalScaleY,
-                                        totalRotation
+                launch(coroutineContext) {
+                    if (animPath.displayItemsMap.isNotEmpty()) {
+                        Log.i("zzc", "offer putDisplayItems")
+                        AnimCache.displayItemCache.putDisplayItems(animPath.displayItemsMap)
+                    }
+                    val drawObject = DrawObject2(animPath.animId)
+                    val drawPathProcessMap = mutableMapOf<Int, List<PathProcess>>()
+                    for ((index, starts) in animPath.startPoints) {
+                        if (starts.isNotEmpty()) {
+                            val pathProcesses = animPath.animPathMap[index]?.let {
+                                it.mapIndexed { index, pathObjectWithDer ->
+                                    val duringTime = pathObjectWithDer.during
+                                    val start = starts[index]
+                                    val startAnimObject = start.toAnimDrawObject2()
+                                    val end = pathObjectWithDer.pathObject
+                                    val endAnimObject = end.toAnimDrawObject2()
+                                    val totalX = endAnimObject.point.x - startAnimObject.point.x
+                                    val totalY = endAnimObject.point.y - startAnimObject.point.y
+                                    val totalAlpha = endAnimObject.alpha - startAnimObject.alpha
+                                    val totalScaleX = endAnimObject.scaleX - startAnimObject.scaleX
+                                    val totalScaleY = endAnimObject.scaleY - startAnimObject.scaleY
+                                    val totalRotation =
+                                        endAnimObject.rotation - startAnimObject.rotation
+                                    val pathProcessItem =
+                                        PathProcessItem(
+                                            totalX,
+                                            totalY,
+                                            totalAlpha,
+                                            totalScaleX,
+                                            totalScaleY,
+                                            totalRotation
+                                        )
+                                    PathProcess(
+                                        startAnimObject,
+                                        start.interpolator, duringTime, 0f, pathProcessItem
                                     )
-                                PathProcess(
-                                    startAnimObject,
-                                    start.interpolator, duringTime, 0f, pathProcessItem
-                                )
+                                }
+                            }
+                            pathProcesses?.let {
+                                drawPathProcessMap[index] = it
                             }
                         }
-                        pathProcesses?.let {
-                            drawPathProcessMap[index] = it
-                        }
                     }
+                    Log.i("zzc", "offer animId:${drawObject.animId}")
+                    drawObject.animDraws = drawPathProcessMap
+                    animDrawObjects[drawObject.animId] = drawObject
+                    animDrawIds.add(drawObject.animId)
                 }
-                Log.i("zzc", "offer animId:${drawObject.animId}")
-                drawObject.animDraws = drawPathProcessMap
-                animDrawObjects[drawObject.animId] = drawObject
-                animDrawIds.add(drawObject.animId)
             }
         }
     }

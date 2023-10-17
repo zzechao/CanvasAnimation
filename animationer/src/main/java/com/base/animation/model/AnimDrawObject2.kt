@@ -33,12 +33,22 @@ class DrawObject2(val animId: Long) : BaseAnimDrawObject() {
         touchPoint: MutableList<PointF>?
     ) {
         var updateCurrencyPosition = true
+        if (currencyPosition == 0 && status == Status.INIT) {
+            status = Status.START
+            pathObjectDeal.animListeners.forEach {
+                it.startAnim(animId)
+            }
+        } else if (status == Status.START) {
+            status = Status.DRAWING
+            pathObjectDeal.animListeners.forEach {
+                it.runningAnim(animId)
+            }
+        }
         animDraws[currencyPosition]?.forEach { drawObject ->
             if (drawObject.start.displayItemId != curDisplayItemId || displayItem == null) {
                 Log.i(
                     "zzc",
-                    "draw use no cache curDisplayItemId:$curDisplayItemId " +
-                            "displayItemId:${drawObject.start.displayItemId}"
+                    "draw use no cache curDisplayItemId:$curDisplayItemId " + "displayItemId:${drawObject.start.displayItemId}"
                 )
                 curDisplayItemId = drawObject.start.displayItemId
                 displayItem = pathObjectDeal.getDisplayItem(drawObject.start.displayItemId)
@@ -55,15 +65,12 @@ class DrawObject2(val animId: Long) : BaseAnimDrawObject() {
                     )
                     val alpha =
                         drawObject.start.alpha + (drawObject.item.totalAlpha * interP).toInt()
-                    val scaleX =
-                        drawObject.start.scaleX + drawObject.item.totalScaleX * interP
-                    val scaleY =
-                        drawObject.start.scaleY + drawObject.item.totalScaleY * interP
+                    val scaleX = drawObject.start.scaleX + drawObject.item.totalScaleX * interP
+                    val scaleY = drawObject.start.scaleY + drawObject.item.totalScaleY * interP
                     val rotation =
                         drawObject.start.rotation + drawObject.item.totalRotation * interP
                     draw(
-                        canvas, inPoint.x, inPoint.y, alpha,
-                        scaleX, scaleY, rotation
+                        canvas, inPoint.x, inPoint.y, alpha, scaleX, scaleY, rotation
                     )
                 }
             } else {
@@ -81,15 +88,12 @@ class DrawObject2(val animId: Long) : BaseAnimDrawObject() {
                     )
                     val alpha =
                         drawObject.start.alpha + (drawObject.item.totalAlpha * interP).toInt()
-                    val scaleX =
-                        drawObject.start.scaleX + drawObject.item.totalScaleX * interP
-                    val scaleY =
-                        drawObject.start.scaleY + drawObject.item.totalScaleY * interP
+                    val scaleX = drawObject.start.scaleX + drawObject.item.totalScaleX * interP
+                    val scaleY = drawObject.start.scaleY + drawObject.item.totalScaleY * interP
                     val rotation =
                         drawObject.start.rotation + drawObject.item.totalRotation * interP
                     draw(
-                        canvas, inPoint.x, inPoint.y, alpha,
-                        scaleX, scaleY, rotation
+                        canvas, inPoint.x, inPoint.y, alpha, scaleX, scaleY, rotation
                     )
                 }
             }
@@ -101,6 +105,10 @@ class DrawObject2(val animId: Long) : BaseAnimDrawObject() {
                 currencyPosition += 1
             }
         } ?: kotlin.run {
+            status = Status.STOP
+            pathObjectDeal.animListeners.forEach {
+                it.endAnim(animId)
+            }
             pathObjectDeal.removeAnimId(animId)
         }
     }
