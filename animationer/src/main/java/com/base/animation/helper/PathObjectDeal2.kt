@@ -1,5 +1,6 @@
 package com.base.animation.helper
 
+import android.util.Log
 import com.base.animation.AnimCache
 import com.base.animation.Animer
 import com.base.animation.IAnimListener
@@ -10,7 +11,6 @@ import com.base.animation.helper.data.PathProcessItem
 import com.base.animation.item.BaseDisplayItem
 import com.base.animation.model.AnimPathObject
 import com.base.animation.model.BaseAnimDrawObject
-import com.base.animation.model.DrawObject
 import com.base.animation.model.DrawObject2
 import com.base.animation.model.toAnimDrawObject2
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -58,6 +58,7 @@ class PathObjectDeal2(private val iAnimView: IAnimView) : IPathObjectDeal {
         supervisorScope {
             for (animPath in this@actor) {
                 if (animPath.displayItemsMap.isNotEmpty()) {
+                    Log.i("zzc", "offer putDisplayItems")
                     AnimCache.displayItemCache.putDisplayItems(animPath.displayItemsMap)
                 }
                 val drawObject = DrawObject2(animPath.animId)
@@ -88,7 +89,7 @@ class PathObjectDeal2(private val iAnimView: IAnimView) : IPathObjectDeal {
                                         totalRotation
                                     )
                                 PathProcess(
-                                    startAnimObject, endAnimObject, startAnimObject.copy(),
+                                    startAnimObject,
                                     start.interpolator, duringTime, 0f, pathProcessItem
                                 )
                             }
@@ -98,6 +99,7 @@ class PathObjectDeal2(private val iAnimView: IAnimView) : IPathObjectDeal {
                         }
                     }
                 }
+                Log.i("zzc", "offer animId:${drawObject.animId}")
                 drawObject.animDraws = drawPathProcessMap
                 animDrawObjects[drawObject.animId] = drawObject
                 animDrawIds.add(drawObject.animId)
@@ -132,10 +134,12 @@ class PathObjectDeal2(private val iAnimView: IAnimView) : IPathObjectDeal {
      * 清空执行中ids
      */
     override fun removeAnimId(animId: Long) {
+        Log.i("zzc", "removeAnimId animId:$animId")
         animDisplayScope.launch {
             animDrawIds.remove(animId)
             animDrawObjects.remove(animId)
             if (animDrawIds.isEmpty()) {
+                Log.i("zzc", "removeAnimId isEmpty animDrawObjects:${animDrawObjects.size}")
                 iAnimView.pause()
             }
         }

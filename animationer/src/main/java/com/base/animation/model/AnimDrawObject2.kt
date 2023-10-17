@@ -2,6 +2,7 @@ package com.base.animation.model
 
 import android.graphics.Canvas
 import android.graphics.PointF
+import android.util.Log
 import com.base.animation.helper.IPathObjectDeal
 import com.base.animation.helper.data.PathProcess
 import com.base.animation.item.BaseDisplayItem
@@ -21,6 +22,9 @@ class DrawObject2(val animId: Long) : BaseAnimDrawObject() {
 
     var status: Status = Status.INIT
 
+    var curDisplayItemId = ""
+    var displayItem: BaseDisplayItem? = null
+
     override fun draw(
         canvas: Canvas,
         pathObjectDeal: IPathObjectDeal,
@@ -28,15 +32,21 @@ class DrawObject2(val animId: Long) : BaseAnimDrawObject() {
         frameTime: Long,
         touchPoint: MutableList<PointF>?
     ) {
-        var curDisplayItemId = ""
-        var displayItem: BaseDisplayItem? = null
         var updateCurrencyPosition = true
         animDraws[currencyPosition]?.forEach { drawObject ->
             if (drawObject.start.displayItemId != curDisplayItemId || displayItem == null) {
+                Log.i(
+                    "zzc",
+                    "draw use no cache curDisplayItemId:$curDisplayItemId " +
+                            "displayItemId:${drawObject.start.displayItemId}"
+                )
                 curDisplayItemId = drawObject.start.displayItemId
                 displayItem = pathObjectDeal.getDisplayItem(drawObject.start.displayItemId)
                 displayItem?.apply {
                     drawObject.curTotalTime += frameTime
+                    if (drawObject.curTotalTime > drawObject.durTime) {
+                        drawObject.curTotalTime = drawObject.durTime * 1f
+                    }
                     val p = drawObject.curTotalTime / drawObject.durTime
                     val interP = drawObject.interpolator.getInterpolation(p)
                     val inPoint = PointF(
@@ -57,8 +67,12 @@ class DrawObject2(val animId: Long) : BaseAnimDrawObject() {
                     )
                 }
             } else {
+                Log.i("zzc", "draw use cache")
                 displayItem?.apply {
                     drawObject.curTotalTime += frameTime
+                    if (drawObject.curTotalTime > drawObject.durTime) {
+                        drawObject.curTotalTime = drawObject.durTime * 1f
+                    }
                     val p = drawObject.curTotalTime / drawObject.durTime
                     val interP = drawObject.interpolator.getInterpolation(p)
                     val inPoint = PointF(

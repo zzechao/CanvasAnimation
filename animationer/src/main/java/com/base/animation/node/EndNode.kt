@@ -73,7 +73,6 @@ class EndNode : IAnimNode {
                 LinearInterpolator()
             }
         }
-        Log.i("zzc2", "interpolator:$interpolator")
         val pointF =
             if ((point?.x ?: 0f) == 0f && (point?.y ?: 0f) == 0f && layoutIdName.isNotEmpty()) {
                 anim.getViewByAnimName(layoutIdName)?.let { it ->

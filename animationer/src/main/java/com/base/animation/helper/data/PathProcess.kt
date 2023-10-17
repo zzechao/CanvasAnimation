@@ -6,8 +6,8 @@ import com.base.animation.model.AnimDrawObject
 
 @Keep
 data class PathProcess(
-    val start: AnimDrawObject, var end: AnimDrawObject,
-    var cur: AnimDrawObject, val interpolator: BaseInterpolator,
+    val start: AnimDrawObject,
+    val interpolator: BaseInterpolator,
     val durTime: Long, var curTotalTime: Float = 0f,
     val item: PathProcessItem
 )
