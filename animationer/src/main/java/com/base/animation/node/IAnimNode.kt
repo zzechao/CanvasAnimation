@@ -7,6 +7,7 @@ import com.base.animation.AnimationEx
 import com.base.animation.Animer
 import com.base.animation.IAnimView
 import com.base.animation.model.PathObject
+import com.base.animation.tryCatch
 import com.base.animation.xml.AnimDecoder2
 import com.base.animation.xml.XmlWriterHelper
 import com.base.animation.xml.node.AnimAttributeName
@@ -38,8 +39,7 @@ interface IAnimNode : XmlBaseAnimNode, IXmlObjNodeParser {
                 AnimDecoder2.mapNodeAttributeCoderMap[key] = attributeCoder
                 val value = attributeCoder.attributeEncode(fieldValue) ?: return
                 write.atttibute(
-                    attriName = annotation.name,
-                    attriValue = value
+                    attriName = annotation.name, attriValue = value
                 )
             }
         } catch (e: Exception) {
@@ -56,7 +56,9 @@ interface IAnimNode : XmlBaseAnimNode, IXmlObjNodeParser {
                 try {
                     val javaClass = this@IAnimNode.javaClass
                     val fields = this@IAnimNode.javaClass.fields
-                    Animer.log.i(TAG, "[encode]:${this@IAnimNode.javaClass} ${fields.size} $javaClass")
+                    Animer.log.i(
+                        TAG, "[encode]:${this@IAnimNode.javaClass} ${fields.size} $javaClass"
+                    )
                     for (i in fields.indices) {
                         parseAndGetField(this, fields[i])
                     }
@@ -74,8 +76,7 @@ interface IAnimNode : XmlBaseAnimNode, IXmlObjNodeParser {
 
     @CallSuper
     override fun setAttribute(
-        name: String,
-        value: String
+        name: String, value: String
     ) {
         try {
             val fields = this.javaClass.fields
@@ -123,11 +124,11 @@ interface IAnimNode : XmlBaseAnimNode, IXmlObjNodeParser {
     @SuppressLint("InternalInsetResource")
     private fun getStatusBarHeight(): Int {
         var height = 0
-        val resourceId: Int = AnimationEx.mApplication.resources.getIdentifier(
-            "status_bar_height",
-            "dimen",
-            "android"
-        )
+        val resourceId: Int = tryCatch {
+            AnimationEx.mApplication.resources.getIdentifier(
+                "status_bar_height", "dimen", "android"
+            )
+        } ?: 0
         if (resourceId > 0) {
             height = AnimationEx.mApplication.resources.getDimensionPixelSize(resourceId)
         }
