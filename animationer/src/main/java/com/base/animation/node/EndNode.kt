@@ -1,7 +1,6 @@
 package com.base.animation.node
 
 import android.graphics.PointF
-import android.util.Log
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator

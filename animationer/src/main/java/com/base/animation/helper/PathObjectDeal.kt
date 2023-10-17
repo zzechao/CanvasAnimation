@@ -46,7 +46,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) : IPathObjectDeal {
     /**
      * 点击事件列表
      */
-    val clickIntercepts = mutableListOf<IClickIntercept>()
+    override val clickIntercepts = mutableListOf<IClickIntercept>()
 
     /**
      * 动画事件

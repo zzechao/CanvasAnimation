@@ -31,7 +31,13 @@ class AnimViewHelper(private val doFrame: DoFrameFps) : IAnimView,
     /**
      * pathObject转化
      */
-    private val pathObjectDeal = PathObjectDeal2(this)
+    private val pathObjectDeal by lazy {
+        if (AnimationEx.mode == 1) {
+            PathObjectDeal(this)
+        } else {
+            PathObjectDeal2(this)
+        }
+    }
 
     override fun resume() {
         Animer.log.i(TAG, "resume hasTask:${pathObjectDeal.hasTask()} isResume:$isResume")

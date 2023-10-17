@@ -1,6 +1,5 @@
 package com.base.animation.helper
 
-import android.util.Log
 import com.base.animation.AnimCache
 import com.base.animation.Animer
 import com.base.animation.IAnimListener
@@ -35,7 +34,7 @@ class PathObjectDeal2(private val iAnimView: IAnimView) : IPathObjectDeal {
     /**
      * 点击事件列表
      */
-    val clickIntercepts = mutableListOf<IClickIntercept>()
+    override val clickIntercepts = mutableListOf<IClickIntercept>()
 
     /**
      * 动画事件
@@ -59,7 +58,6 @@ class PathObjectDeal2(private val iAnimView: IAnimView) : IPathObjectDeal {
             for (animPath in this@actor) {
                 launch(coroutineContext) {
                     if (animPath.displayItemsMap.isNotEmpty()) {
-                        Log.i("zzc", "offer putDisplayItems")
                         AnimCache.displayItemCache.putDisplayItems(animPath.displayItemsMap)
                     }
                     val drawObject = DrawObject2(animPath.animId)
@@ -100,7 +98,6 @@ class PathObjectDeal2(private val iAnimView: IAnimView) : IPathObjectDeal {
                             }
                         }
                     }
-                    Log.i("zzc", "offer animId:${drawObject.animId}")
                     drawObject.animDraws = drawPathProcessMap
                     animDrawObjects[drawObject.animId] = drawObject
                     animDrawIds.add(drawObject.animId)
@@ -136,12 +133,10 @@ class PathObjectDeal2(private val iAnimView: IAnimView) : IPathObjectDeal {
      * 清空执行中ids
      */
     override fun removeAnimId(animId: Long) {
-        Log.i("zzc", "removeAnimId animId:$animId")
         animDisplayScope.launch {
             animDrawIds.remove(animId)
             animDrawObjects.remove(animId)
             if (animDrawIds.isEmpty()) {
-                Log.i("zzc", "removeAnimId isEmpty animDrawObjects:${animDrawObjects.size}")
                 iAnimView.pause()
             }
         }

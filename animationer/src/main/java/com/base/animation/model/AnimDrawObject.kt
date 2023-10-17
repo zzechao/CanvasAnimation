@@ -21,6 +21,9 @@ class DrawObject(val animId: Long) : BaseAnimDrawObject() {
 
     var status: Status = Status.INIT
 
+    var curDisplayItemId = ""
+    var displayItem: BaseDisplayItem? = null
+
     override fun draw(
         canvas: Canvas,
         pathObjectDeal: IPathObjectDeal,
@@ -33,7 +36,7 @@ class DrawObject(val animId: Long) : BaseAnimDrawObject() {
                 currencyPosition = animDraws.size - 1
                 status = Status.STOP
                 pathObjectDeal.animListeners.forEach {
-                    it?.endAnim(animId)
+                    it.endAnim(animId)
                 }
                 pathObjectDeal.removeAnimId(animId)
                 return
@@ -41,16 +44,15 @@ class DrawObject(val animId: Long) : BaseAnimDrawObject() {
                 if (currencyPosition == 0) {
                     status = Status.START
                     pathObjectDeal.animListeners.forEach {
-                        it?.startAnim(animId)
+                        it.startAnim(animId)
                     }
                 } else if (status == Status.START) {
                     status = Status.DRAWING
                     pathObjectDeal.animListeners.forEach {
-                        it?.runningAnim(animId)
+                        it.runningAnim(animId)
                     }
                 }
-                var curDisplayItemId = ""
-                var displayItem: BaseDisplayItem? = null
+
                 animDraws[currencyPosition]?.forEach { drawObject ->
                     if (drawObject.displayItemId != curDisplayItemId || displayItem == null) {
                         curDisplayItemId = drawObject.displayItemId
