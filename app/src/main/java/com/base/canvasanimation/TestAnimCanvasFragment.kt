@@ -567,11 +567,13 @@ suspend fun loadImage(fragment: Fragment, url: String, size: Int): Bitmap? {
                 override fun onResourceReady(
                     resource: Bitmap, transition: Transition<in Bitmap>?
                 ) {
-                    it.resume(resource)
+                    if(it.isActive)
+                        it.resume(resource)
                 }
 
                 override fun onLoadCleared(placeholder: Drawable?) {
-                    it.resume(null)
+                    if(it.isActive)
+                        it.resume(null)
                 }
             })
     }
