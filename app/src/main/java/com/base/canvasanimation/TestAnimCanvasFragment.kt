@@ -525,15 +525,15 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
     }
 
     override fun startAnim(animId: Long) {
-        Log.i("zzc4","startAnim animId:$animId")
+        Log.i("zzc4", "startAnim animId:$animId")
     }
 
     override fun runningAnim(animId: Long) {
-        Log.i("zzc4","runningAnim animId:$animId")
+        Log.i("zzc4", "runningAnim animId:$animId")
     }
 
     override fun endAnim(animId: Long) {
-        Log.i("zzc4","endAnim animId:$animId")
+        Log.i("zzc4", "endAnim animId:$animId")
     }
 }
 
@@ -546,11 +546,13 @@ suspend fun loadImage(fragment: Fragment, url: String, size: Int): Bitmap? {
                 override fun onResourceReady(
                     resource: Bitmap, transition: Transition<in Bitmap>?
                 ) {
-                    it.resume(resource)
+                    if (it.isActive)
+                        it.resume(resource)
                 }
 
                 override fun onLoadCleared(placeholder: Drawable?) {
-                    it.resume(null)
+                    if (it.isActive)
+                        it.resume(null)
                 }
             })
     }
