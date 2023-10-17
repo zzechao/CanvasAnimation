@@ -19,6 +19,7 @@ import com.base.animation.node.ImageNode
 import com.base.animation.node.LayoutNode
 import com.base.animation.node.StartNode
 import com.base.animation.node.TextNode
+import com.base.animation.tryCatch
 import com.base.animation.xml.node.AnimNodeChain
 import com.base.animation.xml.node.coder.IAttributeCoder
 
@@ -106,6 +107,7 @@ object AnimDecoder2 {
                     }
                 }
             }
+
             is ImageNode -> {
                 if (animNode.getNodes().isEmpty()) return
                 val key = animNode.url + animNode.displayHeightSize + animNode.nodeName
@@ -171,11 +173,13 @@ object AnimDecoder2 {
                     key = key,
                     kClass = animNode.displayItem
                 ) {
-                    val layoutId = AnimationEx.mApplication.resources.getIdentifier(
-                        animNode.layoutIdName,
-                        "layout",
-                        AnimationEx.mApplication.packageName
-                    )
+                    val layoutId = tryCatch {
+                        AnimationEx.mApplication.resources.getIdentifier(
+                            animNode.layoutIdName,
+                            "layout",
+                            AnimationEx.mApplication.packageName
+                        )
+                    } ?: 0
                     if (layoutId > 0) {
                         val activity =
                             chain.anim.getView()?.getFragmentActivity() ?: return@suspendAdd null
