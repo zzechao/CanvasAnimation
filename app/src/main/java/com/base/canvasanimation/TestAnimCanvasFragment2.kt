@@ -212,6 +212,7 @@ class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
             }
         }.apply {
             lifecycleScope.launch(Dispatchers.IO) {
+                anim_surface ?: return@launch
                 AnimDecoder2.suspendPlayAnimWithAnimNode(
                     anim_surface,
                     this@apply,
@@ -315,6 +316,7 @@ class TestAnimCanvasFragment2 : Fragment(), IClickIntercept, IAnimListener {
             }
         }.apply {
             lifecycleScope.launch {
+                anim_surface ?: return@launch
                 AnimDecoder2.suspendPlayAnimWithAnimNode(
                     anim_surface, this@apply
                 ) { node, displayItem ->
