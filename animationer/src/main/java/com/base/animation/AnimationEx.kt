@@ -16,6 +16,8 @@ object AnimationEx {
     }
 
     /**
+     * application 应用的Application
+     * displayMaxCacheSize 缓存display的大小（这里有DisplayItem的重用逻辑，根据内部声称key）
      * mode 模式1：计算动画节点预先处理，模式2：计算动画节点，根据每帧时长实时计算
      */
     fun init(application: Application, displayMaxCacheSize: Long, mode: Int = 1) {

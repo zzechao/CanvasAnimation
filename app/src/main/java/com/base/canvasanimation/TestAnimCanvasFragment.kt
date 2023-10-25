@@ -1,5 +1,8 @@
 package com.base.canvasanimation
 
+import android.animation.Animator
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PointF
@@ -9,7 +12,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.LinearInterpolator
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -36,10 +41,11 @@ import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_1
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_2
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_3
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_surface
-import kotlinx.android.synthetic.main.fragment_anim_canvas.colorTextView
+import kotlinx.android.synthetic.main.fragment_anim_canvas.relative
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
@@ -70,15 +76,16 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
         super.onViewCreated(view, savedInstanceState)
         anim_1?.setOnClickListener {
             lifecycleScope.launch {
-                startSingleAnim2()
-                colorTextView?.starter()
+                repeat(100) {
+                    startSingleAnim()
+                    delay(50)
+                }
             }
         }
 
         anim_2?.setOnClickListener {
             lifecycleScope.launch {
                 startImageDouAnim2()
-                colorTextView?.stop()
             }
         }
 
@@ -97,6 +104,116 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
     override fun onPause() {
         super.onPause()
         anim_surface?.pause()
+    }
+
+    private fun startSingleAnimOrigin() {
+        val view = ImageView(context)
+        relative.addView(view)
+        view.visibility = View.GONE
+        val size = 80
+        val bitmap =
+            BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, size, size)
+        view.setImageBitmap(bitmap)
+        val translationAnimatorSet = AnimatorSet()
+        val animator = ObjectAnimator.ofFloat(
+            view,
+            "translationX", 0f,
+            DisplayUtils.getScreenWidth(this.activity).toFloat() / 2 - size
+        ).setDuration(1000)
+        val animator1 = ObjectAnimator.ofFloat(
+            view,
+            "translationY", 0f,
+            DisplayUtils.getScreenHeight(this.activity).toFloat() / 2 - size
+        ).setDuration(1000)
+        val animator2 = ObjectAnimator.ofFloat(view, "scaleX", 0f, 1f).setDuration(1000)
+        val animator3 = ObjectAnimator.ofFloat(view, "scaleY", 0f, 1f).setDuration(1000)
+        val animator4 = ObjectAnimator.ofFloat(
+            view,
+            "translationY", 0f,
+        ).setDuration(1000)
+        val animator5 = ObjectAnimator.ofFloat(view, "scaleX", 1f, 0f).setDuration(1000)
+        val animator6 = ObjectAnimator.ofFloat(view, "scaleY", 1f, 0f).setDuration(1000)
+        //translationAnimatorSet.playTogether(animator, animator1, animator2, animator3)
+        translationAnimatorSet
+            .play(animator).with(animator1).with(animator2)
+            .with(animator3).before(AnimatorSet().apply {
+                play(animator4).with(animator5).with(animator6)
+            })
+        translationAnimatorSet.interpolator = AccelerateDecelerateInterpolator()
+        translationAnimatorSet.addListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator?) {
+                view.visibility = View.VISIBLE
+            }
+
+            override fun onAnimationEnd(animation: Animator?) {
+                view.visibility = View.GONE
+                relative.removeView(view)
+            }
+
+            override fun onAnimationCancel(animation: Animator?) {
+                view.visibility = View.GONE
+                relative.removeView(view)
+            }
+
+            override fun onAnimationRepeat(animation: Animator?) {
+            }
+        })
+        translationAnimatorSet.start()
+    }
+
+    private fun startSingleAnim() {
+        val size = 80
+        val url = "https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png"
+        AnimEncoder().buildAnimNode {
+            imageNode {
+                this.url = url
+                this.displayHeightSize = size
+                startNode {
+                    point = PointF(0f, 0f)
+                    scaleX = 0.5f
+                    scaleY = 0.5f
+                    endNode {
+                        point = PointF(
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                                .toFloat() / 2 - size / 2,
+                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                                .toFloat() / 2 - size / 2
+                        )
+                        scaleX = 3f
+                        scaleY = 3f
+                        durTime = 1000
+                        interpolator = InterpolatorEnum.Accelerate.type
+                    }
+                    endNode {
+                        point = PointF(
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                                .toFloat() / 2 - size / 2,
+                            0f
+                        )
+                        scaleX = 0.5f
+                        scaleY = 0.5f
+                        durTime = 2000
+                        interpolator = InterpolatorEnum.Accelerate.type
+                    }
+                }
+            }
+        }.apply {
+            lifecycleScope.launch(Dispatchers.IO) {
+                anim_surface ?: return@launch
+                AnimDecoder2.suspendPlayAnimWithAnimNode(
+                    anim_surface,
+                    this@apply,
+                ) { node, displayItem ->
+                    when (displayItem) {
+                        is BitmapDisplayItem -> {
+                            displayItem.mBitmap =
+                                BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, 100, 100)
+                        }
+                    }
+                    displayItem
+                }
+            }
+        }
     }
 
     private fun startSingleAnim2() {
