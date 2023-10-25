@@ -16,6 +16,10 @@ import com.base.animation.xml.node.XmlBaseAnimNode
 import com.base.animation.xml.node.coder.IXmlObjNodeParser
 import java.lang.reflect.Field
 
+/**
+ * @author:zhouzechao
+ * description：*
+ */
 private const val TAG = "IAnimNode"
 
 interface IAnimNode : XmlBaseAnimNode, IXmlObjNodeParser {

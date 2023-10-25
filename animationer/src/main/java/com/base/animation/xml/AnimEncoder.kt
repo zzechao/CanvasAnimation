@@ -10,6 +10,10 @@ import com.base.animation.node.StartNode
 import com.base.animation.node.TextNode
 import com.base.animation.xml.node.XmlBaseAnimNode
 
+/**
+ * @author:zhouzechao
+ * description：*
+ */
 private const val TAG = "AnimEncoder"
 
 class AnimEncoder {

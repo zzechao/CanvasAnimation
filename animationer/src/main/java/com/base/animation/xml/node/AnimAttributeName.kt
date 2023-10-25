@@ -6,6 +6,10 @@ import java.lang.annotation.Documented
 import java.lang.annotation.Inherited
 import kotlin.reflect.KClass
 
+/**
+ * @author:zhouzechao
+ * description：*
+ */
 @Documented
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)

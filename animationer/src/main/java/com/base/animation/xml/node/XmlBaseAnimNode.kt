@@ -2,6 +2,10 @@ package com.base.animation.xml.node
 
 import com.base.animation.node.IAnimNode
 
+/**
+ * @author:zhouzechao
+ * description：*
+ */
 interface XmlBaseAnimNode {
     /**
      * 设置属性时调用

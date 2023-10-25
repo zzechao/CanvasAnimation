@@ -6,6 +6,10 @@ import com.base.animation.xml.node.AnimNodeName
 import com.base.animation.xml.node.coder.DefaultAttributeCoder
 import com.base.animation.xml.node.coder.UrlAttributeCoder
 
+/**
+ * @author:zhouzechao
+ * description：*
+ */
 @AnimNodeName("endContainer")
 class EndNodeContainer : IAnimNode {
 

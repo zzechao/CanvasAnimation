@@ -5,6 +5,10 @@ import com.base.animation.model.AnimPathObject
 import com.base.animation.model.PathObject
 import com.base.animation.model.PathObjectWithDer
 
+/**
+ * @author:zhouzechao
+ * description：*
+ */
 class AnimNodeChain(val anim: IAnimView) {
     var curDisplayId = ""
     var path: AnimPathObject.Inner? = null

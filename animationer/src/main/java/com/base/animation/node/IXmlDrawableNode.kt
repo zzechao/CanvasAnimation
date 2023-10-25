@@ -5,6 +5,10 @@ import com.base.animation.xml.IDealNodeDealIntercept
 import com.base.animation.xml.XmlWriterHelper
 import kotlin.reflect.KClass
 
+/**
+ * @author:zhouzechao
+ * description：*
+ */
 open class IXmlDrawableNode : IAnimNode {
 
     open var displayItem: KClass<out BaseDisplayItem> = BaseDisplayItem::class

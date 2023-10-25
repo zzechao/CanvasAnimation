@@ -3,6 +3,10 @@ package com.base.animation.node
 import com.base.animation.xml.XmlWriterHelper
 import com.base.animation.xml.node.AnimNodeName
 
+/**
+ * @author:zhouzechao
+ * description：*
+ */
 @AnimNodeName(name = "anim")
 class AnimNode : IAnimNode {
     

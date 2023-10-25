@@ -10,6 +10,11 @@ import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
 import java.io.StringReader
 
+
+/**
+ * @author:zhouzechao
+ * description：*
+ */
 private const val TAG = "XmlObjectBuilder"
 
 typealias OnCreateNode = ((name: String) -> IAnimNode)
