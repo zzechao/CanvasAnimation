@@ -5,6 +5,10 @@ import android.graphics.ColorFilter
 import android.graphics.PixelFormat
 import android.graphics.drawable.Drawable
 
+/**
+ * @author:zhouzechao
+ * description：*
+ */
 class AnimViewDrawable(var drawable: (Canvas) -> Unit) : Drawable() {
 
     init {

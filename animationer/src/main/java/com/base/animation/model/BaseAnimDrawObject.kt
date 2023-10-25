@@ -4,6 +4,10 @@ import android.graphics.Canvas
 import android.graphics.PointF
 import com.base.animation.helper.IPathObjectDeal
 
+/**
+ * @author:zhouzechao
+ * description：*
+ */
 abstract class BaseAnimDrawObject {
 
     abstract fun draw(

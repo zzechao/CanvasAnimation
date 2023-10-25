@@ -68,8 +68,18 @@
 
     <include
         layout="@layout/view_liuguang"
-        android:layout_centerInParent="true"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
+
+    <com.base.canvasanimation.GradientColorAnimTextView
+        android:id="@+id/colorTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="测试数据数据数据"
+        android:layout_marginTop="100dp"
+        android:layout_centerHorizontal="true"
+        android:textColor="#FFD38D14"
+        android:textSize="20sp" />
 
 </RelativeLayout>

@@ -18,6 +18,10 @@ import java.lang.reflect.Field
 
 private const val TAG = "IAnimNode"
 
+/**
+ * @author:zhouzechao
+ * description：*
+ */
 interface IAnimNode : XmlBaseAnimNode, IXmlObjNodeParser {
 
     val nodeName: String

@@ -21,6 +21,10 @@ import kotlinx.coroutines.supervisorScope
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
+/**
+ * @author:zhouzechao
+ * description：*
+ */
 @ObsoleteCoroutinesApi
 class PathObjectDeal2(private val iAnimView: IAnimView) : IPathObjectDeal {
 

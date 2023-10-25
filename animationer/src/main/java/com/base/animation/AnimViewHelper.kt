@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Time:2022/4/15 12:36 下午
- * Author:
+ * Author: zhouzechao
  * Description:
  */
 typealias DoFrameFps = (framePositionCount: Int, frameTime: Long) -> Unit

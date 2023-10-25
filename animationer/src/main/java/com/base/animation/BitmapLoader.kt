@@ -4,6 +4,10 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 
+/**
+ * @author:zhouzechao
+ * description：*
+ */
 object BitmapLoader {
     fun decodeBitmapFrom(
         res: Resources,

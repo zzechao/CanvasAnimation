@@ -4,6 +4,10 @@ import android.view.animation.BaseInterpolator
 import androidx.annotation.Keep
 import com.base.animation.model.AnimDrawObject
 
+/**
+ * @author:zhouzechao
+ * description：*
+ */
 @Keep
 data class PathProcess(
     val start: AnimDrawObject,

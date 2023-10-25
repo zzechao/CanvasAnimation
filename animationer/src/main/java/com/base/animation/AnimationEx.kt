@@ -2,6 +2,10 @@ package com.base.animation
 
 import android.app.Application
 
+/**
+ * @author:zhouzechao
+ * description：*
+ */
 object AnimationEx {
 
     lateinit var mApplication: Application

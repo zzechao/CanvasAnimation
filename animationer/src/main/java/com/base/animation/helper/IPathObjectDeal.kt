@@ -7,6 +7,10 @@ import com.base.animation.item.BaseDisplayItem
 import com.base.animation.model.AnimPathObject
 import com.base.animation.model.BaseAnimDrawObject
 
+/**
+ * @author:zhouzechao
+ * description：*
+ */
 interface IPathObjectDeal {
 
     val animDrawObjects: MutableMap<Long, BaseAnimDrawObject>

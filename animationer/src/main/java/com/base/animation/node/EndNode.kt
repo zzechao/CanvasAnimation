@@ -15,6 +15,10 @@ import com.base.animation.xml.node.coder.LayoutIDAttributeCoder
 import com.base.animation.xml.node.coder.LocationAttributeCoder
 import com.base.animation.xml.node.coder.UrlAttributeCoder
 
+/**
+ * @author:zhouzechao
+ * description：*
+ */
 @AnimNodeName("endAnim")
 class EndNode : IAnimNode {
 

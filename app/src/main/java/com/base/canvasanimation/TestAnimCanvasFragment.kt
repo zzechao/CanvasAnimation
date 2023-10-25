@@ -36,6 +36,7 @@ import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_1
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_2
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_3
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_surface
+import kotlinx.android.synthetic.main.fragment_anim_canvas.colorTextView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -71,12 +72,14 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
         anim_1?.setOnClickListener {
             lifecycleScope.launch {
                 startSingleAnim2()
+                colorTextView?.starter()
             }
         }
 
         anim_2?.setOnClickListener {
             lifecycleScope.launch {
                 startImageDouAnim2()
+                colorTextView?.stop()
             }
         }
 

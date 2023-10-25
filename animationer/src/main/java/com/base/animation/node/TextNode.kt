@@ -10,6 +10,10 @@ import com.base.animation.xml.node.coder.DefaultAttributeCoder
 import com.base.animation.xml.node.coder.UrlAttributeCoder
 import kotlin.reflect.KClass
 
+/**
+ * @author:zhouzechao
+ * description：*
+ */
 @AnimNodeName("txtNode")
 class TextNode : IXmlDrawableNode() {
 
