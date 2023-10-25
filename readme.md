@@ -122,9 +122,17 @@ clone 项目，自行导出aar库，（之后提供build.gradle支持）
 ```
 
 ### 动画的效果演示
-<video id="video" controls="" preload="none" poster="封面">
-      <source id="mp4" src="https://github.com/zzechao/CanvasAnimation/blob/canvas_view_new_feature_2.0/video1.mp4" type="video/mp4">
-</videos>
+<iframe
+src="https://github.com/zzechao/CanvasAnimation/blob/canvas_view_new_feature_2.0/video1.mp4"
+scrolling="no"
+border="0"
+frameborder="no"
+framespacing="0"
+allowfullscreen="true"
+height=500
+width=250>
+</iframe>
+
 <video id="video" controls="" preload="none" poster="封面">
       <source id="mp4" src="https://github.com/zzechao/CanvasAnimation/blob/canvas_view_new_feature_2.0/video2.mp4" type="video/mp4">
 </videos>
