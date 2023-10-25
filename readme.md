@@ -8,8 +8,7 @@
 ## 效果图
 
 ### 做类似的动画效果（间隔50ms播放100个动画）
-
-[![Watch the video](https://raw.github.com/GabLeRoux/WebMole/master/ressources/WebMole_Youtube_Video.png)](https://github.com/zzechao/CanvasAnimation/blob/canvas_view_new_feature_2.0/OScreen_recording.mp4)
+![image](https://github.com/zzechao/CanvasAnimation/blob/canvas_view_new_feature_2.0/Screen_recording.gif)
 
 ### 用普通属性动画，内存消耗情况
 ![image](https://github.com/zzechao/CanvasAnimation/blob/canvas_view_new_feature_2.0/origin.jpg)
