@@ -40,7 +40,6 @@ import kotlinx.android.synthetic.main.fragment_anim_canvas.colorTextView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
@@ -202,6 +201,7 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
             }
         }.apply {
             lifecycleScope.launch(Dispatchers.IO) {
+                anim_surface ?: return@launch
                 AnimDecoder2.suspendPlayAnimWithAnimNode(
                     anim_surface,
                     this@apply,
@@ -315,6 +315,7 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
         }.apply {
             Animer.log.i("tttt2", this.buildString())
             lifecycleScope.launch {
+                anim_surface ?: return@launch
                 AnimDecoder2.suspendPlayAnimWithAnimNode(
                     anim_surface, this@apply
                 ) { node, displayItem ->
@@ -376,6 +377,7 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
             }
         }.apply {
             lifecycleScope.launch {
+                anim_surface ?: return@launch
                 AnimDecoder2.suspendPlayAnimWithAnimNode(
                     anim_surface, this@apply
                 ) { node, displayItem ->
@@ -456,6 +458,7 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
             }
         }.apply {
             lifecycleScope.launch {
+                anim_surface ?: return@launch
                 AnimDecoder2.suspendPlayAnimWithAnimNode(
                     anim_surface, this@apply
                 ) { node, displayItem ->
