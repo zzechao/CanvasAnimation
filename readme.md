@@ -121,5 +121,17 @@ clone 项目，自行导出aar库，（之后提供build.gradle支持）
     }
 ```
 
-### 提供自定义的绘制元素节点以及路径过程节点，让用户自己定义新的绘制元素以及不同的路径
-可以参考BitmapDouDisplay、ImageDouNode。
+### 动画的效果演示
+<video id="video" controls="" preload="none" poster="封面">
+      <source id="mp4" src="https://github.com/zzechao/CanvasAnimation/blob/canvas_view_new_feature_2.0/video1.mp4" type="video/mp4">
+</videos>
+<video id="video" controls="" preload="none" poster="封面">
+      <source id="mp4" src="https://github.com/zzechao/CanvasAnimation/blob/canvas_view_new_feature_2.0/video2.mp4" type="video/mp4">
+</videos>
+
+### 提供自定义的绘制元素节点以及路径过程节点，效果图
+<video id="video" controls="" preload="none" poster="封面">
+      <source id="mp4" src="https://github.com/zzechao/CanvasAnimation/blob/canvas_view_new_feature_2.0/video3.mp4" type="video/mp4">
+</videos>
+
+可以参考BitmapDouDisplay、ImageDouNode
