@@ -3,10 +3,15 @@ package com.base.canvasanimation
 import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.Matrix
+import android.graphics.NinePatch
 import android.graphics.PointF
+import android.graphics.Rect
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.NinePatchDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -41,6 +46,8 @@ import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_1
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_2
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_3
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_surface
+import kotlinx.android.synthetic.main.fragment_anim_canvas.mGradientColorAnimTextView
+import kotlinx.android.synthetic.main.fragment_anim_canvas.mNinePTxt
 import kotlinx.android.synthetic.main.fragment_anim_canvas.relative
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -74,6 +81,14 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        lifecycleScope.launch {
+            mNinePTxt.background = loadNinePatchDrawable(
+                this@TestAnimCanvasFragment.context,
+                "http://imgs.pago.tv/products/8e09145b-4521-4184-a405-dd08882df3d3.png", true
+            )
+        }
+        mGradientColorAnimTextView?.starter()
+
         anim_1?.setOnClickListener {
             lifecycleScope.launch {
                 repeat(100) {
@@ -671,6 +686,66 @@ suspend fun loadImage(fragment: Fragment, url: String, size: Int): Bitmap? {
                 override fun onLoadCleared(placeholder: Drawable?) {
                     if (it.isActive)
                         it.resume(null)
+                }
+            })
+    }
+}
+
+/**
+ * url 转.9.png
+ */
+suspend fun loadNinePatchDrawable(
+    context: Context?,
+    url: String?,
+    isMirror: Boolean = false
+): NinePatchDrawable? {
+    if (url.isNullOrEmpty()) {
+        return null
+    }
+    context ?: return null
+    return suspendCancellableCoroutine {
+        Glide.with(context).asBitmap().load(url)
+            .dontAnimate().into(object : CustomTarget<Bitmap>() {
+                override fun onResourceReady(
+                    resource: Bitmap,
+                    transition: Transition<in Bitmap>?
+                ) {
+                    val newBitmap = if (isMirror) {
+                        val matrix = Matrix()
+                        matrix.postScale(-1f, 1f) //镜像垂直翻转
+                        Bitmap.createBitmap(
+                            resource, 0, 0, resource.width, resource.height, matrix, false
+                        )
+                    } else {
+                        resource
+                    }
+                    if (NinePatch.isNinePatchChunk(newBitmap.ninePatchChunk)) {
+                        Log.i("zzc", "isNinePatchChunk ")
+                        it.resume(
+                            NinePatchDrawable(
+                                context.resources,
+                                newBitmap,
+                                newBitmap.ninePatchChunk,
+                                Rect(),
+                                null
+                            )
+                        )
+                    } else {
+                        Log.i("zzc", "isNinePatchChunk not")
+                        val start = resource.width / 2 - 10
+                        val hStart = resource.height / 2 - 5
+                        val ninePatch =
+                            NinePatchChunk.createInstance(start, start + 20, hStart, hStart + 10)
+                                ?.toData() ?: byteArrayOf()
+                        Log.i("zzc", "isNinePatchChunk  $ninePatch")
+                        val patch = NinePatch(newBitmap, ninePatch, null)
+                        it.resume(
+                            NinePatchDrawable(context.resources, patch)
+                        )
+                    }
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {
                 }
             })
     }

@@ -70,7 +70,25 @@
         layout="@layout/view_liuguang"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_centerInParent="true" />
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/mNinePTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_centerInParent="true"
+        android:text="t"
+        android:textColor="@color/white"
+        android:textSize="12sp" />
+
+    <com.base.canvasanimation.GradientColorAnimTextView
+        android:id="@+id/mGradientColorAnimTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="测试测测😄测测测测"
+        android:layout_marginTop="50dp"
+        android:textSize="12sp"/>
 </RelativeLayout>
