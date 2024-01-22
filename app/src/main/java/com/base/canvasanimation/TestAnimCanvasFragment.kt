@@ -169,27 +169,21 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                 this.url = url
                 this.displayHeightSize = size
                 startNode {
+                    layoutIdName = "test1"
                     point = PointF(0f, 0f)
                     scaleX = 0.5f
                     scaleY = 0.5f
                     endNode {
-                        point = PointF(
-                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
-                                .toFloat() / 2 - size / 2,
-                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
-                                .toFloat() / 2 - size / 2
-                        )
+                        layoutIdName = "test2"
+                        point = PointF(500f, 500f)
                         scaleX = 3f
                         scaleY = 3f
                         durTime = 1000
                         interpolator = InterpolatorEnum.Accelerate.type
                     }
                     endNode {
-                        point = PointF(
-                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
-                                .toFloat() / 2 - size / 2,
-                            0f
-                        )
+                        layoutIdName = "test3"
+                        point = PointF(500f, 0f)
                         scaleX = 0.5f
                         scaleY = 0.5f
                         durTime = 2000
@@ -198,6 +192,7 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                 }
             }
         }.apply {
+            Log.i("zzc", this.buildString())
             lifecycleScope.launch(Dispatchers.IO) {
                 anim_surface ?: return@launch
                 AnimDecoder2.suspendPlayAnimWithAnimNode(
