@@ -12,16 +12,16 @@ task androidSourcesJar(type: Jar) {
 //--- 修改配置一 ---
 ext {path=
         PUBLISH_GROUP_ID = 'io.github.zzechao'
-    PUBLISH_ARTIFACT_ID = 'canvasAnimation'
+    PUBLISH_ARTIFACT_ID = 'canvasanimation'
     PUBLISH_VERSION = '1.0.0'
 }
 
 //--- 修改配置二 ---
-ext["signing.keyId"] = 'DE3381FC'
+ext["signing.keyId"] = '0DC18FD6'
 ext["signing.password"] = '12345678'
 ext["signing.secretKeyRingFile"] = 'D:\\secring.gpg'
 ext["ossrhUsername"] = 'zhouzechao10'
-ext["ossrhPassword"] = '&Zz84128861'
+ext["ossrhPassword"] = '&Zzc84128861'
 
 File secretPropsFile = project.rootProject.file('local.properties')
 if (secretPropsFile.exists()) {
