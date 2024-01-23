@@ -46,7 +46,7 @@ dependencies {
     implementation dep_androidx.lifecycle_extensions
     implementation dep_kotlin_lib.ktx_coroutines_android
     implementation dep_kotlin_lib.kotlin_reflect
-    implementation "io.github.zzechao:canvasanimation:1.0.0@aar"
+    implementation "io.github.zzechao:canvasanimation:1.0.0"
     implementation ("com.github.bumptech.glide:glide:4.11.0") {
         exclude group: "com.android.support"
     }

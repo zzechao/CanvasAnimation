@@ -10,14 +10,15 @@ task androidSourcesJar(type: Jar) {
 }
 
 //--- 修改配置一 ---
-ext {path=
+ext {
+    path=
         PUBLISH_GROUP_ID = 'io.github.zzechao'
     PUBLISH_ARTIFACT_ID = 'canvasanimation'
     PUBLISH_VERSION = '1.0.0'
 }
 
 //--- 修改配置二 ---
-ext["signing.keyId"] = '0DC18FD6'
+ext["signing.keyId"] = 'DE3381FC'
 ext["signing.password"] = '12345678'
 ext["signing.secretKeyRingFile"] = 'D:\\secring.gpg'
 ext["ossrhUsername"] = 'zhouzechao10'
@@ -37,7 +38,11 @@ if (secretPropsFile.exists()) {
 publishing {
     publications {
         release(MavenPublication) {
-            println("publish-maven Log-------> PUBLISH_GROUP_ID: $PUBLISH_GROUP_ID; PUBLISH_ARTIFACT_ID: $PUBLISH_ARTIFACT_ID; PUBLISH_VERSION: $PUBLISH_VERSION")
+            println("publish-maven Log-------> PUBLISH_GROUP_ID: $PUBLISH_GROUP_ID; " +
+                    "PUBLISH_ARTIFACT_ID: $PUBLISH_ARTIFACT_ID; " +
+                    "PUBLISH_VERSION: $PUBLISH_VERSION; " +
+                    "ossrhUsername:$ossrhUsername; " +
+                    "ossrhPassword:$ossrhPassword ")
             // The coordinates of the library, being set from variables that
             // we'll set up in a moment
 
