@@ -2,10 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-//apply plugin: 'maven'
-//apply plugin: 'net.researchgate.release'
-//apply plugin: 'architecture-lint'
-//apply from: 'https://git.duowan.com/ci_team/build-snippet/raw/master/gradlebuild/publish-aar-551.gradle'
+apply from: "${rootProject.projectDir}/publish-mavencentral.gradle"
 
 android {
     compileSdkVersion build_version.compile_sdk
@@ -26,14 +23,13 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation dep_kotlin_lib.kotlin_stdlib_jdk7
     implementation dep_androidx.lifecycle_extensions
     implementation dep_kotlin_lib.ktx_coroutines_android

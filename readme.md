@@ -18,8 +18,21 @@
 
 
 ## 用法
+根目录build.gradle中添加mavenCentral()
 
-clone 项目，自行导出aar库，（之后提供build.gradle支持）
+```groovy
+    repositories {
+        mavenCentral()
+    }
+```
+
+model build.gradle添加
+
+```groovy
+     implementation "io.github.zzechao:canvasanimation:1.0.0"
+```
+
+当前版本：1.0.0
 
 ### 动画库初始化
 
@@ -121,7 +134,7 @@ clone 项目，自行导出aar库，（之后提供build.gradle支持）
     }
 ```
 
-### 动画的效果演示
+### 动画的效果演示，压缩成gif可能导致画质损伤，可参考项目里的mp4更为清晰顺畅
 ![image](https://github.com/zzechao/CanvasAnimation/blob/canvas_view_new_feature_2.0/v1.gif)
 
 ![image](https://github.com/zzechao/CanvasAnimation/blob/canvas_view_new_feature_2.0/v2.gif)

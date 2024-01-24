@@ -6,6 +6,7 @@ buildscript {
     ext.kotlin_version = "1.6.20"
     repositories {
        // maven { url 'https://nexus-android.duowan.com/nexus/content/groups/public' }
+        mavenCentral()
         google()
         jcenter()
         maven { url 'https://jitpack.io' }
@@ -25,6 +26,7 @@ allprojects {
     apply from: "$rootDir/versions.gradle"
     repositories {
         //maven { url 'https://nexus-android.duowan.com/nexus/content/groups/public' }
+        mavenCentral()
         google()
         jcenter()
         maven { url 'https://jitpack.io' }

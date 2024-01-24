@@ -10,13 +10,11 @@ android {
     compileSdkVersion build_version.compile_sdk
 
     defaultConfig {
-        applicationId "com.chao.canvasanimation"
+        applicationId "com.zhouz.canvasanimation"
         minSdkVersion build_version.min_sdk
         targetSdkVersion build_version.target_sdk
         versionCode _versionCode
         versionName "$version"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -48,7 +46,7 @@ dependencies {
     implementation dep_androidx.lifecycle_extensions
     implementation dep_kotlin_lib.ktx_coroutines_android
     implementation dep_kotlin_lib.kotlin_reflect
-    implementation project(path: ':animationer')
+    implementation "io.github.zzechao:canvasanimation:1.0.0"
     implementation ("com.github.bumptech.glide:glide:4.11.0") {
         exclude group: "com.android.support"
     }
