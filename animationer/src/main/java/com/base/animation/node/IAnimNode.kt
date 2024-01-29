@@ -129,12 +129,12 @@ interface IAnimNode : XmlBaseAnimNode, IXmlObjNodeParser {
     private fun getStatusBarHeight(): Int {
         var height = 0
         val resourceId: Int = tryCatch {
-            AnimationEx.mApplication.resources.getIdentifier(
+            AnimationEx.mApplication?.resources?.getIdentifier(
                 "status_bar_height", "dimen", "android"
             )
         } ?: 0
         if (resourceId > 0) {
-            height = AnimationEx.mApplication.resources.getDimensionPixelSize(resourceId)
+            height = AnimationEx.mApplication?.resources?.getDimensionPixelSize(resourceId) ?: 0
         }
         return height
     }

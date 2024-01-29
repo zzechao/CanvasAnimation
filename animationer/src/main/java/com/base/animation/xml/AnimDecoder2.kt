@@ -159,8 +159,9 @@ object AnimDecoder2 {
                     key = key, kClass = animNode.displayItem
                 ) {
                     val layoutId = tryCatch {
-                         AnimationEx.mApplication.resources.getIdentifier(
-                            animNode.layoutIdName, "layout", AnimationEx.mApplication.packageName
+                        val context = AnimationEx.mApplication ?: return@tryCatch 0
+                        context.resources?.getIdentifier(
+                            animNode.layoutIdName, "layout", context.packageName
                         )
                     } ?: 0
                     if (layoutId > 0) {

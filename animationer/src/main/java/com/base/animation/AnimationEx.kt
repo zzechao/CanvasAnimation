@@ -8,7 +8,7 @@ import android.app.Application
  */
 object AnimationEx {
 
-    lateinit var mApplication: Application
+    var mApplication: Application? = null
     var mode = 1
 
     fun init(application: Application) {

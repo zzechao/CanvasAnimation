@@ -114,11 +114,12 @@ class AnimSurfaceView @JvmOverloads constructor(
 
     override fun getViewByAnimName(name: String): View? {
         return tryCatch {
+            val context = AnimationEx.mApplication ?: return@tryCatch null
             val id =
-                AnimationEx.mApplication.resources.getIdentifier(
+                context.resources.getIdentifier(
                     name,
                     "id",
-                    AnimationEx.mApplication.packageName
+                    context.packageName
                 )
             this.findFragmentOfGivenView()?.let {
                 it.view?.findViewById<View>(id)
