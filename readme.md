@@ -29,10 +29,10 @@
 model build.gradle添加
 
 ```groovy
-     implementation "io.github.zzechao:canvasanimation:1.0.0"
+     implementation "io.github.zzechao:canvasanimation:1.0.1"
 ```
 
-当前版本：1.0.0
+当前版本：1.0.1
 
 ### 动画库初始化
 

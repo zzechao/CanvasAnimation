@@ -23,7 +23,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -31,7 +31,6 @@ android {
 
 dependencies {
     implementation dep_kotlin_lib.kotlin_stdlib_jdk7
-    implementation dep_androidx.lifecycle_extensions
     implementation dep_kotlin_lib.ktx_coroutines_android
     implementation dep_kotlin_lib.kotlin_reflect
     implementation dep_androidx.guava_android
