@@ -46,13 +46,13 @@ import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_1
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_2
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_3
 import kotlinx.android.synthetic.main.fragment_anim_canvas.anim_surface
-import kotlinx.android.synthetic.main.fragment_anim_canvas.mGradientColorAnimTextView
+import kotlinx.android.synthetic.main.fragment_anim_canvas.mCode
 import kotlinx.android.synthetic.main.fragment_anim_canvas.mNinePTxt
+import kotlinx.android.synthetic.main.fragment_anim_canvas.mTextXml
 import kotlinx.android.synthetic.main.fragment_anim_canvas.relative
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
@@ -73,6 +73,33 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
     private val xmlMore =
         "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>\n" + "<anim>\n" + "    <startAnim alpha=\"255\" displaySize=\"80\" startId=\"0\" startL='{\"x\":0.0,\"y\":0.0}' rotation=\"0.0\" scaleX=\"0.5\" scaleY=\"0.5\" url=\"https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png\">\n" + "        <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"2\" endId=\"0\" endL='{\"x\":680.0,\"y\":1463.5}' rotation=\"0.0\" scaleX=\"2.0\" scaleY=\"2.0\" url=\"\" />\n" + "        <endContainer displaySize=\"0\" durTime=\"1500\" url=\"\">\n" + "            <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"0\" endId=\"0\" endL='{\"x\":680.0,\"y\":0.0}' rotation=\"360.0\" scaleX=\"1.0\" scaleY=\"1.0\" url=\"\" />\n" + "            <endAnim alpha=\"0\" displaySize=\"0\" durTime=\"1000\" interpolator=\"0\" endId=\"0\" endL='{\"x\":0.0,\"y\":1463.5}' rotation=\"0.0\" scaleX=\"1.0\" scaleY=\"1.0\" url=\"\" />\n" + "            <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"0\" endId=\"0\" endL='{\"x\":680.0,\"y\":3007.0}' rotation=\"0.0\" scaleX=\"0.0\" scaleY=\"0.0\" url=\"\" />\n" + "            <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"0\" endId=\"0\" endL='{\"x\":1440.0,\"y\":1463.5}' rotation=\"0.0\" scaleX=\"0.0\" scaleY=\"0.0\" url=\"\" />\n" + "        </endContainer>\n" + "    </startAnim>\n" + "</anim>"
 
+    private val code = "imageNode {\n" +
+            "                this.url = url\n" +
+            "                this.displayHeightSize = size\n" +
+            "                startNode {\n" +
+            "                    layoutIdName = \"test1\"\n" +
+            "                    point = PointF(0f, 0f)\n" +
+            "                    scaleX = 0.5f\n" +
+            "                    scaleY = 0.5f\n" +
+            "                    endNode {\n" +
+            "                        layoutIdName = \"test2\"\n" +
+            "                        point = PointF(500f, 500f)\n" +
+            "                        scaleX = 3f\n" +
+            "                        scaleY = 3f\n" +
+            "                        durTime = 1000\n" +
+            "                        interpolator = InterpolatorEnum.Accelerate.type\n" +
+            "                    }\n" +
+            "                    endNode {\n" +
+            "                        layoutIdName = \"test3\"\n" +
+            "                        point = PointF(500f, 0f)\n" +
+            "                        scaleX = 0.5f\n" +
+            "                        scaleY = 0.5f\n" +
+            "                        durTime = 2000\n" +
+            "                        interpolator = InterpolatorEnum.Accelerate.type\n" +
+            "                    }\n" +
+            "                }\n" +
+            "            }"
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
@@ -89,12 +116,12 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
         }
         //mGradientColorAnimTextView?.starter()
 
+        mTextXml.text = xml
+        mCode.text = code
+
         anim_1?.setOnClickListener {
             lifecycleScope.launch {
-                repeat(100) {
-                    startSingleAnim()
-                    delay(50)
-                }
+                startSingleAnim3()
             }
         }
 
