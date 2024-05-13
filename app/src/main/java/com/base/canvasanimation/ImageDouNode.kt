@@ -3,6 +3,7 @@ package com.base.canvasanimation
 import com.base.animation.DisplayObject
 import com.base.animation.item.BaseDisplayItem
 import com.base.animation.node.IAnimNode
+import com.base.animation.node.IXmlDrawableNode
 import com.base.animation.node.IXmlDrawableNodeDealIntercept
 import com.base.animation.node.ImageNode
 import com.base.animation.node.StartNode

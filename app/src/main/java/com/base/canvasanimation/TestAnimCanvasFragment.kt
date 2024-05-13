@@ -87,7 +87,7 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
                 "http://imgs.pago.tv/products/8e09145b-4521-4184-a405-dd08882df3d3.png", true
             )
         }
-        mGradientColorAnimTextView?.starter()
+        //mGradientColorAnimTextView?.starter()
 
         anim_1?.setOnClickListener {
             lifecycleScope.launch {
