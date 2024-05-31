@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
  * description：SurfaceView的canvas的动画
  */
 @ObsoleteCoroutinesApi
-class AnimSurfaceView @JvmOverloads constructor(
+open class AnimSurfaceView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : SurfaceView(context, attrs, defStyleAttr), SurfaceHolder.Callback, IAnimView {
 

@@ -14,7 +14,7 @@ import kotlinx.coroutines.ObsoleteCoroutinesApi
  */
 @ObsoleteCoroutinesApi
 @ExperimentalCoroutinesApi
-class AnimView @JvmOverloads constructor(
+open class AnimView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr), IAnimView {
     private val helper: AnimViewHelper
@@ -85,7 +85,9 @@ class AnimView @JvmOverloads constructor(
     }
 
     override fun getViewByAnimName(name: String): View? {
-        return tryCatch {
+        return tryCatch(catchBlock = {
+            Animer.log.e("AnimView", "getViewByAnimName name:$name")
+        }) {
             val context = AnimationEx.mApplication ?: return@tryCatch null
             val id =
                 context.resources.getIdentifier(
@@ -93,7 +95,7 @@ class AnimView @JvmOverloads constructor(
                     "id",
                     context.packageName
                 )
-             this.findFragmentOfGivenView()?.let {
+            this.findFragmentOfGivenView()?.let {
                 it.view?.findViewById<View>(id)
             } ?: this.getFragmentActivity()?.findViewById(id)
         }

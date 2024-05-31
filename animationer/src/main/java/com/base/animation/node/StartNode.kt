@@ -1,6 +1,7 @@
 package com.base.animation.node
 
 import android.graphics.PointF
+import com.base.animation.Animer
 import com.base.animation.IAnimView
 import com.base.animation.model.PathObject
 import com.base.animation.xml.XmlWriterHelper
@@ -65,6 +66,7 @@ class StartNode : IAnimNode {
             && layoutIdName.isNotEmpty()
         ) {
             anim.getViewByAnimName(layoutIdName)?.let { it ->
+                Animer.log.i("StartNode", "getViewByAnimName view attach")
                 getCenterOfViewLocationInWindow(it).let {
                     PointF(it[0].toFloat(), it[1].toFloat())
                 }
@@ -72,6 +74,7 @@ class StartNode : IAnimNode {
         } else {
             point ?: PointF()
         }
+        Animer.log.i("StartNode", "getViewByAnimName view point:$point")
         return PathObject(id, pointF, alpha, scaleX, scaleY, rotation)
     }
 }

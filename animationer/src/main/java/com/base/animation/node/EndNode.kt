@@ -4,6 +4,7 @@ import android.graphics.PointF
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
+import com.base.animation.Animer
 import com.base.animation.IAnimView
 import com.base.animation.model.PathObject
 import com.base.animation.xml.node.AnimAttributeName
@@ -79,6 +80,7 @@ class EndNode : IAnimNode {
         val pointF =
             if ((point?.x ?: 0f) == 0f && (point?.y ?: 0f) == 0f && layoutIdName.isNotEmpty()) {
                 anim.getViewByAnimName(layoutIdName)?.let { it ->
+                    Animer.log.i("EndNode", "getViewByAnimName view attach")
                     getCenterOfViewLocationInWindow(it).let {
                         PointF(it[0].toFloat(), it[1].toFloat())
                     }
@@ -86,6 +88,7 @@ class EndNode : IAnimNode {
             } else {
                 point ?: PointF()
             }
+        Animer.log.i("EndNode", "getViewByAnimName view point:$point")
         return PathObject(
             id, pointF, alpha, scaleX, scaleY, rotation, interpolator = interpolatorObject
         )
