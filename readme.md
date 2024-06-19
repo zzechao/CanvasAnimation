@@ -1,5 +1,7 @@
 # CanvasAnimation
 
+[![GitHub license](https://img.shields.io/github/license/JailedBird/ArouterGradlePlugin.svg)](https://github.com/zzechao/CanvasAnimation/blob/canvas_view_new_feature_2.0/LICENSE)
+
 ## 介绍
 
 `CanvasAnimation` 是一个轻量的属性动画的库。支持普通的view以及surfaceview两种布局进行绘制，还支持xml远程配置模式，配置方便。
