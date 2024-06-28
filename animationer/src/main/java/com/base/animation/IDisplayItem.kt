@@ -2,6 +2,7 @@ package com.base.animation
 
 import android.graphics.Canvas
 import android.graphics.PointF
+import android.view.animation.BaseInterpolator
 import com.base.animation.model.AnimDrawObject
 
 /**
@@ -13,6 +14,8 @@ interface IDisplayItem {
 
     var displayItemId: String
 
+    var isCalculate: Boolean
+
     fun getScalePX(scaleX: Float): Float
 
     fun getScalePY(scaleY: Float): Float
@@ -22,6 +25,11 @@ interface IDisplayItem {
     fun getRotatePY(rotation: Float, scaleY: Float): Float
 
     fun setDisplaySize(displayWidth: Int, displayHeight: Int)
+
+    /**
+     * 是否自己进行绘制坐标的计算，只能针对com.base.animation.AnimationEx.getMode为2时使用
+     */
+    fun calculate(present: Float, current: AnimDrawObject, interpolator: BaseInterpolator) {}
 
     /**
      * 绘制

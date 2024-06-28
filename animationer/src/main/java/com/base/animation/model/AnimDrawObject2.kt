@@ -44,18 +44,25 @@ class DrawObject2(val animId: Long) : BaseAnimDrawObject() {
                     drawObject.curTotalTime = drawObject.durTime * 1f
                 }
                 val p = drawObject.curTotalTime / drawObject.durTime
-                val interP = drawObject.interpolator.getInterpolation(p)
-                val inPoint = PointF(
-                    drawObject.start.point.x + drawObject.item.totalX * interP,
-                    drawObject.start.point.y + drawObject.item.totalY * interP
-                )
-                val alpha = drawObject.start.alpha + (drawObject.item.totalAlpha * interP).toInt()
-                val scaleX = drawObject.start.scaleX + drawObject.item.totalScaleX * interP
-                val scaleY = drawObject.start.scaleY + drawObject.item.totalScaleY * interP
-                val rotation = drawObject.start.rotation + drawObject.item.totalRotation * interP
-                draw(canvas, inPoint.x, inPoint.y, alpha, scaleX, scaleY, rotation)
-                if (drawObject.clickable && touchPoint != null && pathObjectDeal.onItemListener != null) {
+                if (isCalculate) { // 是否计算任务回调上层触发
+                    calculate(p, drawObject.current, drawObject.interpolator)
+                } else {
+                    val interP = drawObject.interpolator.getInterpolation(p)
+                    val inPoint = PointF(
+                        drawObject.start.point.x + drawObject.item.totalX * interP,
+                        drawObject.start.point.y + drawObject.item.totalY * interP
+                    )
+                    val alpha = drawObject.start.alpha + (drawObject.item.totalAlpha * interP).toInt()
+                    val scaleX = drawObject.start.scaleX + drawObject.item.totalScaleX * interP
+                    val scaleY = drawObject.start.scaleY + drawObject.item.totalScaleY * interP
+                    val rotation = drawObject.start.rotation + drawObject.item.totalRotation * interP
                     drawObject.current.reset(inPoint, alpha, scaleX, scaleY, rotation)
+                }
+                draw(
+                    canvas, drawObject.current.point.x, drawObject.current.point.y, drawObject.current.alpha,
+                    drawObject.current.scaleX, drawObject.current.scaleY, drawObject.current.rotation
+                )
+                if (drawObject.clickable && touchPoint != null && pathObjectDeal.onItemListener != null) {
                     touch(animId, pathObjectDeal.onItemListener!!, drawObject.current, touchPoint, drawObject.extra)
                 }
             }

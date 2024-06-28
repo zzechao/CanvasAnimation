@@ -23,6 +23,8 @@ abstract class BaseDisplayItem : IDisplayItem, IRecycle {
 
     override var displayItemId: String = itemId.toString()
 
+    override var isCalculate: Boolean = false
+
     override fun draw(
         canvas: Canvas, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float,
         rotation: Float
