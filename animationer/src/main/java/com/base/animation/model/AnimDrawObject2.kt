@@ -24,71 +24,39 @@ class DrawObject2(val animId: Long) : BaseAnimDrawObject() {
     var curDisplayItemId = ""
     var displayItem: BaseDisplayItem? = null
 
-    override fun draw(
-        canvas: Canvas,
-        pathObjectDeal: IPathObjectDeal,
-        framePositionCount: Int,
-        frameTime: Long,
-        touchPoint: MutableList<PointF>?
-    ) {
+    override fun draw(canvas: Canvas, pathObjectDeal: IPathObjectDeal, framePositionCount: Int, frameTime: Long, touchPoint: PointF?) {
         var updateCurrencyPosition = true
         if (currencyPosition == 0 && status == Status.INIT) {
             status = Status.START
-            pathObjectDeal.animListeners.forEach {
-                it.startAnim(animId)
-            }
+            pathObjectDeal.animListeners.forEach { it.startAnim(animId) }
         } else if (status == Status.START) {
             status = Status.DRAWING
-            pathObjectDeal.animListeners.forEach {
-                it.runningAnim(animId)
-            }
+            pathObjectDeal.animListeners.forEach { it.runningAnim(animId) }
         }
         animDraws[currencyPosition]?.forEach { drawObject ->
             if (drawObject.start.displayItemId != curDisplayItemId || displayItem == null) {
                 curDisplayItemId = drawObject.start.displayItemId
                 displayItem = pathObjectDeal.getDisplayItem(drawObject.start.displayItemId)
-                displayItem?.apply {
-                    drawObject.curTotalTime += frameTime
-                    if (drawObject.curTotalTime > drawObject.durTime) {
-                        drawObject.curTotalTime = drawObject.durTime * 1f
-                    }
-                    val p = drawObject.curTotalTime / drawObject.durTime
-                    val interP = drawObject.interpolator.getInterpolation(p)
-                    val inPoint = PointF(
-                        drawObject.start.point.x + drawObject.item.totalX * interP,
-                        drawObject.start.point.y + drawObject.item.totalY * interP
-                    )
-                    val alpha =
-                        drawObject.start.alpha + (drawObject.item.totalAlpha * interP).toInt()
-                    val scaleX = drawObject.start.scaleX + drawObject.item.totalScaleX * interP
-                    val scaleY = drawObject.start.scaleY + drawObject.item.totalScaleY * interP
-                    val rotation =
-                        drawObject.start.rotation + drawObject.item.totalRotation * interP
-                    draw(
-                        canvas, inPoint.x, inPoint.y, alpha, scaleX, scaleY, rotation
-                    )
+            }
+            displayItem?.apply {
+                drawObject.curTotalTime += frameTime
+                if (drawObject.curTotalTime > drawObject.durTime) {
+                    drawObject.curTotalTime = drawObject.durTime * 1f
                 }
-            } else {
-                displayItem?.apply {
-                    drawObject.curTotalTime += frameTime
-                    if (drawObject.curTotalTime > drawObject.durTime) {
-                        drawObject.curTotalTime = drawObject.durTime * 1f
-                    }
-                    val p = drawObject.curTotalTime / drawObject.durTime
-                    val interP = drawObject.interpolator.getInterpolation(p)
-                    val inPoint = PointF(
-                        drawObject.start.point.x + drawObject.item.totalX * interP,
-                        drawObject.start.point.y + drawObject.item.totalY * interP
-                    )
-                    val alpha =
-                        drawObject.start.alpha + (drawObject.item.totalAlpha * interP).toInt()
-                    val scaleX = drawObject.start.scaleX + drawObject.item.totalScaleX * interP
-                    val scaleY = drawObject.start.scaleY + drawObject.item.totalScaleY * interP
-                    val rotation =
-                        drawObject.start.rotation + drawObject.item.totalRotation * interP
-                    draw(
-                        canvas, inPoint.x, inPoint.y, alpha, scaleX, scaleY, rotation
-                    )
+                val p = drawObject.curTotalTime / drawObject.durTime
+                val interP = drawObject.interpolator.getInterpolation(p)
+                val inPoint = PointF(
+                    drawObject.start.point.x + drawObject.item.totalX * interP,
+                    drawObject.start.point.y + drawObject.item.totalY * interP
+                )
+                val alpha = drawObject.start.alpha + (drawObject.item.totalAlpha * interP).toInt()
+                val scaleX = drawObject.start.scaleX + drawObject.item.totalScaleX * interP
+                val scaleY = drawObject.start.scaleY + drawObject.item.totalScaleY * interP
+                val rotation = drawObject.start.rotation + drawObject.item.totalRotation * interP
+                draw(canvas, inPoint.x, inPoint.y, alpha, scaleX, scaleY, rotation)
+                if (drawObject.clickable && touchPoint != null && pathObjectDeal.onItemListener != null) {
+                    drawObject.current.reset(inPoint, alpha, scaleX, scaleY, rotation)
+                    touch(animId, pathObjectDeal.onItemListener!!, drawObject.current, touchPoint, drawObject.extra)
                 }
             }
             if (drawObject.curTotalTime < drawObject.durTime) {

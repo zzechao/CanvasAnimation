@@ -8,6 +8,6 @@ import com.base.animation.model.AnimDrawObject
  * @date: 2/18/21
  * description：点击拦截器
  */
-interface IClickIntercept {
-    fun intercept(animId: Long, animDrawObject: AnimDrawObject, touchPointF: PointF)
+interface OnAnimItemClick {
+    fun itemClick(animId: Long, animDrawObject: AnimDrawObject, touchPointF: PointF, itemCenterPointF: PointF, extra: String)
 }

@@ -27,7 +27,7 @@ import com.base.animation.Animer
 import com.base.animation.BitmapLoader
 import com.base.animation.DisplayObject
 import com.base.animation.IAnimListener
-import com.base.animation.IClickIntercept
+import com.base.animation.OnAnimItemClick
 import com.base.animation.item.BitmapDisplayItem
 import com.base.animation.item.LayoutDisplayItem
 import com.base.animation.model.AnimDrawObject
@@ -65,7 +65,7 @@ import kotlin.coroutines.resume
  */
 @ExperimentalCoroutinesApi
 @ObsoleteCoroutinesApi
-class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
+class TestAnimCanvasFragment : Fragment(), IAnimListener, OnAnimItemClick {
 
     private val xml =
         "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>\n" + "<anim>\n" + "    <imageNode displaySize=\"80\" url=\"https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png\">\n" + "        <startAnim alpha=\"255\" startIdName=\"\" startL='{\"x\":0.0,\"y\":0.0}' rotation=\"0.0\" scaleX=\"0.5\" scaleY=\"0.5\">\n" + "            <endAnim alpha=\"255\" durTime=\"1000\" interpolator=\"1\" endIdName=\"\" endL='{\"x\":680.0,\"y\":1463.5}' rotation=\"0.0\" scaleX=\"2.0\" scaleY=\"2.0\" url=\"\" />\n" + "            <txtNode txtColor=\"#ff0000ff\" fontSize=\"40\" txt=\"测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据测试数据\">\n" + "                <startAnim alpha=\"255\" startIdName=\"\" startL='{\"x\":680.0,\"y\":40.0}' rotation=\"0.0\" scaleX=\"1.0\" scaleY=\"1.0\">\n" + "                    <endAnim alpha=\"255\" durTime=\"5000\" interpolator=\"1\" endIdName=\"\" endL='{\"x\":0.0,\"y\":1463.5}' rotation=\"0.0\" scaleX=\"1.0\" scaleY=\"1.0\" url=\"\" />\n" + "                </startAnim>\n" + "            </txtNode>\n" + "            <layoutNode data=\"\" layoutIdName=\"view_test_layout\" versionCode=\"version_1.0\">\n" + "                <endAnim alpha=\"255\" durTime=\"1000\" interpolator=\"0\" endIdName=\"\" endL='{\"x\":680.0,\"y\":2967.0}' rotation=\"0.0\" scaleX=\"2.0\" scaleY=\"2.0\" url=\"\" />\n" + "            </layoutNode>\n" + "            <endAnim alpha=\"255\" durTime=\"1000\" interpolator=\"2\" endIdName=\"\" endL='{\"x\":1400.0,\"y\":1463.5}' rotation=\"0.0\" scaleX=\"2.0\" scaleY=\"2.0\" url=\"\" />\n" + "            <layoutNode data=\"\" layoutIdName=\"view_test_layout\" versionCode=\"version_1.0\">\n" + "                <endAnim alpha=\"255\" durTime=\"1000\" interpolator=\"0\" endIdName=\"\" endL='{\"x\":680.0,\"y\":40.0}' rotation=\"0.0\" scaleX=\"0.0\" scaleY=\"0.0\" url=\"\" />\n" + "            </layoutNode>\n" + "        </startAnim>\n" + "    </imageNode>\n" + "    <layoutNode data=\"\" layoutIdName=\"view_test_layout\" versionCode=\"version_1.0\">\n" + "        <startAnim alpha=\"255\" startIdName=\"\" startL='{\"x\":680.0,\"y\":40.0}' rotation=\"0.0\" scaleX=\"0.0\" scaleY=\"0.0\">\n" + "            <endAnim alpha=\"255\" durTime=\"1000\" interpolator=\"1\" endIdName=\"\" endL='{\"x\":0.0,\"y\":1463.5}' rotation=\"0.0\" scaleX=\"3.0\" scaleY=\"3.0\" url=\"\" />\n" + "        </startAnim>\n" + "    </layoutNode>\n" + "</anim>\n"
@@ -121,7 +121,7 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
 
         anim_1?.setOnClickListener {
             lifecycleScope.launch {
-                startSingleAnim3()
+                startAnimRain()
             }
         }
 
@@ -135,7 +135,7 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
             startImageDouAnim3()
         }
         anim_surface?.addAnimListener(this)
-        anim_surface?.addClickIntercept(this)
+        anim_surface?.setOnItemClick(this)
     }
 
     override fun onResume() {
@@ -671,17 +671,10 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
         }
     }
 
-    override fun intercept(animId: Long, animDrawObject: AnimDrawObject, touchPointF: PointF) {
-        Toast.makeText(this@TestAnimCanvasFragment.context, "$animId", Toast.LENGTH_SHORT).show()
-        anim_surface?.removeAnimId(animId)
-        //startSingleAnim()
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         anim_surface?.endAnimation()
         anim_surface?.removeAnimListener(this)
-        anim_surface?.removeClickIntercept(this)
     }
 
     override fun startAnim(animId: Long) {
@@ -694,6 +687,11 @@ class TestAnimCanvasFragment : Fragment(), IClickIntercept, IAnimListener {
 
     override fun endAnim(animId: Long) {
         Log.i("zzc4", "endAnim animId:$animId")
+    }
+
+    override fun itemClick(animId: Long, animDrawObject: AnimDrawObject, touchPointF: PointF, itemCenterPointF: PointF, extra: String) {
+        Toast.makeText(this@TestAnimCanvasFragment.context, "$animId", Toast.LENGTH_SHORT).show()
+        //anim_surface?.removeAnimId(animId)
     }
 }
 

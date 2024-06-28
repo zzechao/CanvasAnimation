@@ -4,7 +4,7 @@ import com.base.animation.AnimCache
 import com.base.animation.Animer
 import com.base.animation.IAnimListener
 import com.base.animation.IAnimView
-import com.base.animation.IClickIntercept
+import com.base.animation.OnAnimItemClick
 import com.base.animation.helper.data.PathProcess
 import com.base.animation.helper.data.PathProcessItem
 import com.base.animation.item.BaseDisplayItem
@@ -38,12 +38,12 @@ class PathObjectDeal2(private val iAnimView: IAnimView) : IPathObjectDeal {
     /**
      * 点击事件列表
      */
-    override val clickIntercepts = mutableListOf<IClickIntercept>()
+    override var onItemListener: OnAnimItemClick? = null
 
     /**
      * 动画事件
      */
-    override val animListeners = mutableListOf<IAnimListener>()
+    override val animListeners = mutableSetOf<IAnimListener>()
 
     private val animDrawIds: CopyOnWriteArrayList<Long> = CopyOnWriteArrayList()
 
@@ -64,6 +64,8 @@ class PathObjectDeal2(private val iAnimView: IAnimView) : IPathObjectDeal {
                     if (animPath.displayItemsMap.isNotEmpty()) {
                         AnimCache.displayItemCache.putDisplayItems(animPath.displayItemsMap)
                     }
+                    val clickable = animPath.clickable
+                    val expand = animPath.expand
                     val drawObject = DrawObject2(animPath.animId)
                     val drawPathProcessMap = mutableMapOf<Int, List<PathProcess>>()
                     for ((index, starts) in animPath.startPoints) {
@@ -80,26 +82,15 @@ class PathObjectDeal2(private val iAnimView: IAnimView) : IPathObjectDeal {
                                     val totalAlpha = endAnimObject.alpha - startAnimObject.alpha
                                     val totalScaleX = endAnimObject.scaleX - startAnimObject.scaleX
                                     val totalScaleY = endAnimObject.scaleY - startAnimObject.scaleY
-                                    val totalRotation =
-                                        endAnimObject.rotation - startAnimObject.rotation
-                                    val pathProcessItem =
-                                        PathProcessItem(
-                                            totalX,
-                                            totalY,
-                                            totalAlpha,
-                                            totalScaleX,
-                                            totalScaleY,
-                                            totalRotation
-                                        )
+                                    val totalRotation = endAnimObject.rotation - startAnimObject.rotation
+                                    val pathProcessItem = PathProcessItem(totalX, totalY, totalAlpha, totalScaleX, totalScaleY, totalRotation)
                                     PathProcess(
-                                        startAnimObject,
-                                        start.interpolator, duringTime, 0f, pathProcessItem
+                                        startAnimObject, start.interpolator, duringTime, 0f,
+                                        pathProcessItem, startAnimObject.copy(), clickable, expand
                                     )
                                 }
                             }
-                            pathProcesses?.let {
-                                drawPathProcessMap[index] = it
-                            }
+                            pathProcesses?.let { drawPathProcessMap[index] = it }
                         }
                     }
                     drawObject.animDraws = drawPathProcessMap
@@ -137,12 +128,7 @@ class PathObjectDeal2(private val iAnimView: IAnimView) : IPathObjectDeal {
      * 清空执行中ids
      */
     override fun removeAnimId(animId: Long) {
-        animDisplayScope.launch {
-            animDrawIds.remove(animId)
-            animDrawObjects.remove(animId)
-            if (animDrawIds.isEmpty()) {
-                iAnimView.pause()
-            }
-        }
+        animDrawIds.remove(animId)
+        animDrawObjects.remove(animId)
     }
 }

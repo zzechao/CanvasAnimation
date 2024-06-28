@@ -15,6 +15,8 @@ android {
         targetSdkVersion build_version.target_sdk
         versionCode _versionCode
         versionName "$version"
+
+        multiDexEnabled true
     }
 
     repositories {
@@ -55,5 +57,5 @@ dependencies {
         exclude group: "com.android.support"
     }
     implementation "com.android.support:support-fragment:26.1.0"
-    implementation "io.github.zzechao:canvasanimation:1.0.1"
+    implementation(project(":animationer"))
 }

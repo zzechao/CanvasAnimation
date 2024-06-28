@@ -6,7 +6,7 @@ import android.graphics.PointF
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.graphics.withSave
-import com.base.animation.IClickIntercept
+import com.base.animation.OnAnimItemClick
 import com.base.animation.model.AnimDrawObject
 
 
@@ -92,11 +92,6 @@ class LayoutDisplayItem(val context: Context, private val layout: Int) : BaseDis
         return displayHeight / 2f
     }
 
-    override fun touch(
-        animId: Long,
-        iClickIntercepts: MutableList<IClickIntercept>,
-        animDrawObject: AnimDrawObject,
-        touchPoint: MutableList<PointF>
-    ) {
+    override fun touch(animId: Long, onAnimItemClick: OnAnimItemClick, animDrawObject: AnimDrawObject, touchPoint: PointF, extra: String) {
     }
 }

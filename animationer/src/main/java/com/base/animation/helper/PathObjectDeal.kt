@@ -6,7 +6,7 @@ import com.base.animation.Animer
 import com.base.animation.CanvasHandler
 import com.base.animation.IAnimListener
 import com.base.animation.IAnimView
-import com.base.animation.IClickIntercept
+import com.base.animation.OnAnimItemClick
 import com.base.animation.cache.PathCache
 import com.base.animation.item.BaseDisplayItem
 import com.base.animation.model.AnimDrawObject
@@ -46,12 +46,12 @@ class PathObjectDeal(private val iAnimView: IAnimView) : IPathObjectDeal {
     /**
      * 点击事件列表
      */
-    override val clickIntercepts = mutableListOf<IClickIntercept>()
+    override var onItemListener: OnAnimItemClick? = null
 
     /**
      * 动画事件
      */
-    override val animListeners = mutableListOf<IAnimListener>()
+    override val animListeners = mutableSetOf<IAnimListener>()
 
     private val animDrawIds: CopyOnWriteArrayList<Long> = CopyOnWriteArrayList()
 
@@ -67,15 +67,6 @@ class PathObjectDeal(private val iAnimView: IAnimView) : IPathObjectDeal {
             .expireAfterWrite(5, TimeUnit.SECONDS)
             .expireAfterAccess(5, TimeUnit.SECONDS)
             .build()
-
-    var cacheTime = 10 * 1000L
-        set(value) {
-            field = if (value < 10) {
-                10 * 1000L
-            } else {
-                value * 1000L
-            }
-        }
 
     /**
      * 路径坐标缓存
@@ -110,14 +101,8 @@ class PathObjectDeal(private val iAnimView: IAnimView) : IPathObjectDeal {
                             it.value.forEach {
                                 animDrawObjects.add(
                                     AnimDrawObject(
-                                        displayItemId = "",
-                                        point = it.point,
-                                        alpha = it.alpha,
-                                        scaleX = it.scaleX,
-                                        scaleY = it.scaleY,
-                                        rotation = it.rotation,
-                                        clickable = false,
-                                        expand = ""
+                                        displayItemId = "", point = it.point, alpha = it.alpha, scaleX = it.scaleX,
+                                        scaleY = it.scaleY, rotation = it.rotation, clickable = false, expand = ""
                                     )
                                 )
                             }
@@ -169,10 +154,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) : IPathObjectDeal {
                                             drawsMap[startPosition] = mutableListOf()
                                         }
                                         drawsMap[startPosition]?.add(
-                                            start.toAnimDrawObject(
-                                                animPath.clickable,
-                                                animPath.expand
-                                            )
+                                            start.toAnimDrawObject(animPath.clickable, animPath.expand)
                                         )
                                         val pathObject = pathObjectWithDer.pathObject
                                         pathObject.getItem(start)
@@ -181,23 +163,16 @@ class PathObjectDeal(private val iAnimView: IAnimView) : IPathObjectDeal {
                                             val p = i * CanvasHandler.fpsTime / duringTime
                                             val interP = start.interpolator.getInterpolation(p)
                                             val inPoint = PointF(
-                                                start.point.x + pathObject.itemX * interP,
-                                                start.point.y + pathObject.itemY * interP
+                                                start.point.x + pathObject.itemX * interP, start.point.y + pathObject.itemY * interP
                                             )
                                             val animDrawObject = AnimDrawObject(
-                                                start.displayItemId,
-                                                clickable = animPath.clickable,
-                                                expand = animPath.expand
+                                                start.displayItemId, clickable = animPath.clickable, expand = animPath.expand
                                             ).apply {
                                                 point = inPoint
-                                                alpha =
-                                                    start.alpha + (pathObject.itemAlpha * interP).toInt()
-                                                scaleX =
-                                                    start.scaleX + pathObject.itemScaleX * interP
-                                                scaleY =
-                                                    start.scaleY + pathObject.itemScaleY * interP
-                                                rotation =
-                                                    start.rotation + pathObject.itemRotation * interP
+                                                alpha = start.alpha + (pathObject.itemAlpha * interP).toInt()
+                                                scaleX = start.scaleX + pathObject.itemScaleX * interP
+                                                scaleY = start.scaleY + pathObject.itemScaleY * interP
+                                                rotation = start.rotation + pathObject.itemRotation * interP
                                             }
                                             if (drawsMap[startPosition] == null) {
                                                 drawsMap[startPosition] = mutableListOf()
@@ -254,13 +229,8 @@ class PathObjectDeal(private val iAnimView: IAnimView) : IPathObjectDeal {
      * 清空执行中ids
      */
     override fun removeAnimId(animId: Long) {
-        animDisplayScope.launch {
-            animDrawIds.remove(animId)
-            animDrawObjects.remove(animId)
-            if (animDrawIds.isEmpty()) {
-                iAnimView.pause()
-            }
-        }
+        animDrawIds.remove(animId)
+        animDrawObjects.remove(animId)
     }
 }
 

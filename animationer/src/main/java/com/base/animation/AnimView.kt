@@ -2,6 +2,7 @@ package com.base.animation
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import com.base.animation.model.AnimPathObject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -72,13 +73,10 @@ open class AnimView @JvmOverloads constructor(
         helper.removeAnimListener(iAnimListener)
     }
 
-    override fun addClickIntercept(iClickIntercept: IClickIntercept) {
-        helper.addClickIntercept(iClickIntercept)
+    override fun setOnItemClick(onItemClick: OnAnimItemClick?) {
+        helper.setOnItemClick(onItemClick)
     }
 
-    override fun removeClickIntercept(iClickIntercept: IClickIntercept?) {
-        helper.removeClickIntercept(iClickIntercept)
-    }
 
     override fun getView(): View {
         return this
@@ -99,5 +97,12 @@ open class AnimView @JvmOverloads constructor(
                 it.view?.findViewById<View>(id)
             } ?: this.getFragmentActivity()?.findViewById(id)
         }
+    }
+
+    override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
+        if (event != null) {
+            helper.touchEvent(event)
+        }
+        return super.dispatchTouchEvent(event)
     }
 }

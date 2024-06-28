@@ -7,6 +7,7 @@ import android.graphics.PixelFormat
 import android.graphics.PorterDuff
 import android.os.Build
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
@@ -100,12 +101,8 @@ open class AnimSurfaceView @JvmOverloads constructor(
         helper.removeAnimListener(iAnimListener)
     }
 
-    override fun addClickIntercept(iClickIntercept: IClickIntercept) {
-        helper.addClickIntercept(iClickIntercept)
-    }
-
-    override fun removeClickIntercept(iClickIntercept: IClickIntercept?) {
-        helper.removeClickIntercept(iClickIntercept)
+    override fun setOnItemClick(onItemClick: OnAnimItemClick?) {
+        helper.setOnItemClick(onItemClick)
     }
 
     override fun getView(): View {
@@ -140,5 +137,12 @@ open class AnimSurfaceView @JvmOverloads constructor(
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
         pause()
+    }
+
+    override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
+        if (event != null) {
+            helper.touchEvent(event)
+        }
+        return super.dispatchTouchEvent(event)
     }
 }

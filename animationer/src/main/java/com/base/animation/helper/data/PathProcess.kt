@@ -13,7 +13,10 @@ data class PathProcess(
     val start: AnimDrawObject,
     val interpolator: BaseInterpolator,
     val durTime: Long, var curTotalTime: Float = 0f,
-    val item: PathProcessItem
+    val item: PathProcessItem,
+    val current: AnimDrawObject,
+    val clickable: Boolean,
+    val extra: String = ""
 )
 
 

@@ -7,7 +7,7 @@ import android.os.Build
 import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
-import com.base.animation.IClickIntercept
+import com.base.animation.OnAnimItemClick
 import com.base.animation.model.AnimDrawObject
 
 /**
@@ -97,11 +97,6 @@ class StringDisplayItem(
         return displayHeight * 1f / 2
     }
 
-    override fun touch(
-        animId: Long,
-        iClickIntercepts: MutableList<IClickIntercept>,
-        animDrawObject: AnimDrawObject,
-        touchPoint: MutableList<PointF>
-    ) {
+    override fun touch(animId: Long, onAnimItemClick: OnAnimItemClick, animDrawObject: AnimDrawObject, touchPoint: PointF, extra: String) {
     }
 }

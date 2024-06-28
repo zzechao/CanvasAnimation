@@ -15,6 +15,6 @@ abstract class BaseAnimDrawObject {
         pathObjectDeal: IPathObjectDeal,
         framePositionCount: Int,
         frameTime: Long,
-        touchPoint: MutableList<PointF>? = null
+        touchPoint: PointF? = null
     )
 }

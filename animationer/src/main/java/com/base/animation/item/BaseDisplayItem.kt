@@ -4,8 +4,8 @@ import android.graphics.Canvas
 import android.graphics.PointF
 import androidx.annotation.CallSuper
 import androidx.core.graphics.withSave
-import com.base.animation.IClickIntercept
 import com.base.animation.IDisplayItem
+import com.base.animation.OnAnimItemClick
 import com.base.animation.cache.IRecycle
 import com.base.animation.model.AnimDrawObject
 import java.util.concurrent.atomic.AtomicLong
@@ -41,12 +41,7 @@ abstract class BaseDisplayItem : IDisplayItem, IRecycle {
         }
     }
 
-    override fun touch(
-        animId: Long,
-        iClickIntercepts: MutableList<IClickIntercept>,
-        animDrawObject: AnimDrawObject,
-        touchPoint: MutableList<PointF>
-    ) {
+    override fun touch(animId: Long, onAnimItemClick: OnAnimItemClick, animDrawObject: AnimDrawObject, touchPoint: PointF, extra: String) {
     }
 
     override fun poolSize(): Int {

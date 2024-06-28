@@ -26,18 +26,10 @@ interface IDisplayItem {
     /**
      * 绘制
      */
-    fun draw(
-        canvas: Canvas, x: Float, y: Float, alpha: Int,
-        scaleX: Float, scaleY: Float, rotation: Float
-    )
+    fun draw(canvas: Canvas, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float, rotation: Float)
 
     /**
      * 点击位置，在Touch的ACTION_UP返回
      */
-    fun touch(
-        animId: Long,
-        iClickIntercepts: MutableList<IClickIntercept>,
-        animDrawObject: AnimDrawObject,
-        touchPoint: MutableList<PointF>
-    )
+    fun touch(animId: Long, onAnimItemClick: OnAnimItemClick, animDrawObject: AnimDrawObject, touchPoint: PointF, extra: String)
 }

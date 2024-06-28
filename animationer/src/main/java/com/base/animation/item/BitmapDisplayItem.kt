@@ -7,7 +7,7 @@ import android.graphics.PointF
 import android.graphics.Rect
 import android.graphics.RectF
 import androidx.core.graphics.withSave
-import com.base.animation.IClickIntercept
+import com.base.animation.OnAnimItemClick
 import com.base.animation.cache.AteDisplayItem
 import com.base.animation.model.AnimDrawObject
 
@@ -21,7 +21,6 @@ private const val TAG = "BitmapDisplayItem"
 
 @AteDisplayItem(usePoolCache = true)
 open class BitmapDisplayItem : BaseDisplayItem() {
-
 
     private val paint by lazy {
         Paint().apply {
@@ -147,12 +146,7 @@ open class BitmapDisplayItem : BaseDisplayItem() {
     }
 
 
-    override fun touch(
-        animId: Long,
-        iClickIntercepts: MutableList<IClickIntercept>,
-        animDrawObject: AnimDrawObject,
-        touchPoint: MutableList<PointF>
-    ) {
+    override fun touch(animId: Long, onAnimItemClick: OnAnimItemClick, animDrawObject: AnimDrawObject, touchPoint: PointF, extra: String) {
         var displayWidth = bitmapWidth.toFloat()
         var displayHeight = bitmapHeight.toFloat()
         if (displaySizeSet) {
@@ -163,12 +157,8 @@ open class BitmapDisplayItem : BaseDisplayItem() {
         val right = animDrawObject.point.x + displayWidth / 2 + 20
         val top = animDrawObject.point.y - displayHeight / 2 - 20
         val bottom = animDrawObject.point.y + displayHeight / 2 + 20
-        touchPoint.forEach {
-            if (it.x in left..right && it.y in top..bottom) {
-                iClickIntercepts.forEach { iClickIntercept ->
-                    iClickIntercept.intercept(animId, animDrawObject, it)
-                }
-            }
+        if (touchPoint.x in left..right && touchPoint.y in top..bottom) {
+            onAnimItemClick.itemClick(animId, animDrawObject, touchPoint, animDrawObject.point, extra)
         }
     }
 

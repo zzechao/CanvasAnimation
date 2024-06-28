@@ -24,9 +24,7 @@ interface IAnimView {
 
     fun removeAnimListener(iAnimListener: IAnimListener?)
 
-    fun addClickIntercept(iClickIntercept: IClickIntercept)
-
-    fun removeClickIntercept(iClickIntercept: IClickIntercept?)
+    fun setOnItemClick(onItemClick: OnAnimItemClick?)
 
     fun getView(): View? {
         return null

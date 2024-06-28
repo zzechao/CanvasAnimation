@@ -7,6 +7,7 @@ import android.os.Looper
 import android.view.MotionEvent
 import com.base.animation.helper.PathObjectDeal
 import com.base.animation.helper.PathObjectDeal2
+import com.base.animation.model.AnimDrawObject
 import com.base.animation.model.AnimPathObject
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import java.util.concurrent.atomic.AtomicBoolean
@@ -19,14 +20,13 @@ import java.util.concurrent.atomic.AtomicBoolean
 typealias DoFrameFps = (framePositionCount: Int, frameTime: Long) -> Unit
 
 @ObsoleteCoroutinesApi
-class AnimViewHelper(private val doFrame: DoFrameFps) : IAnimView,
-    CanvasHandler.CanvasFrameCallback {
+class AnimViewHelper(private val doFrame: DoFrameFps) : IAnimView, CanvasHandler.CanvasFrameCallback {
     private val TAG = "AnimViewHelper"
 
     private val mainHandler: Handler = Handler(Looper.getMainLooper())
 
     private var isResume = AtomicBoolean(false)
-    private var mTouchPointFList: MutableList<PointF> = mutableListOf()
+    private var mTouchPointF: PointF? = null
 
     /**
      * pathObject转化
@@ -79,9 +79,7 @@ class AnimViewHelper(private val doFrame: DoFrameFps) : IAnimView,
 
     override fun addAnimListener(iAnimListener: IAnimListener) {
         checkInMainThread {
-            if (!pathObjectDeal.animListeners.contains(iAnimListener)) {
-                pathObjectDeal.animListeners.add(iAnimListener)
-            }
+            pathObjectDeal.animListeners.add(iAnimListener)
         }
     }
 
@@ -95,20 +93,15 @@ class AnimViewHelper(private val doFrame: DoFrameFps) : IAnimView,
         }
     }
 
-    override fun addClickIntercept(iClickIntercept: IClickIntercept) {
-        checkInMainThread {
-            if (!pathObjectDeal.clickIntercepts.contains(iClickIntercept)) {
-                pathObjectDeal.clickIntercepts.add(iClickIntercept)
-            }
-        }
-    }
-
-    override fun removeClickIntercept(iClickIntercept: IClickIntercept?) {
-        checkInMainThread {
-            if (iClickIntercept == null) {
-                pathObjectDeal.clickIntercepts.clear()
-            } else {
-                pathObjectDeal.clickIntercepts.remove(iClickIntercept)
+    override fun setOnItemClick(onItemClick: OnAnimItemClick?) {
+        pathObjectDeal.onItemListener = null
+        onItemClick?.let {
+            pathObjectDeal.onItemListener = object : OnAnimItemClick {
+                override fun itemClick(animId: Long, animDrawObject: AnimDrawObject, touchPointF: PointF, itemCenterPointF: PointF, extra: String) {
+                    checkInMainThread {
+                        it.itemClick(animId, animDrawObject, touchPointF, itemCenterPointF, extra)
+                    }
+                }
             }
         }
     }
@@ -124,10 +117,6 @@ class AnimViewHelper(private val doFrame: DoFrameFps) : IAnimView,
                 framePositionCount.toInt()
             }
         }
-        Animer.log.i(
-            TAG,
-            "doCanvasFrame mFramePositionCount:$framePositionCount frameTime:$frameTime"
-        )
         doFrame.invoke(framePositionCount, frameTime)
         return true
     }
@@ -139,7 +128,7 @@ class AnimViewHelper(private val doFrame: DoFrameFps) : IAnimView,
             MotionEvent.ACTION_POINTER_DOWN -> {
                 val index = event.actionIndex
                 val (xPos: Float, yPos: Float) = event.getX(index) to event.getY(index)
-                mTouchPointFList.add(PointF(xPos, yPos))
+                mTouchPointF = PointF(xPos, yPos)
             }
         }
         return false
@@ -148,9 +137,9 @@ class AnimViewHelper(private val doFrame: DoFrameFps) : IAnimView,
     fun drawAnim(canvas: Canvas?, framePositionCount: Int, frameTime: Long) {
         canvas ?: return
         pathObjectDeal.animDrawObjects.map {
-            it.value.draw(canvas, pathObjectDeal, framePositionCount, frameTime, mTouchPointFList)
+            it.value.draw(canvas, pathObjectDeal, framePositionCount, frameTime, mTouchPointF)
         }
-        mTouchPointFList.clear()
+        mTouchPointF = null
     }
 
     private fun checkInMainThread(block: () -> Unit) {

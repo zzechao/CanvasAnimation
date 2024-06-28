@@ -24,13 +24,7 @@ class DrawObject(val animId: Long) : BaseAnimDrawObject() {
     var curDisplayItemId = ""
     var displayItem: BaseDisplayItem? = null
 
-    override fun draw(
-        canvas: Canvas,
-        pathObjectDeal: IPathObjectDeal,
-        framePositionCount: Int,
-        frameTime: Long,
-        touchPoint: MutableList<PointF>?
-    ) {
+    override fun draw(canvas: Canvas, pathObjectDeal: IPathObjectDeal, framePositionCount: Int, frameTime: Long, touchPoint: PointF?) {
         if ((pathObjectDeal is PathObjectDeal)) {
             if (currencyPosition >= animDraws.size - 1) {
                 currencyPosition = animDraws.size - 1
@@ -57,38 +51,11 @@ class DrawObject(val animId: Long) : BaseAnimDrawObject() {
                     if (drawObject.displayItemId != curDisplayItemId || displayItem == null) {
                         curDisplayItemId = drawObject.displayItemId
                         displayItem = pathObjectDeal.getDisplayItem(drawObject.displayItemId)
-                        displayItem?.apply {
-                            draw(
-                                canvas, drawObject.point.x, drawObject.point.y, drawObject.alpha,
-                                drawObject.scaleX, drawObject.scaleY, drawObject.rotation
-                            )
-                            if (drawObject.clickable && !touchPoint.isNullOrEmpty()
-                                && pathObjectDeal.clickIntercepts.isNotEmpty()
-                            ) {
-                                touch(
-                                    animId,
-                                    pathObjectDeal.clickIntercepts,
-                                    drawObject,
-                                    touchPoint
-                                )
-                            }
-                        }
-                    } else {
-                        displayItem?.apply {
-                            draw(
-                                canvas, drawObject.point.x, drawObject.point.y, drawObject.alpha,
-                                drawObject.scaleX, drawObject.scaleY, drawObject.rotation
-                            )
-                            if (drawObject.clickable && !touchPoint.isNullOrEmpty()
-                                && pathObjectDeal.clickIntercepts.isNotEmpty()
-                            ) {
-                                touch(
-                                    animId,
-                                    pathObjectDeal.clickIntercepts,
-                                    drawObject,
-                                    touchPoint
-                                )
-                            }
+                    }
+                    displayItem?.apply {
+                        draw(canvas, drawObject.point.x, drawObject.point.y, drawObject.alpha, drawObject.scaleX, drawObject.scaleY, drawObject.rotation)
+                        if (drawObject.clickable && touchPoint != null && pathObjectDeal.onItemListener != null) {
+                            touch(animId, pathObjectDeal.onItemListener!!, drawObject, touchPoint, drawObject.expand)
                         }
                     }
                 }
@@ -107,7 +74,15 @@ data class AnimDrawObject(
     var rotation: Float = 0.0f,
     var clickable: Boolean = false,
     var expand: String = ""
-)
+) {
+    fun reset(point: PointF, alpha: Int, scaleX: Float, scaleY: Float, rotation: Float) {
+        this.point = point
+        this.alpha = alpha
+        this.scaleX = scaleX
+        this.scaleY = scaleY
+        this.rotation = rotation
+    }
+}
 
 /**
  * 转化
