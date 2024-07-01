@@ -2,6 +2,7 @@ package com.base.animation.model
 
 import android.graphics.Canvas
 import android.graphics.PointF
+import com.base.animation.DoubleLinkedReference
 import com.base.animation.helper.IPathObjectDeal
 import com.base.animation.helper.PathObjectDeal
 import com.base.animation.item.BaseDisplayItem
@@ -24,7 +25,7 @@ class DrawObject(val animId: Long) : BaseAnimDrawObject() {
     var curDisplayItemId = ""
     var displayItem: BaseDisplayItem? = null
 
-    override fun draw(canvas: Canvas, pathObjectDeal: IPathObjectDeal, framePositionCount: Int, frameTime: Long, touchPoint: PointF?) {
+    override fun draw(canvas: Canvas, pathObjectDeal: IPathObjectDeal, framePositionCount: Int, frameTime: Long, touchPoint: DoubleLinkedReference<PointF>?) {
         if ((pathObjectDeal is PathObjectDeal)) {
             if (currencyPosition >= animDraws.size - 1) {
                 currencyPosition = animDraws.size - 1

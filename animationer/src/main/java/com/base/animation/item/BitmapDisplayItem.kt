@@ -7,6 +7,7 @@ import android.graphics.PointF
 import android.graphics.Rect
 import android.graphics.RectF
 import androidx.core.graphics.withSave
+import com.base.animation.DoubleLinkedReference
 import com.base.animation.OnAnimItemClick
 import com.base.animation.cache.AteDisplayItem
 import com.base.animation.model.AnimDrawObject
@@ -146,19 +147,22 @@ open class BitmapDisplayItem : BaseDisplayItem() {
     }
 
 
-    override fun touch(animId: Long, onAnimItemClick: OnAnimItemClick, animDrawObject: AnimDrawObject, touchPoint: PointF, extra: String) {
+    override fun touch(animId: Long, onAnimItemClick: OnAnimItemClick, animDrawObject: AnimDrawObject, touchPoint: DoubleLinkedReference<PointF>, extra: String) {
         var displayWidth = bitmapWidth.toFloat()
         var displayHeight = bitmapHeight.toFloat()
         if (displaySizeSet) {
             displayWidth = this.displayWidth.toFloat()
             displayHeight = this.displayHeight.toFloat()
         }
-        val left = animDrawObject.point.x - displayWidth / 2 - 20
-        val right = animDrawObject.point.x + displayWidth / 2 + 20
-        val top = animDrawObject.point.y - displayHeight / 2 - 20
-        val bottom = animDrawObject.point.y + displayHeight / 2 + 20
-        if (touchPoint.x in left..right && touchPoint.y in top..bottom) {
-            onAnimItemClick.itemClick(animId, animDrawObject, touchPoint, animDrawObject.point, extra)
+        val left = animDrawObject.point.x - displayWidth / 2
+        val right = animDrawObject.point.x + displayWidth / 2
+        val top = animDrawObject.point.y - displayHeight / 2
+        val bottom = animDrawObject.point.y + displayHeight / 2
+        touchPoint.data?.let {
+            if (it.x in left..right && it.y in top..bottom) {
+                onAnimItemClick.itemClick(animId, animDrawObject, it, animDrawObject.point, extra)
+                touchPoint.reset()
+            }
         }
     }
 

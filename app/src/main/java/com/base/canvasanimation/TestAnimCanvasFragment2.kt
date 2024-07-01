@@ -15,11 +15,11 @@ import com.base.animation.BitmapLoader
 import com.base.animation.IAnimListener
 import com.base.animation.OnAnimItemClick
 import com.base.animation.item.BitmapDisplayItem
+import com.base.animation.item.imageBezierNode
 import com.base.animation.model.AnimDrawObject
 import com.base.animation.xml.AnimDecoder2
 import com.base.animation.xml.AnimEncoder
 import com.base.animation.xml.buildAnimNode
-import com.base.animation.xml.buildString
 import com.base.animation.xml.node.coder.InterpolatorEnum
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
@@ -348,14 +348,15 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick, IAnimListener {
      * 动画雨
      */
     private fun startAnimRain() {
-        val size = 80
+        val size = 160
         val url = "https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png"
         val width = DisplayUtils.getScreenWidth(this.activity).toFloat()
         val height = DisplayUtils.getScreenHeight(this.activity).toFloat()
-        val indexSize = (width / 80 / 2).toInt()
+        val indexSize = 50
 
         for (i in 0 until indexSize) {
-            val time = (1000L..10000L).random()
+            val time = (0L..10000L).random()
+            val itemLocationX = (size..(width - size).toInt()).random()
             val node = AnimEncoder().buildAnimNode {
                 imageNode {
                     this.url = url
@@ -363,23 +364,24 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick, IAnimListener {
                     this.clickable = true
                     this.extras = "rain"
                     startNode {
-                        point = PointF((i * 80 + (80 * (i + 1))).toFloat(), 0f)
+                        point = PointF(itemLocationX.toFloat(), 0f)
                         scaleX = 1f
                         scaleY = 1f
                         endNode {
-                            point = PointF((i * 80 + (80 * (i + 1))).toFloat(), height)
+                            point = PointF(itemLocationX.toFloat(), height)
                             scaleX = 1f
                             scaleY = 1f
-                            durTime = time
+                            durTime = 5000L
                             interpolator = InterpolatorEnum.Linear.type
                         }
                     }
                 }
-            }.buildString()
+            }
 
             lifecycleScope.launch {
+                delay(time)
                 anim_surface ?: return@launch
-                AnimDecoder2.suspendPlayAnimWithXml(anim_surface, node) { node, displayItem ->
+                AnimDecoder2.suspendPlayAnimWithAnimNode(anim_surface, node) { node, displayItem ->
                     when (displayItem) {
                         is BitmapDisplayItem -> {
                             displayItem.mBitmap = suspendCancellableCoroutine {
@@ -418,5 +420,49 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick, IAnimListener {
     override fun itemClick(animId: Long, animDrawObject: AnimDrawObject, touchPointF: PointF, itemCenterPointF: PointF, extra: String) {
         Toast.makeText(this@TestAnimCanvasFragment2.context, "$animId $extra", Toast.LENGTH_SHORT).show()
         anim_surface?.removeAnimId(animId)
+        val size = 160
+        val url = "https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png"
+        val width = DisplayUtils.getScreenWidth(this.activity).toFloat()
+        val height = DisplayUtils.getScreenHeight(this.activity).toFloat()
+        val node = AnimEncoder().buildAnimNode {
+            imageBezierNode {
+                this.url = url
+                this.displayHeightSize = size
+                startNode {
+                    point = itemCenterPointF
+                    scaleX = 1f
+                    scaleY = 1f
+                    alpha = 255
+                    endNode {
+                        point = PointF(width / 2f, height)
+                        scaleX = 1f
+                        scaleY = 1f
+                        alpha = 100
+                        durTime = 2000L
+                        interpolator = InterpolatorEnum.Decelerate.type
+                    }
+                }
+            }
+        }
+        lifecycleScope.launch {
+            anim_surface ?: return@launch
+            AnimDecoder2.suspendPlayAnimWithAnimNode(anim_surface, node) { node, displayItem ->
+                when (displayItem) {
+                    is BitmapDisplayItem -> {
+                        displayItem.mBitmap = suspendCancellableCoroutine {
+                            Glide.with(this@TestAnimCanvasFragment2).asBitmap().load(url).into(object : CustomTarget<Bitmap>() {
+                                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                    it.resume(resource)
+                                }
+
+                                override fun onLoadCleared(placeholder: Drawable?) {
+                                }
+                            })
+                        }
+                    }
+                }
+                displayItem
+            }
+        }
     }
 }

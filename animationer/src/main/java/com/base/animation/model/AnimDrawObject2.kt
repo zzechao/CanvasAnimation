@@ -2,6 +2,7 @@ package com.base.animation.model
 
 import android.graphics.Canvas
 import android.graphics.PointF
+import com.base.animation.DoubleLinkedReference
 import com.base.animation.helper.IPathObjectDeal
 import com.base.animation.helper.data.PathProcess
 import com.base.animation.item.BaseDisplayItem
@@ -24,7 +25,7 @@ class DrawObject2(val animId: Long) : BaseAnimDrawObject() {
     var curDisplayItemId = ""
     var displayItem: BaseDisplayItem? = null
 
-    override fun draw(canvas: Canvas, pathObjectDeal: IPathObjectDeal, framePositionCount: Int, frameTime: Long, touchPoint: PointF?) {
+    override fun draw(canvas: Canvas, pathObjectDeal: IPathObjectDeal, framePositionCount: Int, frameTime: Long, touchPoint: DoubleLinkedReference<PointF>?) {
         var updateCurrencyPosition = true
         if (currencyPosition == 0 && status == Status.INIT) {
             status = Status.START
@@ -43,10 +44,10 @@ class DrawObject2(val animId: Long) : BaseAnimDrawObject() {
                 if (drawObject.curTotalTime > drawObject.durTime) {
                     drawObject.curTotalTime = drawObject.durTime * 1f
                 }
-                val p = drawObject.curTotalTime / drawObject.durTime
                 if (isCalculate) { // 是否计算任务回调上层触发
-                    calculate(p, drawObject.current, drawObject.interpolator)
+                    calculate(drawObject, drawObject.current, drawObject.interpolator)
                 } else {
+                    val p = drawObject.curTotalTime / drawObject.durTime
                     val interP = drawObject.interpolator.getInterpolation(p)
                     val inPoint = PointF(
                         drawObject.start.point.x + drawObject.item.totalX * interP,

@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.PointF
 import androidx.annotation.CallSuper
 import androidx.core.graphics.withSave
+import com.base.animation.DoubleLinkedReference
 import com.base.animation.IDisplayItem
 import com.base.animation.OnAnimItemClick
 import com.base.animation.cache.IRecycle
@@ -43,7 +44,7 @@ abstract class BaseDisplayItem : IDisplayItem, IRecycle {
         }
     }
 
-    override fun touch(animId: Long, onAnimItemClick: OnAnimItemClick, animDrawObject: AnimDrawObject, touchPoint: PointF, extra: String) {
+    override fun touch(animId: Long, onAnimItemClick: OnAnimItemClick, animDrawObject: AnimDrawObject, touchPoint: DoubleLinkedReference<PointF>, extra: String) {
     }
 
     override fun poolSize(): Int {

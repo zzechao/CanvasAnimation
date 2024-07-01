@@ -136,8 +136,11 @@ class AnimViewHelper(private val doFrame: DoFrameFps) : IAnimView, CanvasHandler
 
     fun drawAnim(canvas: Canvas?, framePositionCount: Int, frameTime: Long) {
         canvas ?: return
+        val doubleLinkedReference = mTouchPointF?.let {
+            DoubleLinkedReference(it)
+        }
         pathObjectDeal.animDrawObjects.map {
-            it.value.draw(canvas, pathObjectDeal, framePositionCount, frameTime, mTouchPointF)
+            it.value.draw(canvas, pathObjectDeal, framePositionCount, frameTime, doubleLinkedReference)
         }
         mTouchPointF = null
     }

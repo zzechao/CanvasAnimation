@@ -85,7 +85,7 @@ class PathObjectDeal2(private val iAnimView: IAnimView) : IPathObjectDeal {
                                     val totalRotation = endAnimObject.rotation - startAnimObject.rotation
                                     val pathProcessItem = PathProcessItem(totalX, totalY, totalAlpha, totalScaleX, totalScaleY, totalRotation)
                                     PathProcess(
-                                        startAnimObject, start.interpolator, duringTime, 0f,
+                                        startAnimObject, endAnimObject, start.interpolator, duringTime, 0f,
                                         pathProcessItem, startAnimObject.copy(), clickable, expand
                                     )
                                 }
