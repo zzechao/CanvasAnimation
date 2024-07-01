@@ -9,6 +9,7 @@ import com.base.animation.xml.node.AnimNodeName
  */
 @AnimNodeName(name = "anim")
 class AnimNode : IAnimNode {
+
     
     private val childNodes by lazy(LazyThreadSafetyMode.NONE) {
         mutableListOf<IAnimNode>()

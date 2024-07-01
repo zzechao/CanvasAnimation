@@ -66,9 +66,16 @@ object AnimDecoder2 {
             val path = AnimPathObject.Inner.with()
             chain.path = path
             dealAnim(displayObject, it, chain, dealDisplayItem)
-
+            var clickable = false
+            var extra = ""
+            if (it is IXmlDrawableNode) {
+                clickable = it.clickable
+                extra = it.extras
+            }
             val data = displayObject.build()
             chain.anim.addAnimDisplay(path.build(data).apply {
+                this.clickable = clickable
+                this.expand = extra
                 listAnimIds.add(this.animId)
             })
         }
@@ -93,7 +100,7 @@ object AnimDecoder2 {
                         chain.curDisplayId = displayId
                     }
                     if (isContainer) return
-                    animNode.getNodes().forEach {
+                    animNode.getNodes().forEach { // 过滤只处理StartNode、EndNode、EndNodeContainer
                         if (it is EndNode || it is EndNodeContainer || it is StartNode) {
                             dealAnim(displayObject, it, chain, dealDisplayItem)
                         }
@@ -108,9 +115,7 @@ object AnimDecoder2 {
                     key = key, kClass = animNode.displayItem
                 ) {
                     val bitmapDisplayItem = BitmapDisplayItem()
-                    dealDisplayItem.invoke(
-                        animNode, bitmapDisplayItem
-                    ) // 代理出去处理图片的加载方式
+                    dealDisplayItem.invoke(animNode, bitmapDisplayItem) // 代理出去处理图片的加载方式
                     val bitmapWidth = bitmapDisplayItem.mBitmap?.width ?: return@suspendAdd null
                     val bitmapHeight = bitmapDisplayItem.mBitmap?.height ?: return@suspendAdd null
                     val displayWidth = animNode.displayHeightSize * bitmapWidth / bitmapHeight

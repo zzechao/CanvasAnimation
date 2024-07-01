@@ -1,27 +1,29 @@
 package com.base.canvasanimation
 
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PointF
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.LinearInterpolator
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.base.animation.BitmapLoader
-import com.base.animation.DisplayObject
 import com.base.animation.IAnimListener
 import com.base.animation.OnAnimItemClick
 import com.base.animation.item.BitmapDisplayItem
 import com.base.animation.model.AnimDrawObject
-import com.base.animation.model.AnimPathObject
-import com.base.animation.model.PathObject
 import com.base.animation.xml.AnimDecoder2
 import com.base.animation.xml.AnimEncoder
 import com.base.animation.xml.buildAnimNode
+import com.base.animation.xml.buildString
 import com.base.animation.xml.node.coder.InterpolatorEnum
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import kotlinx.android.synthetic.main.fragment_anim_canvas2.anim_1
 import kotlinx.android.synthetic.main.fragment_anim_canvas2.anim_2
 import kotlinx.android.synthetic.main.fragment_anim_canvas2.anim_3
@@ -31,6 +33,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 /**
  * @author:zhouzechao
@@ -322,8 +326,16 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick, IAnimListener {
                 ) { node, displayItem ->
                     when (displayItem) {
                         is BitmapDisplayItem -> {
-                            displayItem.mBitmap =
-                                BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, 100, 100)
+                            displayItem.mBitmap = suspendCancellableCoroutine {
+                                Glide.with(this@TestAnimCanvasFragment2).asBitmap().load(url).into(object : CustomTarget<Bitmap>() {
+                                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                        it.resume(resource)
+                                    }
+
+                                    override fun onLoadCleared(placeholder: Drawable?) {
+                                    }
+                                })
+                            }
                         }
                     }
                     displayItem
@@ -337,48 +349,54 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick, IAnimListener {
      */
     private fun startAnimRain() {
         val size = 80
-        val displayObject = DisplayObject.with()
-        val displayItemId = displayObject.add(
-            key = "xin_startMoreAnim", kClass = BitmapDisplayItem::class
-        ) {
-            val bitmap =
-                BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, size, size)
-            val bitmapWidth = bitmap.width
-            val bitmapHeight = bitmap.height
-            val displayWidth = size * bitmapWidth / bitmapHeight
-            return@add BitmapDisplayItem().apply {
-                mBitmap = bitmap
-                setDisplaySize(displayWidth, size)
-            }
-        }
+        val url = "https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png"
         val width = DisplayUtils.getScreenWidth(this.activity).toFloat()
+        val height = DisplayUtils.getScreenHeight(this.activity).toFloat()
         val indexSize = (width / 80 / 2).toInt()
 
         for (i in 0 until indexSize) {
-            val start =
-                PathObject(
-                    displayItemId,
-                    point = PointF((i * 80 + (80 * (i + 1))).toFloat(), 0f),
-                    interpolator = LinearInterpolator(),
-                    scaleX = 1f,
-                    scaleY = 1f
-                )
-            val next =
-                PathObject(
-                    displayItemId,
-                    point = PointF((i * 80 + (80 * (i + 1))).toFloat(), DisplayUtils.getScreenHeight(this.activity).toFloat()),
-                    interpolator = LinearInterpolator(),
-                    scaleX = 1f,
-                    scaleY = 1f
-                )
             val time = (1000L..10000L).random()
-            anim_surface?.addAnimDisplay(
-                AnimPathObject.Inner.with().beginAnimPath(start)
-                    .doAnimPath(time, next).build(displayObject.build())
-                    .apply {
-                        clickable = true
-                        expand = "rain"
-                    })
+            val node = AnimEncoder().buildAnimNode {
+                imageNode {
+                    this.url = url
+                    this.displayHeightSize = size
+                    this.clickable = true
+                    this.extras = "rain"
+                    startNode {
+                        point = PointF((i * 80 + (80 * (i + 1))).toFloat(), 0f)
+                        scaleX = 1f
+                        scaleY = 1f
+                        endNode {
+                            point = PointF((i * 80 + (80 * (i + 1))).toFloat(), height)
+                            scaleX = 1f
+                            scaleY = 1f
+                            durTime = time
+                            interpolator = InterpolatorEnum.Linear.type
+                        }
+                    }
+                }
+            }.buildString()
+
+            lifecycleScope.launch {
+                anim_surface ?: return@launch
+                AnimDecoder2.suspendPlayAnimWithXml(anim_surface, node) { node, displayItem ->
+                    when (displayItem) {
+                        is BitmapDisplayItem -> {
+                            displayItem.mBitmap = suspendCancellableCoroutine {
+                                Glide.with(this@TestAnimCanvasFragment2).asBitmap().load(url).into(object : CustomTarget<Bitmap>() {
+                                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                        it.resume(resource)
+                                    }
+
+                                    override fun onLoadCleared(placeholder: Drawable?) {
+                                    }
+                                })
+                            }
+                        }
+                    }
+                    displayItem
+                }
+            }
         }
     }
 

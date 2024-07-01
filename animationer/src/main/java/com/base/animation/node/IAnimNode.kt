@@ -99,12 +99,14 @@ interface IAnimNode : XmlBaseAnimNode, IXmlObjNodeParser {
             val key = "${animNodeName}_${annotation.name}"
             if (annotation.name.equals(name, true)) {
                 AnimDecoder2.mapNodeAttributeCoderMap[key]?.let {
+                    Animer.log.i(TAG, "[parseAndSetField]:${field.type.kotlin} $value")
                     it.attributeDecode(field.type.kotlin, value)?.let {
                         field.set(this, it)
                     }
                 } ?: kotlin.run {
                     val attributeCoder = annotation.coder.java.newInstance()
                     AnimDecoder2.mapNodeAttributeCoderMap[key] = attributeCoder
+                    Animer.log.i(TAG, "[parseAndSetField]:${field.type.kotlin} $value")
                     attributeCoder.attributeDecode(field.type.kotlin, value)?.let {
                         field.set(this, it)
                     }
