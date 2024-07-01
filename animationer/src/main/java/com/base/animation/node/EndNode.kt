@@ -1,6 +1,7 @@
 package com.base.animation.node
 
 import android.graphics.PointF
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
@@ -71,6 +72,10 @@ class EndNode : IAnimNode {
 
             InterpolatorEnum.Decelerate.type -> {
                 DecelerateInterpolator()
+            }
+
+            InterpolatorEnum.AccelerateDecelerate.type -> {
+                AccelerateDecelerateInterpolator()
             }
 
             else -> {

@@ -52,6 +52,10 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick, IAnimListener {
     private val xmlMore =
         "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>\n" + "<anim>\n" + "    <startAnim alpha=\"255\" displaySize=\"80\" startId=\"0\" startL='{\"x\":0.0,\"y\":0.0}' rotation=\"0.0\" scaleX=\"0.5\" scaleY=\"0.5\" url=\"https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png\">\n" + "        <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"2\" endId=\"0\" endL='{\"x\":680.0,\"y\":1463.5}' rotation=\"0.0\" scaleX=\"2.0\" scaleY=\"2.0\" url=\"\" />\n" + "        <endContainer displaySize=\"0\" durTime=\"1500\" url=\"\">\n" + "            <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"0\" endId=\"0\" endL='{\"x\":680.0,\"y\":0.0}' rotation=\"360.0\" scaleX=\"1.0\" scaleY=\"1.0\" url=\"\" />\n" + "            <endAnim alpha=\"0\" displaySize=\"0\" durTime=\"1000\" interpolator=\"0\" endId=\"0\" endL='{\"x\":0.0,\"y\":1463.5}' rotation=\"0.0\" scaleX=\"1.0\" scaleY=\"1.0\" url=\"\" />\n" + "            <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"0\" endId=\"0\" endL='{\"x\":680.0,\"y\":3007.0}' rotation=\"0.0\" scaleX=\"0.0\" scaleY=\"0.0\" url=\"\" />\n" + "            <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"0\" endId=\"0\" endL='{\"x\":1440.0,\"y\":1463.5}' rotation=\"0.0\" scaleX=\"0.0\" scaleY=\"0.0\" url=\"\" />\n" + "        </endContainer>\n" + "    </startAnim>\n" + "</anim>"
 
+    val red by lazy {
+        BitmapLoader.decodeBitmapFrom(resources, R.mipmap.red, 1, 300, 300)
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -401,7 +405,7 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick, IAnimListener {
                 AnimDecoder2.suspendPlayAnimWithAnimNode(anim_surface, node) { node, displayItem ->
                     when (displayItem) {
                         is BitmapDisplayItem -> {
-                            displayItem.mBitmap = BitmapLoader.decodeBitmapFrom(resources, R.mipmap.red, 1, 177, 177)
+                            displayItem.mBitmap = red
                         }
                     }
                     displayItem
@@ -445,7 +449,7 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick, IAnimListener {
                         scaleX = 1f
                         scaleY = 1f
                         durTime = 2000L
-                        interpolator = InterpolatorEnum.Decelerate.type
+                        interpolator = InterpolatorEnum.Linear.type
                     }
                 }
             }
@@ -455,7 +459,7 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick, IAnimListener {
             AnimDecoder2.suspendPlayAnimWithAnimNode(anim_surface, node) { node, displayItem ->
                 when (displayItem) {
                     is BitmapDisplayItem -> {
-                        displayItem.mBitmap = BitmapLoader.decodeBitmapFrom(resources, R.mipmap.red, 1, 354, 354)
+                        displayItem.mBitmap = red
                     }
                 }
                 displayItem

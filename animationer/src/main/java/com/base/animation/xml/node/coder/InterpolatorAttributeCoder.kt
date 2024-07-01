@@ -21,5 +21,5 @@ class InterpolatorAttributeCoder : IAttributeCoder<Int> {
 }
 
 enum class InterpolatorEnum(val type: Int) {
-    Linear(0), Accelerate(1), Decelerate(2)
+    Linear(0), Accelerate(1), Decelerate(2), AccelerateDecelerate(3)
 }
