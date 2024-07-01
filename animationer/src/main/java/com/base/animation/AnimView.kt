@@ -23,7 +23,7 @@ open class AnimView @JvmOverloads constructor(
     init {
         var frameCount = 0
         var curFrameTime = 0L
-        helper = AnimViewHelper { framePositionCount, frameTime ->
+        helper = AnimViewHelper(isSurfaceView = false) { framePositionCount, frameTime ->
             frameCount = framePositionCount
             curFrameTime = frameTime
             background.invalidateSelf()
@@ -58,7 +58,6 @@ open class AnimView @JvmOverloads constructor(
     override fun addAnimDisplay(animPathObject: AnimPathObject) {
         helper.addAnimDisplay(animPathObject)
     }
-
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()

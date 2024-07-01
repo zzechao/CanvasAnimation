@@ -2,14 +2,12 @@ package com.base.animation
 
 import android.graphics.Canvas
 import android.graphics.PointF
-import android.os.Handler
 import android.os.Looper
 import android.view.MotionEvent
 import com.base.animation.helper.PathObjectDeal
 import com.base.animation.helper.PathObjectDeal2
 import com.base.animation.model.AnimDrawObject
 import com.base.animation.model.AnimPathObject
-import kotlinx.coroutines.ObsoleteCoroutinesApi
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -19,11 +17,13 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 typealias DoFrameFps = (framePositionCount: Int, frameTime: Long) -> Unit
 
-@ObsoleteCoroutinesApi
-class AnimViewHelper(private val doFrame: DoFrameFps) : IAnimView, CanvasHandler.CanvasFrameCallback {
+class AnimViewHelper(var isSurfaceView: Boolean = false, private val doFrame: DoFrameFps) : IAnimView, CanvasHandler.CanvasFrameCallback {
     private val TAG = "AnimViewHelper"
 
-    private val mainHandler: Handler = Handler(Looper.getMainLooper())
+    private val canvasHandler by lazy {
+        CanvasHandler()
+    }
+
 
     private var isResume = AtomicBoolean(false)
     private var mTouchPointF: PointF? = null
@@ -49,17 +49,21 @@ class AnimViewHelper(private val doFrame: DoFrameFps) : IAnimView, CanvasHandler
     private fun onResume() {
         if (isResume.compareAndSet(false, true)) {
             Animer.log.i(TAG, "onResume")
-            checkInMainThread {
-                CanvasHandler.addAnimationFrameCallback(this)
+            if (isSurfaceView) {
+                ChoreographerKT.animViewHandler.post {
+                    canvasHandler.setAnimationFrameCallback(this)
+                }
+            } else {
+                ChoreographerKT.mainHandler.post {
+                    canvasHandler.setAnimationFrameCallback(this)
+                }
             }
         }
     }
 
     override fun pause() {
         if (isResume.compareAndSet(true, false)) {
-            checkInMainThread {
-                CanvasHandler.removeCallback(this)
-            }
+            canvasHandler.removeCallback()
         }
     }
 
@@ -78,18 +82,14 @@ class AnimViewHelper(private val doFrame: DoFrameFps) : IAnimView, CanvasHandler
 
 
     override fun addAnimListener(iAnimListener: IAnimListener) {
-        checkInMainThread {
-            pathObjectDeal.animListeners.add(iAnimListener)
-        }
+        pathObjectDeal.animListeners.add(iAnimListener)
     }
 
     override fun removeAnimListener(iAnimListener: IAnimListener?) {
-        checkInMainThread {
-            if (iAnimListener == null) {
-                pathObjectDeal.animListeners.clear()
-            } else {
-                pathObjectDeal.animListeners.remove(iAnimListener)
-            }
+        if (iAnimListener == null) {
+            pathObjectDeal.animListeners.clear()
+        } else {
+            pathObjectDeal.animListeners.remove(iAnimListener)
         }
     }
 
@@ -110,7 +110,7 @@ class AnimViewHelper(private val doFrame: DoFrameFps) : IAnimView, CanvasHandler
         val framePositionCount = if (frameTime == 0L) {
             1
         } else {
-            val framePositionCount = frameTime / CanvasHandler.fpsTime
+            val framePositionCount = frameTime / fpsTime
             if (framePositionCount <= 1) {
                 1
             } else {
@@ -149,7 +149,7 @@ class AnimViewHelper(private val doFrame: DoFrameFps) : IAnimView, CanvasHandler
         if (Looper.myLooper() == Looper.getMainLooper()) {
             block()
         } else {
-            mainHandler.post { block.invoke() }
+            ChoreographerKT.mainHandler.post { block.invoke() }
         }
     }
 }

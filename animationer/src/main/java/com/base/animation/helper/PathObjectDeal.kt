@@ -3,11 +3,11 @@ package com.base.animation.helper
 import android.graphics.PointF
 import com.base.animation.AnimCache
 import com.base.animation.Animer
-import com.base.animation.CanvasHandler
 import com.base.animation.IAnimListener
 import com.base.animation.IAnimView
 import com.base.animation.OnAnimItemClick
 import com.base.animation.cache.PathCache
+import com.base.animation.fpsTime
 import com.base.animation.item.BaseDisplayItem
 import com.base.animation.model.AnimDrawObject
 import com.base.animation.model.AnimPathObject
@@ -37,6 +37,7 @@ const val TAG = "PathObjectDeal"
 class PathObjectDeal(private val iAnimView: IAnimView) : IPathObjectDeal {
 
     private val animDisplayScope = CoroutineScope(Animer.calculationDispatcher)
+
 
     /**
      * 路径坐标
@@ -90,7 +91,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) : IPathObjectDeal {
                     if (animPath.displayItemsMap.isNotEmpty()) {
                         AnimCache.displayItemCache.putDisplayItems(animPath.displayItemsMap)
                     }
-                    val cacheKey = pathCachePools.conventKey(CanvasHandler.fpsTime, animPath)
+                    val cacheKey = pathCachePools.conventKey(fpsTime, animPath)
                     val drawsMap = mutableMapOf<Int, MutableList<AnimDrawObject>>()
                     var position = 0
                     val drawObject = DrawObject(animPath.animId)
@@ -114,7 +115,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) : IPathObjectDeal {
                                 animPath.animPathMap[index]?.apply {
                                     this.forEachIndexed { index, pathObjectWithDer ->
                                         val duringTime = pathObjectWithDer.during
-                                        val times = duringTime * 1f / CanvasHandler.fpsTime
+                                        val times = duringTime * 1f / fpsTime
                                         val start = starts.getOrNull(index) ?: return@forEachIndexed
                                         drawsMap[startPosition]?.map {
                                             it.displayItemId = start.displayItemId
@@ -148,7 +149,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) : IPathObjectDeal {
                                 animPath.animPathMap[index]?.apply {
                                     this.forEachIndexed { index, pathObjectWithDer ->
                                         val duringTime = pathObjectWithDer.during
-                                        val times = duringTime * 1f / CanvasHandler.fpsTime
+                                        val times = duringTime * 1f / fpsTime
                                         val start = starts.getOrNull(index) ?: return@forEachIndexed
                                         if (drawsMap[startPosition] == null) {
                                             drawsMap[startPosition] = mutableListOf()
@@ -160,7 +161,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) : IPathObjectDeal {
                                         pathObject.getItem(start)
                                         for (i in 0..times.toInt()) {
                                             startPosition++
-                                            val p = i * CanvasHandler.fpsTime / duringTime
+                                            val p = i * fpsTime / duringTime
                                             val interP = start.interpolator.getInterpolation(p)
                                             val inPoint = PointF(
                                                 start.point.x + pathObject.itemX * interP, start.point.y + pathObject.itemY * interP

@@ -1,8 +1,10 @@
 package com.base.animation
 
+import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.view.WindowManager
 
 /**
  * @author:zhouzechao
@@ -66,4 +68,11 @@ object BitmapLoader {
 
         return inSampleSize
     }
+}
+
+internal val fpsTime: Float by lazy {
+    val wm = AnimationEx.mApplication?.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
+    val display = wm?.defaultDisplay
+    val rate = display?.refreshRate ?: 60f
+    1000 * 1f / rate
 }

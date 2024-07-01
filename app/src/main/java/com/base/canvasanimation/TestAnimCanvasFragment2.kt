@@ -35,6 +35,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
+import kotlin.math.abs
 
 /**
  * @author:zhouzechao
@@ -348,15 +349,15 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick, IAnimListener {
      * 动画雨
      */
     private fun startAnimRain() {
-        val size = 160
+        val size = 300
         val url = "https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png"
         val width = DisplayUtils.getScreenWidth(this.activity).toFloat()
         val height = DisplayUtils.getScreenHeight(this.activity).toFloat()
-        val indexSize = 50
-
+        val indexSize = 30
+        val checkOverlapping = mutableMapOf<Int, Long>()
         for (i in 0 until indexSize) {
-            val time = (0L..10000L).random()
-            val itemLocationX = (size..(width - size).toInt()).random()
+            var time = (0L..15000L).random()
+            val itemLocationX = (size / 2..(width - size / 2).toInt()).random()
             val node = AnimEncoder().buildAnimNode {
                 imageNode {
                     this.url = url
@@ -378,22 +379,29 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick, IAnimListener {
                 }
             }
 
+            val timesList = checkOverlapping.mapNotNull {
+                var value = 0L
+                if (it.key in (itemLocationX - size)..(itemLocationX + size)) {
+                    value = it.value
+                }
+                value
+            }.filter { it != 0L }
+            if (timesList.isNotEmpty()) {
+                var hasTime = timesList.firstOrNull { (abs(time - it) < 500L) } != null
+                while (hasTime) {
+                    time = (0L..15000L).random()
+                    hasTime = timesList.firstOrNull { (abs(time - it) < 500L) } != null
+                }
+            }
+            checkOverlapping[itemLocationX] = time
+
             lifecycleScope.launch {
                 delay(time)
                 anim_surface ?: return@launch
                 AnimDecoder2.suspendPlayAnimWithAnimNode(anim_surface, node) { node, displayItem ->
                     when (displayItem) {
                         is BitmapDisplayItem -> {
-                            displayItem.mBitmap = suspendCancellableCoroutine {
-                                Glide.with(this@TestAnimCanvasFragment2).asBitmap().load(url).into(object : CustomTarget<Bitmap>() {
-                                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                        it.resume(resource)
-                                    }
-
-                                    override fun onLoadCleared(placeholder: Drawable?) {
-                                    }
-                                })
-                            }
+                            displayItem.mBitmap = BitmapLoader.decodeBitmapFrom(resources, R.mipmap.red, 1, 177, 177)
                         }
                     }
                     displayItem
@@ -420,7 +428,7 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick, IAnimListener {
     override fun itemClick(animId: Long, animDrawObject: AnimDrawObject, touchPointF: PointF, itemCenterPointF: PointF, extra: String) {
         Toast.makeText(this@TestAnimCanvasFragment2.context, "$animId $extra", Toast.LENGTH_SHORT).show()
         anim_surface?.removeAnimId(animId)
-        val size = 160
+        val size = 300
         val url = "https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png"
         val width = DisplayUtils.getScreenWidth(this.activity).toFloat()
         val height = DisplayUtils.getScreenHeight(this.activity).toFloat()
@@ -432,12 +440,10 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick, IAnimListener {
                     point = itemCenterPointF
                     scaleX = 1f
                     scaleY = 1f
-                    alpha = 255
                     endNode {
                         point = PointF(width / 2f, height)
                         scaleX = 1f
                         scaleY = 1f
-                        alpha = 100
                         durTime = 2000L
                         interpolator = InterpolatorEnum.Decelerate.type
                     }
@@ -449,16 +455,7 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick, IAnimListener {
             AnimDecoder2.suspendPlayAnimWithAnimNode(anim_surface, node) { node, displayItem ->
                 when (displayItem) {
                     is BitmapDisplayItem -> {
-                        displayItem.mBitmap = suspendCancellableCoroutine {
-                            Glide.with(this@TestAnimCanvasFragment2).asBitmap().load(url).into(object : CustomTarget<Bitmap>() {
-                                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                    it.resume(resource)
-                                }
-
-                                override fun onLoadCleared(placeholder: Drawable?) {
-                                }
-                            })
-                        }
+                        displayItem.mBitmap = BitmapLoader.decodeBitmapFrom(resources, R.mipmap.red, 1, 354, 354)
                     }
                 }
                 displayItem

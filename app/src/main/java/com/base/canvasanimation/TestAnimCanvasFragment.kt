@@ -702,7 +702,6 @@ class TestAnimCanvasFragment : Fragment(), IAnimListener, OnAnimItemClick {
     }
 
     override fun endAnim(animId: Long) {
-        Log.i("zzc4", "endAnim animId:$animId")
     }
 
     override fun itemClick(animId: Long, animDrawObject: AnimDrawObject, touchPointF: PointF, itemCenterPointF: PointF, extra: String) {

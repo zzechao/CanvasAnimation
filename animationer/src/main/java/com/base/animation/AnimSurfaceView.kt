@@ -12,11 +12,7 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import com.base.animation.model.AnimPathObject
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 
 /**
  * @author:zhouzechao
@@ -24,21 +20,12 @@ import kotlinx.coroutines.launch
  * description：SurfaceView的canvas的动画
  */
 @ObsoleteCoroutinesApi
-open class AnimSurfaceView @JvmOverloads constructor(
+class AnimSurfaceView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : SurfaceView(context, attrs, defStyleAttr), SurfaceHolder.Callback, IAnimView {
 
+    private var isSurfaceRelease: Boolean = true
     private val helper: AnimViewHelper
-
-    private var loggingExceptionHandler = CoroutineExceptionHandler { context, throwable ->
-        Animer.log.e("CoroutineException", "Coroutine exception occurred. $context", throwable)
-    }
-
-
-    private val animScope =
-        CoroutineScope(
-            SupervisorJob() + Animer.animDispatcher + loggingExceptionHandler
-        )
 
     init {
         holder.addCallback(this)
@@ -46,9 +33,10 @@ open class AnimSurfaceView @JvmOverloads constructor(
         keepScreenOn = true
         setZOrderOnTop(true)
         holder.setFormat(PixelFormat.TRANSPARENT)
-        isFocusableInTouchMode = true
-        helper = AnimViewHelper { framePositionCount, frameTime ->
-            animScope.launch {
+        //isFocusableInTouchMode = true
+        helper = AnimViewHelper(isSurfaceView = true) { framePositionCount, frameTime ->
+            tryCatch {
+                if (isSurfaceRelease) return@tryCatch
                 val canvas = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     holder.lockHardwareCanvas()
                 } else {
@@ -130,12 +118,14 @@ open class AnimSurfaceView @JvmOverloads constructor(
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
+        isSurfaceRelease = false
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
+        isSurfaceRelease = true
         pause()
     }
 
