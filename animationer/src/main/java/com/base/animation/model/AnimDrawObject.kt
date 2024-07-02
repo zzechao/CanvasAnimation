@@ -14,7 +14,7 @@ import com.base.animation.item.BaseDisplayItem
  */
 private const val TAG = "DrawObject"
 
-class DrawObject(val animId: Long) : BaseAnimDrawObject() {
+class DrawObject(val animId: Long, override val extra: String) : BaseAnimDrawObject(extra) {
 
     var animDraws: MutableMap<Int, MutableList<AnimDrawObject>> = mutableMapOf()
 
@@ -31,7 +31,7 @@ class DrawObject(val animId: Long) : BaseAnimDrawObject() {
                 currencyPosition = animDraws.size - 1
                 status = Status.STOP
                 pathObjectDeal.animListeners.forEach {
-                    it.endAnim(animId)
+                    it.onEndAnim(animId, extra)
                 }
                 pathObjectDeal.removeAnimId(animId)
                 return
@@ -39,12 +39,12 @@ class DrawObject(val animId: Long) : BaseAnimDrawObject() {
                 if (currencyPosition == 0) {
                     status = Status.START
                     pathObjectDeal.animListeners.forEach {
-                        it.startAnim(animId)
+                        it.onStartAnim(animId, extra)
                     }
                 } else if (status == Status.START) {
                     status = Status.DRAWING
                     pathObjectDeal.animListeners.forEach {
-                        it.runningAnim(animId)
+                        it.onRunningAnim(animId, extra)
                     }
                 }
 

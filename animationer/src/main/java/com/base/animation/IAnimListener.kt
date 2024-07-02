@@ -10,15 +10,20 @@ interface IAnimListener {
     /**
      * 动画开始
      */
-    fun startAnim(animId: Long)
+    fun onStartAnim(animId: Long, extra: String)
 
     /**
      * 动画执行中
      */
-    fun runningAnim(animId: Long)
+    fun onRunningAnim(animId: Long, extra: String)
+
+    /**
+     * 动画取消
+     */
+    fun onCancelAnim(animId: Long, extra: String)
 
     /**
      * 动画结束
      */
-    fun endAnim(animId: Long)
+    fun onEndAnim(animId: Long, extra: String)
 }

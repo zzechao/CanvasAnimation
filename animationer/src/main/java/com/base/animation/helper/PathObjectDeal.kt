@@ -4,7 +4,6 @@ import android.graphics.PointF
 import com.base.animation.AnimCache
 import com.base.animation.Animer
 import com.base.animation.IAnimListener
-import com.base.animation.IAnimView
 import com.base.animation.OnAnimItemClick
 import com.base.animation.cache.PathCache
 import com.base.animation.fpsTime
@@ -18,7 +17,6 @@ import com.google.common.cache.CacheBuilder
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope.coroutineContext
-import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
@@ -33,8 +31,7 @@ import java.util.concurrent.TimeUnit
  */
 const val TAG = "PathObjectDeal"
 
-@ObsoleteCoroutinesApi
-class PathObjectDeal(private val iAnimView: IAnimView) : IPathObjectDeal {
+class PathObjectDeal : IPathObjectDeal {
 
     private val animDisplayScope = CoroutineScope(Animer.calculationDispatcher)
 
@@ -94,7 +91,7 @@ class PathObjectDeal(private val iAnimView: IAnimView) : IPathObjectDeal {
                     val cacheKey = pathCachePools.conventKey(fpsTime, animPath)
                     val drawsMap = mutableMapOf<Int, MutableList<AnimDrawObject>>()
                     var position = 0
-                    val drawObject = DrawObject(animPath.animId)
+                    val drawObject = DrawObject(animPath.animId, animPath.expand)
                     if (pathCacheMap.getIfPresent(cacheKey) != null) {
                         Animer.log.i(TAG, "cache used")
                         pathCacheMap.getIfPresent(cacheKey)?.map {
@@ -231,7 +228,10 @@ class PathObjectDeal(private val iAnimView: IAnimView) : IPathObjectDeal {
      */
     override fun removeAnimId(animId: Long) {
         animDrawIds.remove(animId)
-        animDrawObjects.remove(animId)
+        val animObject = animDrawObjects.remove(animId)
+        animListeners.forEach {
+            it.onCancelAnim(animId, animObject?.extra ?: "")
+        }
     }
 }
 

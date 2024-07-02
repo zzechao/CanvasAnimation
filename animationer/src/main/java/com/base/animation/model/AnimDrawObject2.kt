@@ -14,7 +14,7 @@ import com.base.animation.item.BaseDisplayItem
  */
 private const val TAG = "DrawObject"
 
-class DrawObject2(val animId: Long) : BaseAnimDrawObject() {
+class DrawObject2(val animId: Long, override val extra: String) : BaseAnimDrawObject(extra) {
 
     var animDraws: MutableMap<Int, List<PathProcess>> = mutableMapOf()
 
@@ -29,10 +29,10 @@ class DrawObject2(val animId: Long) : BaseAnimDrawObject() {
         var updateCurrencyPosition = true
         if (currencyPosition == 0 && status == Status.INIT) {
             status = Status.START
-            pathObjectDeal.animListeners.forEach { it.startAnim(animId) }
+            pathObjectDeal.animListeners.forEach { it.onStartAnim(animId, extra) }
         } else if (status == Status.START) {
             status = Status.DRAWING
-            pathObjectDeal.animListeners.forEach { it.runningAnim(animId) }
+            pathObjectDeal.animListeners.forEach { it.onRunningAnim(animId, extra) }
         }
         animDraws[currencyPosition]?.forEach { drawObject ->
             if (drawObject.start.displayItemId != curDisplayItemId || displayItem == null) {
@@ -77,7 +77,7 @@ class DrawObject2(val animId: Long) : BaseAnimDrawObject() {
         } ?: kotlin.run {
             status = Status.STOP
             pathObjectDeal.animListeners.forEach {
-                it.endAnim(animId)
+                it.onEndAnim(animId, extra)
             }
             pathObjectDeal.removeAnimId(animId)
         }

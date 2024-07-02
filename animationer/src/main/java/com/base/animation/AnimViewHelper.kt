@@ -33,9 +33,9 @@ class AnimViewHelper(var isSurfaceView: Boolean = false, private val doFrame: Do
      */
     private val pathObjectDeal by lazy {
         if (AnimationEx.mode == 1) {
-            PathObjectDeal(this)
+            PathObjectDeal()
         } else {
-            PathObjectDeal2(this)
+            PathObjectDeal2()
         }
     }
 

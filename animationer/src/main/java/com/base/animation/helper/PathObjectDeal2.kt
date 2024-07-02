@@ -3,7 +3,6 @@ package com.base.animation.helper
 import com.base.animation.AnimCache
 import com.base.animation.Animer
 import com.base.animation.IAnimListener
-import com.base.animation.IAnimView
 import com.base.animation.OnAnimItemClick
 import com.base.animation.helper.data.PathProcess
 import com.base.animation.helper.data.PathProcessItem
@@ -14,7 +13,6 @@ import com.base.animation.model.DrawObject2
 import com.base.animation.model.toAnimDrawObject2
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
@@ -25,8 +23,7 @@ import java.util.concurrent.CopyOnWriteArrayList
  * @author:zhouzechao
  * description：*
  */
-@ObsoleteCoroutinesApi
-class PathObjectDeal2(private val iAnimView: IAnimView) : IPathObjectDeal {
+class PathObjectDeal2 : IPathObjectDeal {
 
     private val animDisplayScope = CoroutineScope(Animer.calculationDispatcher)
 
@@ -66,7 +63,7 @@ class PathObjectDeal2(private val iAnimView: IAnimView) : IPathObjectDeal {
                     }
                     val clickable = animPath.clickable
                     val expand = animPath.expand
-                    val drawObject = DrawObject2(animPath.animId)
+                    val drawObject = DrawObject2(animPath.animId, expand)
                     val drawPathProcessMap = mutableMapOf<Int, List<PathProcess>>()
                     for ((index, starts) in animPath.startPoints) {
                         if (starts.isNotEmpty()) {
@@ -129,6 +126,9 @@ class PathObjectDeal2(private val iAnimView: IAnimView) : IPathObjectDeal {
      */
     override fun removeAnimId(animId: Long) {
         animDrawIds.remove(animId)
-        animDrawObjects.remove(animId)
+        val animObject = animDrawObjects.remove(animId)
+        animListeners.forEach {
+            it.onCancelAnim(animId, animObject?.extra ?: "")
+        }
     }
 }

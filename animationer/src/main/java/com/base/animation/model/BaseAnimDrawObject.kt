@@ -9,7 +9,7 @@ import com.base.animation.helper.IPathObjectDeal
  * @author:zhouzechao
  * description：*
  */
-abstract class BaseAnimDrawObject {
+abstract class BaseAnimDrawObject(open val extra: String) {
 
     abstract fun draw(
         canvas: Canvas,
