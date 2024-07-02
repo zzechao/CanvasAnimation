@@ -35,6 +35,7 @@ import com.base.animation.xml.AnimEncoder
 import com.base.animation.xml.buildAnimNode
 import com.base.animation.xml.buildString
 import com.base.animation.xml.node.coder.InterpolatorEnum
+import com.base.canvasanimation.TestAnimCanvasFragment2.LocationX
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -53,6 +54,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
+import kotlin.math.abs
 
 
 /**
@@ -69,6 +71,10 @@ class TestAnimCanvasFragment : Fragment(), IAnimListener, OnAnimItemClick {
 
     private val xmlMore =
         "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>\n" + "<anim>\n" + "    <startAnim alpha=\"255\" displaySize=\"80\" startId=\"0\" startL='{\"x\":0.0,\"y\":0.0}' rotation=\"0.0\" scaleX=\"0.5\" scaleY=\"0.5\" url=\"https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png\">\n" + "        <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"2\" endId=\"0\" endL='{\"x\":680.0,\"y\":1463.5}' rotation=\"0.0\" scaleX=\"2.0\" scaleY=\"2.0\" url=\"\" />\n" + "        <endContainer displaySize=\"0\" durTime=\"1500\" url=\"\">\n" + "            <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"0\" endId=\"0\" endL='{\"x\":680.0,\"y\":0.0}' rotation=\"360.0\" scaleX=\"1.0\" scaleY=\"1.0\" url=\"\" />\n" + "            <endAnim alpha=\"0\" displaySize=\"0\" durTime=\"1000\" interpolator=\"0\" endId=\"0\" endL='{\"x\":0.0,\"y\":1463.5}' rotation=\"0.0\" scaleX=\"1.0\" scaleY=\"1.0\" url=\"\" />\n" + "            <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"0\" endId=\"0\" endL='{\"x\":680.0,\"y\":3007.0}' rotation=\"0.0\" scaleX=\"0.0\" scaleY=\"0.0\" url=\"\" />\n" + "            <endAnim alpha=\"255\" displaySize=\"0\" durTime=\"1000\" interpolator=\"0\" endId=\"0\" endL='{\"x\":1440.0,\"y\":1463.5}' rotation=\"0.0\" scaleX=\"0.0\" scaleY=\"0.0\" url=\"\" />\n" + "        </endContainer>\n" + "    </startAnim>\n" + "</anim>"
+
+    val red by lazy {
+        BitmapLoader.decodeBitmapFrom(resources, R.mipmap.red, 1, 300, 300)
+    }
 
     private val code = "imageNode {\n" +
             "                this.url = url\n" +
@@ -533,12 +539,8 @@ class TestAnimCanvasFragment : Fragment(), IAnimListener, OnAnimItemClick {
                     anim_surface, this@apply
                 ) { node, displayItem ->
                     when (displayItem) {
-                        is BitmapDouDisplay -> {
-                            loadImage(
-                                fragment = this@TestAnimCanvasFragment,
-                                (node as ImageNode).url,
-                                node.displayHeightSize
-                            )?.let {
+                        is ImageDouNode.BitmapDouDisplay -> {
+                            loadImage(fragment = this@TestAnimCanvasFragment, (node as ImageNode).url, node.displayHeightSize)?.let {
                                 displayItem.setBitmap(it)
                             }
                         }
@@ -628,15 +630,15 @@ class TestAnimCanvasFragment : Fragment(), IAnimListener, OnAnimItemClick {
      * 动画雨
      */
     private fun startAnimRain() {
-        val size = 100
+        val size = 300
         val url = "https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png"
-        val width = DisplayUtils.getScreenWidth(this.activity).toFloat()
         val height = DisplayUtils.getScreenHeight(this.activity).toFloat()
-        val indexSize = 50
-
+        val indexSize = 20
+        val checkOverlapping = mutableMapOf<Long, Int>()
         for (i in 0 until indexSize) {
-            val time = (0L..10000L).random()
-            val itemLocationX = (size..(width - size).toInt()).random()
+            val locationX = getLocationX(size, 3000L, 300L, checkOverlapping)
+            checkOverlapping[locationX.delayTime] = locationX.itemLocationX
+
             val node = AnimEncoder().buildAnimNode {
                 imageNode {
                     this.url = url
@@ -644,42 +646,71 @@ class TestAnimCanvasFragment : Fragment(), IAnimListener, OnAnimItemClick {
                     this.clickable = true
                     this.extras = "rain"
                     startNode {
-                        point = PointF(itemLocationX.toFloat(), 0f)
+                        point = PointF(locationX.itemLocationX.toFloat(), 0f)
                         scaleX = 1f
                         scaleY = 1f
                         endNode {
-                            point = PointF(itemLocationX.toFloat(), height)
+                            point = PointF(locationX.itemLocationX.toFloat(), height)
                             scaleX = 1f
                             scaleY = 1f
-                            durTime = 5000L
+                            durTime = 2000L
                             interpolator = InterpolatorEnum.Linear.type
                         }
                     }
                 }
             }
 
+
+
             lifecycleScope.launch {
-                delay(time)
+                delay(locationX.delayTime)
                 anim_surface ?: return@launch
                 AnimDecoder2.suspendPlayAnimWithAnimNode(anim_surface, node) { node, displayItem ->
                     when (displayItem) {
                         is BitmapDisplayItem -> {
-                            displayItem.mBitmap = suspendCancellableCoroutine {
-                                Glide.with(this@TestAnimCanvasFragment).asBitmap().load(url).into(object : CustomTarget<Bitmap>() {
-                                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                        it.resume(resource)
-                                    }
-
-                                    override fun onLoadCleared(placeholder: Drawable?) {
-                                    }
-                                })
-                            }
+                            displayItem.mBitmap = red
                         }
                     }
                     displayItem
                 }
             }
         }
+    }
+
+    private fun getLocationX(size: Int, totalTime: Long, duringTime: Long, checkOverlapping: MutableMap<Long, Int>): LocationX {
+        val width = DisplayUtils.getScreenWidth(this.activity)
+        var time = (0L..totalTime).random()
+        var itemLocationX = (size / 2..(width - size / 2)).random()
+        var timeList = checkOverlapping.filter { abs(it.key - time) < duringTime }
+        Log.i("ttt", "timeList:${timeList.size}")
+        while (timeList.size > 2) {
+            time = (0L..totalTime).random()
+            timeList = checkOverlapping.filter { abs(it.key - time) < duringTime }
+            Log.i("ttt", "update timeList:${timeList.size}")
+        }
+        Log.i("ttt", "itemLocationX:$itemLocationX time:$time")
+        var itemList = timeList.filter { abs(itemLocationX - it.value) < size / 2 }
+        Log.i("ttt", "itemList:${itemList.size}")
+        var i = 0
+        while (itemList.isNotEmpty()) {
+            itemLocationX = (size / 2..(width - size / 2)).random()
+            itemList = timeList.filter { abs(itemLocationX - it.value) < size / 2 }
+            i++
+            if (i > 5) {
+                return getLocationX(size, totalTime, duringTime, checkOverlapping)
+            }
+            Log.i("ttt", "update itemList:${itemList.size} itemLocationX:$itemLocationX timeList:${timeList.values.map { it.toString() }}")
+        }
+
+        return LocationX().apply {
+            this.itemLocationX = itemLocationX
+            this.delayTime = time
+        }
+    }
+
+    inner class LocationX {
+        var itemLocationX: Int = -1
+        var delayTime: Long = 0L
     }
 
     override fun onDestroyView() {

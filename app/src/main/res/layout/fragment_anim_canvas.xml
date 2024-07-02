@@ -27,11 +27,6 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
-    <com.base.animation.AnimView
-        android:id="@+id/anim_surface"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
 
     <TextView
         android:id="@+id/mTextXml"
@@ -100,4 +95,9 @@
         android:textColor="@color/white"
         android:textSize="12sp"
         android:visibility="gone" />
+
+    <com.base.animation.AnimView
+        android:id="@+id/anim_surface"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </RelativeLayout>

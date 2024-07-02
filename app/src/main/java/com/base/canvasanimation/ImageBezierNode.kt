@@ -36,7 +36,7 @@ class ImageBezierNode : ImageNode(), IXmlDrawableNodeDealIntercept {
         ): String {
             if (animNode is ImageBezierNode) {
                 val key =
-                    animNode.url + animNode.displayHeightSize + animNode.nodeName + System.currentTimeMillis()
+                    animNode.url + animNode.displayHeightSize + animNode.nodeName
                 val displayId = displayObject.suspendAdd(
                     key = key, kClass = animNode.displayItem
                 ) {

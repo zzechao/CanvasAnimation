@@ -31,10 +31,10 @@
 model build.gradle添加
 
 ```groovy
-     implementation "io.github.zzechao:canvasanimation:1.0.1"
+     implementation "io.github.zzechao:canvasanimation:1.0.2.1"
 ```
 
-当前版本：1.0.1
+当前版本：1.0.2.1
 
 ### 动画库初始化
 
@@ -143,5 +143,123 @@ model build.gradle添加
 
 ### 提供自定义的绘制元素节点以及路径过程节点，效果图
 ![image](https://github.com/zzechao/CanvasAnimation/blob/canvas_view_new_feature_2.0/v3.gif)
+
+### 仿支付宝的红包雨效果
+![image](https://github.com/zzechao/CanvasAnimation/blob/canvas_view_new_feature_2.0/v4.gif)
+
+### 自定义节点以及ItemDisplay绘制
+```kotlin 
+/**
+ * 自定义声明式节点
+ */
+class ImageDouNode : ImageNode(), IXmlDrawableNodeDealIntercept {
+
+    @AnimAttributeName("rocation", DefaultAttributeCoder::class)
+    @JvmField
+    var rocation = 5
+
+    override var displayItem: KClass<out BaseDisplayItem> = BitmapDouDisplay::class
+
+    override val dealIntercept: IDealNodeDealIntercept = object : IDealNodeDealIntercept {
+        override suspend fun invoke(
+            displayObject: DisplayObject,
+            animNode: IAnimNode,
+            chain: AnimNodeChain,
+            dealDisplayItem: DealDisplayItem
+        ): String {
+            if (animNode is ImageDouNode) {
+                val key =
+                    animNode.url + animNode.displayHeightSize + animNode.nodeName
+                val bitmapKey = animNode.url + animNode.displayHeightSize + animNode.nodeName
+                val displayId = displayObject.suspendAdd(
+                    key = key, kClass = animNode.displayItem
+                ) {
+                    val bitmapDisplayItem = BitmapDouDisplay(rocation)
+                    dealDisplayItem.invoke(animNode, bitmapDisplayItem) // 代理出去处理图片的加载方式
+                    val bitmapWidth = bitmapDisplayItem.mBitmap?.width ?: return@suspendAdd null
+                    val bitmapHeight = bitmapDisplayItem.mBitmap?.height ?: return@suspendAdd null
+                    val displayWidth = animNode.displayHeightSize * bitmapWidth / bitmapHeight
+                    bitmapDisplayItem.setDisplaySize(displayWidth, animNode.displayHeightSize)
+                    bitmapDisplayItem
+                }
+                return displayId
+            }
+            return ""
+        }
+    }
+
+    /**
+     * 自定义绘制的节点计算以及绘制过程
+     */
+    inner class BitmapDouDisplay(val rocation: Int) : BitmapDisplayItem() {
+
+        override var isCalculate: Boolean = true
+
+        override fun calculate(pathProcess: PathProcess, current: AnimDrawObject, interpolator: BaseInterpolator) {
+            super.calculate(pathProcess, current, interpolator)
+            val p = pathProcess.curTotalTime / pathProcess.durTime
+            val interP = pathProcess.interpolator.getInterpolation(p)
+            val inPoint = PointF(
+                pathProcess.start.point.x + pathProcess.item.totalX * interP,
+                pathProcess.start.point.y + pathProcess.item.totalY * interP
+            )
+            val alpha = pathProcess.start.alpha + (pathProcess.item.totalAlpha * interP).toInt()
+            val scaleX = pathProcess.start.scaleX + pathProcess.item.totalScaleX * interP
+            val scaleY = pathProcess.start.scaleY + pathProcess.item.totalScaleY * interP
+            val rotation = sin(pathProcess.curTotalTime / 30L) * rocation
+            current.reset(inPoint, alpha, scaleX, scaleY, rotation)
+        }
+    }
+}
+
+/**
+ * AnimEncoder拓展ImageDouNode节点，构造声明式方法
+ */
+fun AnimEncoder.imageDouNode(onInit: ImageDouNode.(encoder: AnimEncoder) -> Unit) {
+    curNode.addNode(ImageDouNode().apply {
+        val lastNode = curNode
+        try {
+            curNode = this
+            onInit(this, this@imageDouNode)
+        } finally {
+            curNode = lastNode
+        }
+    })
+}
+
+/**
+ * 构造自定义绘制itemDisplay的节点动画
+ */
+AnimEncoder().buildAnimNode {
+    imageDouNode { // 自定义绘制节点
+        this.rocation = 5
+        this.url = url
+        this.displayHeightSize = size
+        startNode {
+            scaleX = 2f
+            scaleY = 2f
+            point = PointF(
+                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context).toFloat() / 2 - size / scaleX / 2,
+                DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context).toFloat() - size / scaleY / 2)
+            endNode {
+                scaleX = 2f
+                scaleY = 2f
+                point = PointF(DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context).toFloat() / 2 - size / scaleX / 2,
+                    DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context).toFloat() / 2 - size / scaleY / 2)
+                durTime = 1000
+                interpolator = InterpolatorEnum.Decelerate.type
+            }
+            endNode {
+                scaleX = 2f
+                scaleY = 2f
+                point = PointF(DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context).toFloat() / 2 - size / scaleX / 2,
+                    DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context).toFloat() - size / scaleY / 2)
+                durTime = 2000
+                interpolator = InterpolatorEnum.Accelerate.type
+            }
+        }
+    }
+}
+```
 
 可以参考BitmapDouDisplay、ImageDouNode
