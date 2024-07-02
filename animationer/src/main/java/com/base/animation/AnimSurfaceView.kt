@@ -12,15 +12,13 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import com.base.animation.model.AnimPathObject
-import kotlinx.coroutines.ObsoleteCoroutinesApi
 
 /**
  * @author:zhouzechao
  * @date: 2020/11/21
  * description：SurfaceView的canvas的动画
  */
-@ObsoleteCoroutinesApi
-class AnimSurfaceView @JvmOverloads constructor(
+open class AnimSurfaceView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : SurfaceView(context, attrs, defStyleAttr), SurfaceHolder.Callback, IAnimView {
 
@@ -31,7 +29,6 @@ class AnimSurfaceView @JvmOverloads constructor(
         holder.addCallback(this)
         isFocusable = true
         keepScreenOn = true
-        setZOrderOnTop(true)
         holder.setFormat(PixelFormat.TRANSPARENT)
         //isFocusableInTouchMode = true
         helper = AnimViewHelper(isSurfaceView = true) { framePositionCount, frameTime ->
@@ -46,6 +43,11 @@ class AnimSurfaceView @JvmOverloads constructor(
                 holder.unlockCanvasAndPost(canvas)
             }
         }
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        setZOrderOnTop(true)
     }
 
     override fun resume() {
@@ -112,7 +114,10 @@ class AnimSurfaceView @JvmOverloads constructor(
         }
     }
 
-    private fun drawAnim(canvas: Canvas?, framePositionCount: Int, frameTime: Long) {
+    /**
+     * open drawAnim方法
+     */
+    open fun drawAnim(canvas: Canvas?, framePositionCount: Int, frameTime: Long) {
         canvas?.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR) // 设置画布的背景为透明
         helper.drawAnim(canvas, framePositionCount, frameTime)
     }

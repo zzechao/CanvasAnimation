@@ -1,20 +1,17 @@
 package com.base.animation
 
 import android.content.Context
+import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import com.base.animation.model.AnimPathObject
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.ObsoleteCoroutinesApi
 
 /**
  * @author:zhouzechao
  * @date: 1/8/21
  * description：普通view的canvas动画
  */
-@ObsoleteCoroutinesApi
-@ExperimentalCoroutinesApi
 open class AnimView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr), IAnimView {
@@ -29,7 +26,7 @@ open class AnimView @JvmOverloads constructor(
             background.invalidateSelf()
         }
         background = AnimViewDrawable {
-            helper.drawAnim(it, frameCount, curFrameTime)
+            drawAnim(it, frameCount, curFrameTime)
         }
     }
 
@@ -50,6 +47,13 @@ open class AnimView @JvmOverloads constructor(
      */
     override fun endAnimation() {
         helper.endAnimation()
+    }
+
+    /**
+     * open drawAnim方法
+     */
+    open fun drawAnim(canvas: Canvas?, framePositionCount: Int, frameTime: Long) {
+        helper.drawAnim(canvas, framePositionCount, frameTime)
     }
 
     /**

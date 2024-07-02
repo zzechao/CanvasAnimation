@@ -134,8 +134,8 @@ class AnimViewHelper(var isSurfaceView: Boolean = false, private val doFrame: Do
         return false
     }
 
-    fun drawAnim(canvas: Canvas?, framePositionCount: Int, frameTime: Long) {
-        canvas ?: return
+    fun drawAnim(canvas: Canvas?, framePositionCount: Int, frameTime: Long): Boolean {
+        canvas ?: return false
         val doubleLinkedReference = mTouchPointF?.let {
             DoubleLinkedReference(it)
         }
@@ -143,6 +143,7 @@ class AnimViewHelper(var isSurfaceView: Boolean = false, private val doFrame: Do
             it.value.draw(canvas, pathObjectDeal, framePositionCount, frameTime, doubleLinkedReference)
         }
         mTouchPointF = null
+        return pathObjectDeal.animDrawObjects.isNotEmpty()
     }
 
     private fun checkInMainThread(block: () -> Unit) {
