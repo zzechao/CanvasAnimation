@@ -1,10 +1,12 @@
-package com.base.animation.item
+package com.base.canvasanimation
 
 import android.animation.TypeEvaluator
 import android.graphics.PointF
 import android.view.animation.BaseInterpolator
 import com.base.animation.DisplayObject
 import com.base.animation.helper.data.PathProcess
+import com.base.animation.item.BaseDisplayItem
+import com.base.animation.item.BitmapDisplayItem
 import com.base.animation.model.AnimDrawObject
 import com.base.animation.node.IAnimNode
 import com.base.animation.node.IXmlDrawableNodeDealIntercept

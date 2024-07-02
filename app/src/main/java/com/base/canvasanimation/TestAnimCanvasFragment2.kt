@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.PointF
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +16,6 @@ import com.base.animation.BitmapLoader
 import com.base.animation.IAnimListener
 import com.base.animation.OnAnimItemClick
 import com.base.animation.item.BitmapDisplayItem
-import com.base.animation.item.imageBezierNode
 import com.base.animation.model.AnimDrawObject
 import com.base.animation.xml.AnimDecoder2
 import com.base.animation.xml.AnimEncoder
@@ -355,13 +355,13 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick, IAnimListener {
     private fun startAnimRain() {
         val size = 300
         val url = "https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png"
-        val width = DisplayUtils.getScreenWidth(this.activity).toFloat()
         val height = DisplayUtils.getScreenHeight(this.activity).toFloat()
-        val indexSize = 30
-        val checkOverlapping = mutableMapOf<Int, Long>()
+        val indexSize = 20
+        val checkOverlapping = mutableMapOf<Long, Int>()
         for (i in 0 until indexSize) {
-            var time = (0L..15000L).random()
-            val itemLocationX = (size / 2..(width - size / 2).toInt()).random()
+            val locationX = getLocationX(size, 3000L, 200L, checkOverlapping)
+            checkOverlapping[locationX.delayTime] = locationX.itemLocationX
+
             val node = AnimEncoder().buildAnimNode {
                 imageNode {
                     this.url = url
@@ -369,38 +369,24 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick, IAnimListener {
                     this.clickable = true
                     this.extras = "rain"
                     startNode {
-                        point = PointF(itemLocationX.toFloat(), 0f)
+                        point = PointF(locationX.itemLocationX.toFloat(), 0f)
                         scaleX = 1f
                         scaleY = 1f
                         endNode {
-                            point = PointF(itemLocationX.toFloat(), height)
+                            point = PointF(locationX.itemLocationX.toFloat(), height)
                             scaleX = 1f
                             scaleY = 1f
-                            durTime = 5000L
+                            durTime = 1000L
                             interpolator = InterpolatorEnum.Linear.type
                         }
                     }
                 }
             }
 
-            val timesList = checkOverlapping.mapNotNull {
-                var value = 0L
-                if (it.key in (itemLocationX - size)..(itemLocationX + size)) {
-                    value = it.value
-                }
-                value
-            }.filter { it != 0L }
-            if (timesList.isNotEmpty()) {
-                var hasTime = timesList.firstOrNull { (abs(time - it) < 500L) } != null
-                while (hasTime) {
-                    time = (0L..15000L).random()
-                    hasTime = timesList.firstOrNull { (abs(time - it) < 500L) } != null
-                }
-            }
-            checkOverlapping[itemLocationX] = time
+
 
             lifecycleScope.launch {
-                delay(time)
+                delay(locationX.delayTime)
                 anim_surface ?: return@launch
                 AnimDecoder2.suspendPlayAnimWithAnimNode(anim_surface, node) { node, displayItem ->
                     when (displayItem) {
@@ -413,6 +399,38 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick, IAnimListener {
             }
         }
     }
+
+    private fun getLocationX(size: Int, totalTime: Long, duringTime: Long, checkOverlapping: MutableMap<Long, Int>): LocationX {
+        val width = DisplayUtils.getScreenWidth(this.activity)
+        var time = (0L..totalTime).random()
+        var itemLocationX = (size / 2..(width - size / 2)).random()
+        var timeList = checkOverlapping.filter { abs(it.key - time) < duringTime }
+        Log.i("ttt", "timeList:${timeList.size}")
+        while (timeList.size > 2) {
+            time = (0L..totalTime).random()
+            timeList = checkOverlapping.filter { abs(it.key - time) < duringTime }
+            Log.i("ttt", "update timeList:${timeList.size}")
+        }
+        Log.i("ttt", "itemLocationX:$itemLocationX time:$time")
+        var itemList = timeList.filter { abs(itemLocationX - it.value) < size / 2 }
+        Log.i("ttt", "itemList:${itemList.size}")
+        var i = 0
+        while (itemList.isNotEmpty()) {
+            itemLocationX = (size / 2..(width - size / 2)).random()
+            itemList = timeList.filter { abs(itemLocationX - it.value) < size / 2 }
+            i++
+            if (i > 5) {
+                return getLocationX(size, totalTime, duringTime, checkOverlapping)
+            }
+            Log.i("ttt", "update itemList:${itemList.size} itemLocationX:$itemLocationX timeList:${timeList.values.map { it.toString() }}")
+        }
+
+        return LocationX().apply {
+            this.itemLocationX = itemLocationX
+            this.delayTime = time
+        }
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -448,7 +466,7 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick, IAnimListener {
                         point = PointF(width / 2f, height)
                         scaleX = 1f
                         scaleY = 1f
-                        durTime = 2000L
+                        durTime = 1000L
                         interpolator = InterpolatorEnum.Linear.type
                     }
                 }
@@ -465,5 +483,10 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick, IAnimListener {
                 displayItem
             }
         }
+    }
+
+    inner class LocationX {
+        var itemLocationX: Int = -1
+        var delayTime: Long = 0L
     }
 }
