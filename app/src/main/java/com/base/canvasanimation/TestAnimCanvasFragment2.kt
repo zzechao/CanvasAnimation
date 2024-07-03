@@ -112,7 +112,7 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick {
 
         anim_2?.setOnClickListener {
             lifecycleScope.launch {
-                repeat(200) {
+                repeat(100) {
                     startMoreAnim2()
                     delay(50)
                 }
