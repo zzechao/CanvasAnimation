@@ -25,7 +25,7 @@ class DrawObject2(val animId: Long, override val extra: String) : BaseAnimDrawOb
     var curDisplayItemId = ""
     var displayItem: BaseDisplayItem? = null
 
-    override fun draw(canvas: Canvas, pathObjectDeal: IPathObjectDeal, framePositionCount: Int, frameTime: Long, touchPoint: DoubleLinkedReference<PointF>?) {
+    override fun draw(canvas: Canvas, pathObjectDeal: IPathObjectDeal, framePositionCount: Int, frameTime: Long) {
         var updateCurrencyPosition = true
         if (currencyPosition == 0 && status == Status.INIT) {
             status = Status.START
@@ -63,9 +63,6 @@ class DrawObject2(val animId: Long, override val extra: String) : BaseAnimDrawOb
                     canvas, drawObject.current.point.x, drawObject.current.point.y, drawObject.current.alpha,
                     drawObject.current.scaleX, drawObject.current.scaleY, drawObject.current.rotation
                 )
-                if (drawObject.clickable && touchPoint != null && pathObjectDeal.onItemListener != null) {
-                    touch(animId, pathObjectDeal.onItemListener!!, drawObject.current, touchPoint, drawObject.extra)
-                }
             }
             if (drawObject.curTotalTime < drawObject.durTime) {
                 updateCurrencyPosition = false
@@ -80,6 +77,20 @@ class DrawObject2(val animId: Long, override val extra: String) : BaseAnimDrawOb
                 it.onEndAnim(animId, extra)
             }
             pathObjectDeal.removeAnimId(animId)
+        }
+    }
+
+    override fun touch(pathObjectDeal: IPathObjectDeal, touchPoint: DoubleLinkedReference<PointF>?) {
+        if (status == Status.START || status == Status.DRAWING) {
+            animDraws[currencyPosition]?.forEach { drawObject ->
+                if (drawObject.clickable && touchPoint != null && pathObjectDeal.onItemListener != null) {
+                    if (drawObject.start.displayItemId != curDisplayItemId || displayItem == null) {
+                        curDisplayItemId = drawObject.start.displayItemId
+                        displayItem = pathObjectDeal.getDisplayItem(drawObject.start.displayItemId)
+                    }
+                    displayItem?.touch(animId, pathObjectDeal.onItemListener!!, drawObject.current, touchPoint, drawObject.extra)
+                }
+            }
         }
     }
 }

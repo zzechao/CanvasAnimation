@@ -65,7 +65,7 @@ class ImageBezierNode : ImageNode(), IXmlDrawableNodeDealIntercept {
         override fun calculate(pathProcess: PathProcess, current: AnimDrawObject, interpolator: BaseInterpolator) {
             super.calculate(pathProcess, current, interpolator)
             val controlPointFX = (pathProcess.end.point.x + pathProcess.start.point.x) / 2
-            val controlPointFY = pathProcess.start.point.y
+            val controlPointFY = pathProcess.start.point.y + pathProcess.start.point.y / 10
             controlPointF = PointF(controlPointFX, controlPointFY)
             val p = pathProcess.curTotalTime / pathProcess.durTime
             val interP = pathProcess.interpolator.getInterpolation(p)

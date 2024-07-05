@@ -15,7 +15,8 @@ abstract class BaseAnimDrawObject(open val extra: String) {
         canvas: Canvas,
         pathObjectDeal: IPathObjectDeal,
         framePositionCount: Int,
-        frameTime: Long,
-        touchPoint: DoubleLinkedReference<PointF>? = null
+        frameTime: Long
     )
+
+    abstract fun touch(pathObjectDeal: IPathObjectDeal, touchPoint: DoubleLinkedReference<PointF>?)
 }

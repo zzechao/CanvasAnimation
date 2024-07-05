@@ -392,17 +392,16 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick {
      */
     private fun startAnimRain() {
         val size = 300
-        val url = "https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png"
         val height = DisplayUtils.getScreenHeight(this.activity).toFloat()
         val indexSize = 20
         val checkOverlapping = mutableMapOf<Long, Int>()
         for (i in 0 until indexSize) {
-            val locationX = getLocationX(size, 3000L, 300L, checkOverlapping)
+            val locationX = getLocationX(size, 3000L, 0L, checkOverlapping)
             checkOverlapping[locationX.delayTime] = locationX.itemLocationX
 
             val node = AnimEncoder().buildAnimNode {
                 imageNode {
-                    this.url = url
+                    this.url = "${R.mipmap.red}"
                     this.displayHeightSize = size
                     this.clickable = true
                     this.extras = "rain"

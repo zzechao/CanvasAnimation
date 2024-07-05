@@ -140,9 +140,16 @@ class AnimViewHelper(var isSurfaceView: Boolean = false, private val doFrame: Do
             DoubleLinkedReference(it)
         }
         pathObjectDeal.animDrawObjects.map {
-            it.value.draw(canvas, pathObjectDeal, framePositionCount, frameTime, doubleLinkedReference)
+            it.value.draw(canvas, pathObjectDeal, framePositionCount, frameTime)
         }
-        mTouchPointF = null
+        doubleLinkedReference?.let {
+            val animDrawObjects = pathObjectDeal.animDrawObjects.values.toMutableList()
+            val size = animDrawObjects.size - 1
+            for (index in size downTo 0) {
+                animDrawObjects[index].touch(pathObjectDeal, it)
+            }
+            mTouchPointF = null
+        }
         return pathObjectDeal.animDrawObjects.isNotEmpty()
     }
 

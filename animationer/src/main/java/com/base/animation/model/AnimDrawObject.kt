@@ -25,7 +25,7 @@ class DrawObject(val animId: Long, override val extra: String) : BaseAnimDrawObj
     var curDisplayItemId = ""
     var displayItem: BaseDisplayItem? = null
 
-    override fun draw(canvas: Canvas, pathObjectDeal: IPathObjectDeal, framePositionCount: Int, frameTime: Long, touchPoint: DoubleLinkedReference<PointF>?) {
+    override fun draw(canvas: Canvas, pathObjectDeal: IPathObjectDeal, framePositionCount: Int, frameTime: Long) {
         if ((pathObjectDeal is PathObjectDeal)) {
             if (currencyPosition >= animDraws.size - 1) {
                 currencyPosition = animDraws.size - 1
@@ -55,12 +55,26 @@ class DrawObject(val animId: Long, override val extra: String) : BaseAnimDrawObj
                     }
                     displayItem?.apply {
                         draw(canvas, drawObject.point.x, drawObject.point.y, drawObject.alpha, drawObject.scaleX, drawObject.scaleY, drawObject.rotation)
-                        if (drawObject.clickable && touchPoint != null && pathObjectDeal.onItemListener != null) {
-                            touch(animId, pathObjectDeal.onItemListener!!, drawObject, touchPoint, drawObject.expand)
-                        }
                     }
                 }
                 currencyPosition += framePositionCount
+            }
+        }
+    }
+
+    override fun touch(pathObjectDeal: IPathObjectDeal, touchPoint: DoubleLinkedReference<PointF>?) {
+        if (status == Status.START || status == Status.DRAWING) {
+            val touchPosition = currencyPosition - 1
+            animDraws[touchPosition]?.forEach { drawObject ->
+                if (drawObject.displayItemId != curDisplayItemId || displayItem == null) {
+                    curDisplayItemId = drawObject.displayItemId
+                    displayItem = pathObjectDeal.getDisplayItem(drawObject.displayItemId)
+                }
+                displayItem?.apply {
+                    if (drawObject.clickable && touchPoint != null && pathObjectDeal.onItemListener != null) {
+                        touch(animId, pathObjectDeal.onItemListener!!, drawObject, touchPoint, drawObject.expand)
+                    }
+                }
             }
         }
     }
