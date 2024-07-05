@@ -1,6 +1,5 @@
 package com.base.animation.cache
 
-import android.graphics.Bitmap
 import com.base.animation.Animer
 import com.base.animation.item.BaseDisplayItem
 import com.google.common.cache.CacheBuilder
@@ -27,15 +26,6 @@ class DisplayItemCache {
             .expireAfterAccess(60, TimeUnit.SECONDS)
             .build()
     }
-
-
-    val bitmapCache: com.google.common.cache.Cache<String, Bitmap> =
-        CacheBuilder.newBuilder().concurrencyLevel(4)
-            .maximumSize(20)
-            .initialCapacity(5)
-            .expireAfterWrite(10, TimeUnit.SECONDS)
-            .expireAfterAccess(10, TimeUnit.SECONDS)
-            .build()
 
 
     fun putDisplayItems(displayItems: MutableMap<String, out BaseDisplayItem>) {

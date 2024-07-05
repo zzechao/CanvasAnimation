@@ -2,6 +2,7 @@ package com.base.animation.model
 
 import android.graphics.Canvas
 import android.graphics.PointF
+import android.util.Log
 import com.base.animation.DoubleLinkedReference
 import com.base.animation.helper.IPathObjectDeal
 import com.base.animation.helper.PathObjectDeal
@@ -54,6 +55,7 @@ class DrawObject(val animId: Long, override val extra: String) : BaseAnimDrawObj
                         displayItem = pathObjectDeal.getDisplayItem(drawObject.displayItemId)
                     }
                     displayItem?.apply {
+                        Log.i("zzzc", "${drawObject.rotation}")
                         draw(canvas, drawObject.point.x, drawObject.point.y, drawObject.alpha, drawObject.scaleX, drawObject.scaleY, drawObject.rotation)
                     }
                 }

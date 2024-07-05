@@ -5,14 +5,6 @@ import android.view.animation.BaseInterpolator
 import android.view.animation.LinearInterpolator
 import com.base.animation.Animer
 
-/**
- * @author:zhouzechao
- * @date: 2020/12/8
- * description：动画节点信息
- */
-// 默认拿start的第一个节点信息计算
-const val FIRST_START_POSITION = -1
-
 class PathObject(
     var displayItemId: String,
     var point: PointF = PointF(0f, 0f),
