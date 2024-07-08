@@ -55,7 +55,6 @@ class DrawObject(val animId: Long, override val extra: String) : BaseAnimDrawObj
                         displayItem = pathObjectDeal.getDisplayItem(drawObject.displayItemId)
                     }
                     displayItem?.apply {
-                        Log.i("zzzc", "${drawObject.rotation}")
                         draw(canvas, drawObject.point.x, drawObject.point.y, drawObject.alpha, drawObject.scaleX, drawObject.scaleY, drawObject.rotation)
                     }
                 }

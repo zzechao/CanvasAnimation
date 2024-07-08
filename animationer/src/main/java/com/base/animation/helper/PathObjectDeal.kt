@@ -6,7 +6,6 @@ import com.base.animation.AnimCache
 import com.base.animation.Animer
 import com.base.animation.IAnimListener
 import com.base.animation.OnAnimItemClick
-import com.base.animation.cache.PathCache
 import com.base.animation.fpsTime
 import com.base.animation.helper.data.PathProcess
 import com.base.animation.helper.data.PathProcessItem
@@ -21,8 +20,8 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope.coroutineContext
 import kotlinx.coroutines.channels.actor
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
+import java.security.MessageDigest
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
@@ -38,11 +37,12 @@ class PathObjectDeal : IPathObjectDeal {
 
     private val animDisplayScope = CoroutineScope(Animer.calculationDispatcher)
 
+    private val md by lazy { MessageDigest.getInstance("MD5") }
 
     /**
      * 路径坐标
      */
-    override val animDrawObjects: MutableMap<Long, BaseAnimDrawObject> = ConcurrentHashMap()
+    override val animDrawObjects: ConcurrentHashMap<Long, BaseAnimDrawObject> = ConcurrentHashMap()
 
     /**
      * 点击事件列表
@@ -62,17 +62,13 @@ class PathObjectDeal : IPathObjectDeal {
     private val pathCacheMap: com.google.common.cache.Cache<String,
             MutableMap<Int, MutableList<AnimDrawObject>>> =
         CacheBuilder.newBuilder()
-            .concurrencyLevel(4)
-            .maximumSize(20)
+            .concurrencyLevel(1)
+            .maximumSize(50)
             .initialCapacity(5)
             .expireAfterWrite(60, TimeUnit.SECONDS)
             .expireAfterAccess(60, TimeUnit.SECONDS)
             .build()
 
-    /**
-     * 路径坐标缓存
-     */
-    private val pathCachePools = PathCache()
 
     private var loggingExceptionHandler = CoroutineExceptionHandler { context, throwable ->
         Animer.log.e("CoroutineException", "Coroutine exception occurred. $context", throwable)
@@ -87,141 +83,88 @@ class PathObjectDeal : IPathObjectDeal {
     ) {
         supervisorScope {
             for (animPath in this@actor) {
-                launch(coroutineContext) {
-                    if (animPath.displayItemsMap.isNotEmpty()) {
-                        AnimCache.displayItemCache.putDisplayItems(animPath.displayItemsMap)
-                    }
-                    val cacheKey = pathCachePools.conventKey(fpsTime, animPath)
-                    val drawsMap = mutableMapOf<Int, MutableList<AnimDrawObject>>()
-                    var position = 0
-                    val drawObject = DrawObject(animPath.animId, animPath.expand)
-                    if (pathCacheMap.getIfPresent(cacheKey) != null) {
-                        pathCacheMap.getIfPresent(cacheKey)?.map {
-                            val animDrawObjects = mutableListOf<AnimDrawObject>()
-                            it.value.forEach {
-                                animDrawObjects.add(
-                                    AnimDrawObject(
-                                        displayItemId = "", point = it.point, alpha = it.alpha, scaleX = it.scaleX,
-                                        scaleY = it.scaleY, rotation = it.rotation, clickable = false, expand = ""
+                if (animPath.displayItemsMap.isNotEmpty()) {
+                    AnimCache.displayItemCache.putDisplayItems(animPath.displayItemsMap)
+                }
+                var drawsMap = mutableMapOf<Int, MutableList<AnimDrawObject>>()
+                var position = 0
+                val drawObject = DrawObject(animPath.animId, animPath.expand)
+                for ((index, starts) in animPath.startPoints) {
+                    var startPosition = position
+                    if (starts.isNotEmpty()) {
+                        animPath.animPathMap[index]?.apply {
+                            this.forEachIndexed { index, pathObjectWithDer ->
+                                val duringTime = pathObjectWithDer.during
+                                val times = duringTime * 1f / fpsTime
+                                val start = starts.getOrNull(index) ?: return@forEachIndexed
+
+                                val end = pathObjectWithDer.pathObject
+                                end.getItem(start)
+
+                                val displayItem = animPath.displayItemsMap[start.displayItemId] ?: getDisplayItem(start.displayItemId)
+                                var pathKey = "${fpsTime}_${start.key()}_${end.key()}_${duringTime}_${displayItem?.let { "${it::class.simpleName}_${it.isCalculate}" }}"
+                                pathKey = md.digest(pathKey.toByteArray(Charsets.UTF_8)).toHexString()
+                                drawsMap = pathCacheMap.get(pathKey) {
+                                    Log.i("zzzc", "loader")
+                                    val pathProcessItem = PathProcessItem(
+                                        end.itemX, end.itemY,
+                                        end.itemAlpha, end.itemScaleX, end.itemScaleY,
+                                        end.itemRotation
                                     )
-                                )
-                            }
-                            drawsMap.put(it.key, animDrawObjects)
-                        }
-                        for ((index, starts) in animPath.startPoints) {
-                            var startPosition = position
-                            if (starts.isNotEmpty()) {
-                                animPath.animPathMap[index]?.apply {
-                                    this.forEachIndexed { index, pathObjectWithDer ->
-                                        val duringTime = pathObjectWithDer.during
-                                        val times = duringTime * 1f / fpsTime
-                                        val start = starts.getOrNull(index) ?: return@forEachIndexed
-                                        drawsMap[startPosition]?.map {
-                                            it.displayItemId = start.displayItemId
-                                        }
-                                        for (i in 0..times.toInt()) {
-                                            startPosition++
-                                            drawsMap[startPosition]?.map {
-                                                it.displayItemId = start.displayItemId
-                                                it.clickable = animPath.clickable
-                                                it.expand = animPath.expand
+                                    val pathProcess = PathProcess(
+                                        start.toAnimDrawObject(animPath.clickable, animPath.expand),
+                                        end.toAnimDrawObject(animPath.clickable, animPath.expand),
+                                        start.interpolator, duringTime, item = pathProcessItem,
+                                        current = start.toAnimDrawObject(animPath.clickable, animPath.expand),
+                                        clickable = animPath.clickable, extra = animPath.expand
+                                    )
+                                    for (i in 0..times.toInt()) {
+                                        val p = i * fpsTime / duringTime
+                                        if (displayItem?.isCalculate == true) {
+                                            pathProcess.curTotalTime += fpsTime
+                                            val animDrawObject = AnimDrawObject(start.displayItemId)
+                                            displayItem.calculate(pathProcess, animDrawObject, start.interpolator)
+                                            if (drawsMap[startPosition] == null) {
+                                                drawsMap[startPosition] = mutableListOf()
                                             }
-                                        }
-                                        // 当索引为这轮终点的长度时，如果是进入下一轮计算，否则继续执行这一轮的计算，从这轮的那个position开始计算
-                                        if (index == this.size - 1) {
-                                            position = startPosition
-                                            position++
+                                            drawsMap[startPosition]?.add(animDrawObject)
                                         } else {
-                                            startPosition = position
+                                            val interP = start.interpolator.getInterpolation(p)
+                                            val inPoint = PointF(
+                                                start.point.x + end.itemX * interP, start.point.y + end.itemY * interP
+                                            )
+                                            val animDrawObject = AnimDrawObject(
+                                                start.displayItemId, clickable = animPath.clickable, expand = animPath.expand
+                                            ).apply {
+                                                point = inPoint
+                                                alpha = start.alpha + (end.itemAlpha * interP).toInt()
+                                                scaleX = start.scaleX + end.itemScaleX * interP
+                                                scaleY = start.scaleY + end.itemScaleY * interP
+                                                rotation = start.rotation + end.itemRotation * interP
+                                            }
+                                            if (drawsMap[startPosition] == null) {
+                                                drawsMap[startPosition] = mutableListOf()
+                                            }
+                                            drawsMap[startPosition]?.add(animDrawObject)
                                         }
+                                        startPosition++
                                     }
+                                    // 当索引为这轮终点的长度时，如果是进入下一轮计算，否则继续执行这一轮的计算，从这轮的那个position开始计算
+                                    if (index == this.size - 1) {
+                                        position = startPosition
+                                        position++
+                                    } else {
+                                        startPosition = position
+                                    }
+                                    drawsMap
                                 }
                             }
                         }
-                        drawObject.animDraws = drawsMap
-                        animDrawObjects[drawObject.animId] = drawObject
-                        animDrawIds.add(drawObject.animId)
-                    } else {
-                        for ((index, starts) in animPath.startPoints) {
-                            var startPosition = position
-                            if (starts.isNotEmpty()) {
-                                animPath.animPathMap[index]?.apply {
-                                    this.forEachIndexed { index, pathObjectWithDer ->
-                                        val duringTime = pathObjectWithDer.during
-                                        val times = duringTime * 1f / fpsTime
-                                        val start = starts.getOrNull(index) ?: return@forEachIndexed
-                                        if (drawsMap[startPosition] == null) {
-                                            drawsMap[startPosition] = mutableListOf()
-                                        }
-                                        drawsMap[startPosition]?.add(
-                                            start.toAnimDrawObject(animPath.clickable, animPath.expand)
-                                        )
-                                        val pathObject = pathObjectWithDer.pathObject
-                                        pathObject.getItem(start)
-                                        val displayItem = animPath.displayItemsMap[start.displayItemId] ?: getDisplayItem(start.displayItemId)
-                                        val pathProcessItem = PathProcessItem(
-                                            pathObject.itemX, pathObject.itemY,
-                                            pathObject.itemAlpha, pathObject.itemScaleX, pathObject.itemScaleY,
-                                            pathObject.itemRotation
-                                        )
-                                        val pathProcess = PathProcess(
-                                            start.toAnimDrawObject(animPath.clickable, animPath.expand),
-                                            pathObject.toAnimDrawObject(animPath.clickable, animPath.expand),
-                                            start.interpolator, duringTime, item = pathProcessItem,
-                                            current = start.toAnimDrawObject(animPath.clickable, animPath.expand),
-                                            clickable = animPath.clickable, extra = animPath.expand
-                                        )
-                                        for (i in 0..times.toInt()) {
-                                            startPosition++
-                                            val p = i * fpsTime / duringTime
-                                            if (displayItem?.isCalculate == true) {
-                                                pathProcess.curTotalTime += fpsTime
-                                                val animDrawObject = AnimDrawObject(start.displayItemId)
-                                                displayItem.calculate(pathProcess, animDrawObject, start.interpolator)
-                                                if (drawsMap[startPosition] == null) {
-                                                    drawsMap[startPosition] = mutableListOf()
-                                                }
-                                                drawsMap[startPosition]?.add(animDrawObject)
-                                            } else {
-                                                val interP = start.interpolator.getInterpolation(p)
-                                                val inPoint = PointF(
-                                                    start.point.x + pathObject.itemX * interP, start.point.y + pathObject.itemY * interP
-                                                )
-                                                val animDrawObject = AnimDrawObject(
-                                                    start.displayItemId, clickable = animPath.clickable, expand = animPath.expand
-                                                ).apply {
-                                                    point = inPoint
-                                                    alpha = start.alpha + (pathObject.itemAlpha * interP).toInt()
-                                                    scaleX = start.scaleX + pathObject.itemScaleX * interP
-                                                    scaleY = start.scaleY + pathObject.itemScaleY * interP
-                                                    rotation = start.rotation + pathObject.itemRotation * interP
-                                                }
-                                                if (drawsMap[startPosition] == null) {
-                                                    drawsMap[startPosition] = mutableListOf()
-                                                }
-                                                Log.i("zzzc", "pathObjectDeal 2 animDrawObject.rotation:${animDrawObject.rotation}")
-                                                drawsMap[startPosition]?.add(animDrawObject)
-                                            }
-                                        }
-                                        // 当索引为这轮终点的长度时，如果是进入下一轮计算，否则继续执行这一轮的计算，从这轮的那个position开始计算
-                                        if (index == this.size - 1) {
-                                            position = startPosition
-                                            position++
-                                        } else {
-                                            startPosition = position
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if (cacheKey.isNotEmpty()) {
-                            pathCacheMap.put(cacheKey, drawsMap)
-                        }
-                        drawObject.animDraws = drawsMap
-                        animDrawObjects[drawObject.animId] = drawObject
-                        animDrawIds.add(drawObject.animId)
                     }
                 }
+                drawObject.animDraws = drawsMap
+                animDrawObjects[drawObject.animId] = drawObject
+                animDrawIds.add(drawObject.animId)
             }
         }
     }
@@ -258,6 +201,19 @@ class PathObjectDeal : IPathObjectDeal {
         animListeners.forEach {
             it.onCancelAnim(animId, animObject?.extra ?: "")
         }
+    }
+
+    private fun ByteArray.toHexString(): String {
+        val sb = StringBuffer()
+        for (b in this) {
+            val i = b.toInt() and 0xff
+            var hexString = Integer.toHexString(i)
+            if (hexString.length < 2) {
+                hexString = "0$hexString"
+            }
+            sb.append(hexString)
+        }
+        return sb.toString()
     }
 }
 

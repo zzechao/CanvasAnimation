@@ -139,8 +139,8 @@ class AnimViewHelper(var isSurfaceView: Boolean = false, private val doFrame: Do
         val doubleLinkedReference = mTouchPointF?.let {
             DoubleLinkedReference(it)
         }
-        pathObjectDeal.animDrawObjects.map {
-            it.value.draw(canvas, pathObjectDeal, framePositionCount, frameTime)
+        pathObjectDeal.animDrawObjects.values.forEach {
+            it.draw(canvas, pathObjectDeal, framePositionCount, frameTime)
         }
         doubleLinkedReference?.let {
             val animDrawObjects = pathObjectDeal.animDrawObjects.values.toMutableList()

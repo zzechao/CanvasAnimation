@@ -6,6 +6,7 @@ import com.base.animation.OnAnimItemClick
 import com.base.animation.item.BaseDisplayItem
 import com.base.animation.model.AnimPathObject
 import com.base.animation.model.BaseAnimDrawObject
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * @author:zhouzechao
@@ -13,7 +14,7 @@ import com.base.animation.model.BaseAnimDrawObject
  */
 interface IPathObjectDeal {
 
-    val animDrawObjects: MutableMap<Long, BaseAnimDrawObject>
+    val animDrawObjects: ConcurrentHashMap<Long, BaseAnimDrawObject>
 
     val animListeners: MutableSet<IAnimListener>
 

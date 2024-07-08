@@ -34,7 +34,7 @@ import com.base.animation.xml.AnimEncoder
 import com.base.animation.xml.buildAnimNode
 import com.base.animation.xml.buildString
 import com.base.animation.xml.node.coder.InterpolatorEnum
-import com.base.canvasanimation.TestAnimCanvasFragment2.LocationX
+import com.base.canvasanimation.TestAnimCanvasFragment.LocationX
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -123,7 +123,10 @@ class TestAnimCanvasFragment : Fragment(), OnAnimItemClick {
 
         anim_1?.setOnClickListener {
             lifecycleScope.launch {
-                startAnimRain()
+                repeat(100) {
+                    startMoreAnim21()
+                    delay(50)
+                }
             }
         }
 
@@ -763,6 +766,102 @@ class TestAnimCanvasFragment : Fragment(), OnAnimItemClick {
                     }
                 }
                 displayItem
+            }
+        }
+    }
+
+    private fun startMoreAnim21() {
+        val size = 80
+        val url = "https://turnover-cn.oss-cn-hangzhou.aliyuncs.com/turnover/1670379863915_948.png"
+        AnimEncoder().buildAnimNode {
+            imageNode {
+                this.url = url
+                this.displayHeightSize = size
+                startNode {
+                    point = PointF(0f, 0f)
+                    scaleX = 0f
+                    scaleY = 0f
+                    endNode {
+                        point = PointF(
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                                .toFloat() / 2 - size / 2,
+                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                                .toFloat() / 2 - size / 2
+                        )
+                        scaleX = 2f
+                        scaleY = 2f
+                        durTime = 1000
+                        interpolator = InterpolatorEnum.Decelerate.type
+                    }
+                    endContainer {
+                        durTime = 1000
+                        endNode {
+                            durTime = 500
+                            rotation = 360f
+                            point = PointF(
+                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                                    .toFloat() / 2 - size / 2, 0f
+                            )
+                        }
+                        endNode {
+                            point = PointF(
+                                0f,
+                                DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                                    .toFloat() / 2 - size / 2
+                            )
+                            alpha = 0
+                        }
+                        endNode {
+                            point = PointF(
+                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                                    .toFloat() / 2 - size / 2,
+                                DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                                    .toFloat()
+                            )
+                            scaleX = 0f
+                            scaleY = 0f
+                        }
+                        layoutNode {
+                            this.layoutIdName = "view_test_layout"
+                            endNode {
+                                point = PointF(
+                                    DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
+                                        .toFloat(),
+                                    DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
+                                        .toFloat() / 2 - size / 2
+                                )
+                                durTime = 500
+                                alpha = 0
+                                rotation = 360f
+                                scaleX = 2f
+                                scaleY = 2f
+                            }
+                        }
+                    }
+                }
+            }
+        }.apply {
+            lifecycleScope.launch {
+                anim_surface ?: return@launch
+                AnimDecoder2.suspendPlayAnimWithAnimNode(
+                    anim_surface, this@apply
+                ) { node, displayItem ->
+                    when (displayItem) {
+                        is BitmapDisplayItem -> {
+                            displayItem.mBitmap = suspendCancellableCoroutine {
+                                Glide.with(this@TestAnimCanvasFragment).asBitmap().load(url).into(object : CustomTarget<Bitmap>() {
+                                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                        it.resume(resource)
+                                    }
+
+                                    override fun onLoadCleared(placeholder: Drawable?) {
+                                    }
+                                })
+                            }
+                        }
+                    }
+                    displayItem
+                }
             }
         }
     }

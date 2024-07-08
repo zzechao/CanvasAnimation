@@ -315,9 +315,9 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick {
                         interpolator = InterpolatorEnum.Decelerate.type
                     }
                     endContainer {
-                        durTime = 3000
+                        durTime = 1000
                         endNode {
-                            durTime = 1000
+                            durTime = 500
                             rotation = 360f
                             point = PointF(
                                 DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment2.context)
@@ -351,7 +351,7 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick {
                                     DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment2.context)
                                         .toFloat() / 2 - size / 2
                                 )
-                                durTime = 1000
+                                durTime = 500
                                 alpha = 0
                                 rotation = 360f
                                 scaleX = 2f

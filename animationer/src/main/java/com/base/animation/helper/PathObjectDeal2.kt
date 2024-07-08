@@ -30,7 +30,7 @@ class PathObjectDeal2 : IPathObjectDeal {
     /**
      * 路径坐标
      */
-    override val animDrawObjects: MutableMap<Long, BaseAnimDrawObject> = ConcurrentHashMap()
+    override val animDrawObjects: ConcurrentHashMap<Long, BaseAnimDrawObject> = ConcurrentHashMap()
 
     /**
      * 点击事件列表

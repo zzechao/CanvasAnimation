@@ -58,6 +58,10 @@ class PathObject(
                 "itemScaleY=$itemScaleY, itemRotation=$itemRotation, isInitItem=$isInitItem)"
     }
 
+    fun key(): String {
+        return "x:${point.x}_y:${point.y}_${alpha}_${scaleX}_${scaleY}_${rotation}_${interpolator::javaClass.name}_${displayItemId}"
+    }
+
     fun copy(): PathObject {
         return PathObject(
             this.displayItemId, point, alpha, scaleX,
