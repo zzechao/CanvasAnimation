@@ -118,7 +118,16 @@ class PathObjectDeal : IPathObjectDeal {
                                         current = start.toAnimDrawObject(animPath.clickable, animPath.expand),
                                         clickable = animPath.clickable, extra = animPath.expand
                                     )
+
+                                    if (drawsMap[startPosition] == null) {
+                                        drawsMap[startPosition] = mutableListOf()
+                                    }
+                                    drawsMap[startPosition]?.add(
+                                        start.toAnimDrawObject(animPath.clickable, animPath.expand)
+                                    )
+
                                     for (i in 0..times.toInt()) {
+                                        startPosition++
                                         val p = i * fpsTime / duringTime
                                         if (displayItem?.isCalculate == true) {
                                             pathProcess.curTotalTime += fpsTime
@@ -147,7 +156,7 @@ class PathObjectDeal : IPathObjectDeal {
                                             }
                                             drawsMap[startPosition]?.add(animDrawObject)
                                         }
-                                        startPosition++
+
                                     }
                                     // 当索引为这轮终点的长度时，如果是进入下一轮计算，否则继续执行这一轮的计算，从这轮的那个position开始计算
                                     if (index == this.size - 1) {
