@@ -7,6 +7,9 @@ import android.view.Choreographer
  * @date: 2/8/21
  * description：仿AnimationHandler写的Choreographer处理机制
  */
+
+private const val TAG = "CanvasHandler"
+
 class CanvasHandler {
 
     private var mCanvasCallbacks: CanvasFrameCallback? = null
@@ -38,6 +41,7 @@ class CanvasHandler {
     fun setAnimationFrameCallback(
         callback: CanvasFrameCallback
     ) {
+        Animer.log.i(TAG, "setAnimationFrameCallback $callback")
         if (mCanvasCallbacks == null) {
             lastTime = 0L
             mProvider.postFrameCallback(mFrameCallback)
@@ -46,10 +50,12 @@ class CanvasHandler {
     }
 
     fun removeCallback() {
+        Animer.log.i(TAG, "removeCallback")
         mCanvasCallbacks = null
     }
 
     private fun doAnimationFrame(frameTime: Long) {
+        Animer.log.i(TAG,"doAnimationFrame frameTime:$frameTime")
         mCanvasCallbacks?.doCanvasFrame(frameTime)
     }
 

@@ -48,7 +48,7 @@ class AnimViewHelper(var isSurfaceView: Boolean = false, private val doFrame: Do
 
     private fun onResume() {
         if (isResume.compareAndSet(false, true)) {
-            Animer.log.i(TAG, "onResume")
+            Animer.log.i(TAG, "onResume isSurfaceView:$isSurfaceView")
             if (isSurfaceView) {
                 ChoreographerKT.animViewHandler.post {
                     canvasHandler.setAnimationFrameCallback(this)
@@ -136,19 +136,23 @@ class AnimViewHelper(var isSurfaceView: Boolean = false, private val doFrame: Do
 
     fun drawAnim(canvas: Canvas?, framePositionCount: Int, frameTime: Long): Boolean {
         canvas ?: return false
-        val doubleLinkedReference = mTouchPointF?.let {
-            DoubleLinkedReference(it)
-        }
-        pathObjectDeal.animDrawObjects.values.forEach {
-            it.draw(canvas, pathObjectDeal, framePositionCount, frameTime)
-        }
-        doubleLinkedReference?.let {
-            val animDrawObjects = pathObjectDeal.animDrawObjects.values.toMutableList()
-            val size = animDrawObjects.size - 1
-            for (index in size downTo 0) {
-                animDrawObjects[index].touch(pathObjectDeal, it)
+        if (pathObjectDeal.animDrawObjects.values.isNotEmpty()) {
+            val doubleLinkedReference = mTouchPointF?.let {
+                DoubleLinkedReference(it)
             }
-            mTouchPointF = null
+            pathObjectDeal.animDrawObjects.values.forEach {
+                it.draw(canvas, pathObjectDeal, framePositionCount, frameTime)
+            }
+            doubleLinkedReference?.let {
+                val animDrawObjects = pathObjectDeal.animDrawObjects.values.toMutableList()
+                val size = animDrawObjects.size - 1
+                for (index in size downTo 0) {
+                    animDrawObjects[index].touch(pathObjectDeal, it)
+                }
+                mTouchPointF = null
+            }
+        } else if (frameTime > 0) {
+            pause()
         }
         return pathObjectDeal.animDrawObjects.isNotEmpty()
     }
