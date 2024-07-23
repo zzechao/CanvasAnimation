@@ -1,8 +1,11 @@
 package com.base.animation.node
 
 import android.annotation.SuppressLint
+import android.graphics.Point
+import android.graphics.Rect
 import android.view.View
 import androidx.annotation.CallSuper
+import com.base.animation.AnimCache.pointLayoutIDCache
 import com.base.animation.AnimationEx
 import com.base.animation.Animer
 import com.base.animation.IAnimView
@@ -118,12 +121,21 @@ interface IAnimNode : XmlBaseAnimNode, IXmlObjNodeParser {
         return false
     }
 
-    fun getCenterOfViewLocationInWindow(view: View): IntArray {
+    fun getLayoutIdPoint(idLayout: Int, init: () -> Point): Point {
+        return pointLayoutIDCache[idLayout] ?: init.invoke().apply {
+            pointLayoutIDCache[idLayout] = this
+        }
+    }
+
+    fun getCenterOfViewLocationInScreen(view: View): IntArray {
         val pos = IntArray(2)
-        view.getLocationInWindow(pos)
-        pos[1] = pos[1] - getStatusBarHeight()
-        pos[0] = (pos[0] + view.width / 2f).toInt()
-        pos[1] = (pos[1] + view.height / 2f).toInt()
+        val point = getLayoutIdPoint(view.id) {
+            val globalRect = Rect()
+            view.getGlobalVisibleRect(globalRect)
+            Point(globalRect.centerX(), globalRect.centerY())
+        }
+        pos[0] = point.x
+        pos[1] = point.y
         return pos
     }
 

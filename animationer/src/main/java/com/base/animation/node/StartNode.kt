@@ -67,7 +67,7 @@ class StartNode : IAnimNode {
         ) {
             anim.getViewByAnimName(layoutIdName)?.let { it ->
                 Animer.log.i("StartNode", "getViewByAnimName view attach")
-                getCenterOfViewLocationInWindow(it).let {
+                getCenterOfViewLocationInScreen(it).let {
                     PointF(it[0].toFloat(), it[1].toFloat())
                 }
             } ?: PointF()
