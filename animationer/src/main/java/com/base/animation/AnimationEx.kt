@@ -13,8 +13,11 @@ object AnimationEx {
     var mApplication: Application? = null
     var mode = 1
 
+    /**
+     * @param application 应用的Application
+     */
     fun init(application: Application) {
-        mApplication = application
+        init(application, 50)
     }
 
     /**
