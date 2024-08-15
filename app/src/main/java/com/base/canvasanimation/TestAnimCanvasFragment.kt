@@ -533,10 +533,10 @@ class TestAnimCanvasFragment : Fragment(), OnAnimItemClick {
                     }
                 }
             }
-        }.apply {
+        }.buildString().apply {
             lifecycleScope.launch {
                 anim_surface ?: return@launch
-                AnimDecoder2.suspendPlayAnimWithAnimNode(
+                AnimDecoder2.suspendPlayAnimWithXml(
                     anim_surface, this@apply
                 ) { node, displayItem ->
                     when (displayItem) {
