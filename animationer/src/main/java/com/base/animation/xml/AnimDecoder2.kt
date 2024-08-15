@@ -34,7 +34,7 @@ typealias IDealNodeDealIntercept = suspend (
 
 object AnimDecoder2 {
 
-    private val decoder by lazy {
+    internal val decoder by lazy {
         XmlObjectDecoder().apply {
             registerNodeCreatetor(AnimNode::class.java)
             registerNodeCreatetor(StartNode::class.java)

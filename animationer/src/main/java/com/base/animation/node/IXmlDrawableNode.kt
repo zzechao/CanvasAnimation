@@ -43,5 +43,6 @@ open class IXmlDrawableNode : IAnimNode {
 }
 
 interface IXmlDrawableNodeDealIntercept {
+
     val dealIntercept: IDealNodeDealIntercept
 }
