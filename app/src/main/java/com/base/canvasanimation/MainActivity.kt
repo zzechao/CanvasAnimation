@@ -11,6 +11,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AnimationEx.init(this.application, 200, 1, ImageBezierNode::class.java, ImageDouNode::class.java)
+        AnimationEx.registerNode(ImageDouNode::class.java)
 
         setContentView(R.layout.activity_main)
         bt1.setOnClickListener {

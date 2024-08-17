@@ -57,7 +57,7 @@ dependencies {
         exclude group: "com.android.support"
     }
     implementation "com.android.support:support-fragment:26.1.0"
-    implementation(project(":animationer"))
+    implementation 'io.github.zzechao:canvasanimation:1.0.3.1'
     implementation 'com.github.bumptech.glide:glide:4.15.1'
     kapt 'com.github.bumptech.glide:compiler:4.15.1'
 }

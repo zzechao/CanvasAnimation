@@ -2,7 +2,6 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-apply from: "${rootProject.projectDir}/publish-mavencentral.gradle"
 
 android {
     compileSdkVersion build_version.compile_sdk
@@ -38,6 +37,11 @@ dependencies {
     implementation dep_androidx.fragment_ktx
     implementation dep_androidx.fragment
 }
+
+
+project.version = "1.0.3.1"
+apply from: "${rootProject.projectDir}/publish-mavencentral.gradle"
+
 
 //uploadArchives {
 //    repositories {

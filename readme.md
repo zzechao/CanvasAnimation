@@ -31,20 +31,26 @@
 model build.gradle添加
 
 ```groovy
-     implementation "io.github.zzechao:canvasanimation:1.0.3"
+     implementation "io.github.zzechao:canvasanimation:1.0.3.1"
 ```
 
-当前版本：1.0.3
+当前版本：1.0.3.1
 
 ### 动画库初始化
 
 ```kotlin
     /**
-     * application 应用的Application
-     * displayMaxCacheSize 缓存display的大小（这里有DisplayItem的重用逻辑，根据内部声称key）
-     * mode 模式1：计算动画节点预先处理，模式2：计算动画节点，根据每帧时长实时计算
+     * @param application 应用的Application
+     * @param displayMaxCacheSize 缓存display的大小（这里有DisplayItem的重用逻辑，根据内部声称key）
+     * @param mode 模式1：计算动画节点预先处理，模式2：计算动画节点，根据每帧时长实时计算
+     * @param nodeClazzs 解码器节点的注册(节点class),xml要使用自定义displayItem的节点就要先注册，这样才能解析出node树
      */
-    AnimationEx.init(this.application, 200, 2)
+    AnimationEx.init(this.application, 200, 2, ImageBezierNode::class.java, ImageDouNode::class.java)
+
+    /**
+     * @param nodeClazz - 节点class 解码器节点的注册(节点class),xml要使用自定义displayItem的节点就要先注册，这样才能解析出node树
+     */
+    AnimationEx.registerNode(ImageDouNode::class.java)
 ```
 
 ### 构建动画的节点（代码构建）
