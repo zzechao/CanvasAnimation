@@ -16,15 +16,6 @@ ext {
     PUBLISH_ARTIFACT_ID = 'canvasanimation'
 }
 
-//--- 修改配置二 ---
-ext["signing.keyId"] = 'EA331011'
-//ext["signing.keyId"] = 'DE3381FC'
-ext["signing.password"] = '12345678'
-ext["signing.secretKeyRingFile"] = 'D:\\secring.gpg'
-ext["ossrhUsername"] = "FHJ43aVm"
-ext["ossrhPassword"] = "PT9sWYg1/0N4IhGt10jq6RE3wzTf1Dcv1CbHO5cZB5PE"
-
-
 File secretPropsFile = project.rootProject.file('local.properties')
 if (secretPropsFile.exists()) {
     println "Found secret props file, loading props"
