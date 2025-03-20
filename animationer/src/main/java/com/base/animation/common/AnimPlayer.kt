@@ -1,9 +1,11 @@
-package com.base.animation
+package com.base.animation.common
 
 import android.graphics.Canvas
 import android.graphics.PointF
 import android.os.Looper
 import android.view.MotionEvent
+import android.view.View
+import com.base.animation.*
 import com.base.animation.helper.PathObjectDeal
 import com.base.animation.helper.PathObjectDeal2
 import com.base.animation.model.AnimDrawObject
@@ -11,19 +13,18 @@ import com.base.animation.model.AnimPathObject
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Time:2022/4/15 12:36 下午
- * Author: zhouzechao
- * Description:
+ * @author zzechao
+ * @date 2025/3/20 11:10
  */
-typealias DoFrameFps = (framePositionCount: Int, frameTime: Long) -> Unit
-
-class AnimViewHelper(var isSurfaceView: Boolean = false, private val doFrame: DoFrameFps) : IAnimView, CanvasHandler.CanvasFrameCallback {
-    private val TAG = "AnimViewHelper"
-
-    private val canvasHandler by lazy {
-        CanvasHandler()
+open class AnimPlayer(
+    private var isMainHandler: Boolean = true
+) : IAnimView {
+    companion object {
+        private const val TAG = "AnimPlayer"
     }
 
+    private val canvasHandler by lazy { CanvasHandler() }
+    private var callback: CanvasHandler.CanvasFrameCallback? = null
 
     private var isResume = AtomicBoolean(false)
     private var mTouchPointF: PointF? = null
@@ -32,39 +33,39 @@ class AnimViewHelper(var isSurfaceView: Boolean = false, private val doFrame: Do
      * pathObject转化
      */
     private val pathObjectDeal by lazy {
-        if (AnimationEx.mode == 1) {
-            PathObjectDeal()
-        } else {
-            PathObjectDeal2()
+        if (AnimationEx.mode == 1) PathObjectDeal {
+            onResume()
+        } else PathObjectDeal2 {
+            onResume()
         }
     }
 
     override fun resume() {
-        Animer.log.i(TAG, "resume hasTask:${pathObjectDeal.hasTask()} isResume:$isResume")
         if (pathObjectDeal.hasTask()) {
             onResume()
         }
     }
 
+    fun setCanvasFrameCallback(callback: CanvasHandler.CanvasFrameCallback?) {
+        this.callback = callback
+    }
+
     private fun onResume() {
+        Animer.log.i(TAG, "onResume isSurfaceView:$isMainHandler $callback")
+        val callback = callback ?: return
         if (isResume.compareAndSet(false, true)) {
-            Animer.log.i(TAG, "onResume isSurfaceView:$isSurfaceView")
-            if (isSurfaceView) {
-                ChoreographerKT.animViewHandler.post {
-                    canvasHandler.setAnimationFrameCallback(this)
-                }
+            Animer.log.i(TAG, "onResume isSurfaceView:$isMainHandler $callback")
+            if (isMainHandler) {
+                ChoreographerKT.mainHandler.post { canvasHandler.setAnimationFrameCallback(callback) }
             } else {
-                ChoreographerKT.mainHandler.post {
-                    canvasHandler.setAnimationFrameCallback(this)
-                }
+                ChoreographerKT.animViewHandler.post { canvasHandler.setAnimationFrameCallback(callback) }
             }
         }
     }
 
     override fun pause() {
-        if (isResume.compareAndSet(true, false)) {
-            canvasHandler.removeCallback()
-        }
+        isResume.getAndSet(false)
+        canvasHandler.removeCallback()
     }
 
     override fun endAnimation() {
@@ -73,7 +74,6 @@ class AnimViewHelper(var isSurfaceView: Boolean = false, private val doFrame: Do
 
     override fun addAnimDisplay(animPathObject: AnimPathObject) {
         pathObjectDeal.sendAnimPath(animPathObject)
-        onResume()
     }
 
     override fun removeAnimId(animId: Long) {
@@ -106,26 +106,14 @@ class AnimViewHelper(var isSurfaceView: Boolean = false, private val doFrame: Do
         }
     }
 
-    override fun doCanvasFrame(frameTime: Long): Boolean {
-        val framePositionCount = if (frameTime == 0L) {
-            1
-        } else {
-            val framePositionCount = frameTime / fpsTime
-            if (framePositionCount <= 1) {
-                1
-            } else {
-                framePositionCount.toInt()
-            }
-        }
-        doFrame.invoke(framePositionCount, frameTime)
-        return true
-    }
+    override fun getView(): View? = null
 
-    fun touchEvent(event: MotionEvent): Boolean {
+    override fun getViewByAnimName(name: String): View? = null
+
+    override fun touchAnimEvent(event: MotionEvent): Boolean {
         Animer.log.i(TAG, "onTouchEvent $event")
         when (event.actionMasked) {
-            MotionEvent.ACTION_DOWN,
-            MotionEvent.ACTION_POINTER_DOWN -> {
+            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> {
                 val index = event.actionIndex
                 val (xPos: Float, yPos: Float) = event.getX(index) to event.getY(index)
                 mTouchPointF = PointF(xPos, yPos)
@@ -134,27 +122,23 @@ class AnimViewHelper(var isSurfaceView: Boolean = false, private val doFrame: Do
         return false
     }
 
-    fun drawAnim(canvas: Canvas?, framePositionCount: Int, frameTime: Long): Boolean {
-        canvas ?: return false
-        if (pathObjectDeal.animDrawObjects.values.isNotEmpty()) {
-            val doubleLinkedReference = mTouchPointF?.let {
-                DoubleLinkedReference(it)
-            }
-            pathObjectDeal.animDrawObjects.values.forEach {
-                it.draw(canvas, pathObjectDeal, framePositionCount, frameTime)
-            }
-            doubleLinkedReference?.let {
-                val animDrawObjects = pathObjectDeal.animDrawObjects.values.toMutableList()
-                val size = animDrawObjects.size - 1
+    override fun drawAnim(canvas: Canvas?, framePositionCount: Int, frameTime: Long) {
+        canvas ?: return
+        val ids = pathObjectDeal.animDrawIds.toList()
+        val data = pathObjectDeal.animDrawObjects.toMap()
+        if (ids.isNotEmpty()) {
+            ids.forEach { data[it]?.draw(canvas, pathObjectDeal, framePositionCount, frameTime) }
+            mTouchPointF?.let { DoubleLinkedReference(it) }?.let {
+                val size = ids.size - 1
                 for (index in size downTo 0) {
-                    animDrawObjects[index].touch(pathObjectDeal, it)
+                    data[ids[index]]?.touch(pathObjectDeal, it)
                 }
                 mTouchPointF = null
             }
         } else if (frameTime > 0) {
             pause()
+            pathObjectDeal.animDrawObjects.clear()
         }
-        return pathObjectDeal.animDrawObjects.isNotEmpty()
     }
 
     private fun checkInMainThread(block: () -> Unit) {

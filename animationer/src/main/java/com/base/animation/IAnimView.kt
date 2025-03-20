@@ -1,6 +1,9 @@
 package com.base.animation
 
+import android.graphics.Canvas
+import android.view.MotionEvent
 import android.view.View
+import com.base.animation.AnimView.Companion
 import com.base.animation.model.AnimPathObject
 
 /**
@@ -26,11 +29,11 @@ interface IAnimView {
 
     fun setOnItemClick(onItemClick: OnAnimItemClick?)
 
-    fun getView(): View? {
-        return null
-    }
+    fun getView(): View?
 
-    fun getViewByAnimName(name: String): View? {
-        return null
-    }
+    fun getViewByAnimName(name: String): View?
+
+    fun drawAnim(canvas: Canvas?, framePositionCount: Int, frameTime: Long)
+
+    fun touchAnimEvent(event: MotionEvent): Boolean
 }

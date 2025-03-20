@@ -5,7 +5,7 @@ import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import com.base.animation.model.AnimPathObject
+import com.base.animation.common.AnimPlayer
 
 /**
  * @author:zhouzechao
@@ -13,73 +13,37 @@ import com.base.animation.model.AnimPathObject
  * description：普通view的canvas动画
  */
 open class AnimView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr), IAnimView {
-    private val helper: AnimViewHelper
+    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0, private val player: AnimPlayer = AnimPlayer()
+) : View(context, attrs, defStyleAttr), IAnimView by player, CanvasHandler.CanvasFrameCallback {
+    companion object {
+        private const val TAG = "AnimView"
+    }
+
+    private var frameCount: Int = 0
+    private var curFrameTime: Long = 0L
 
     init {
-        var frameCount = 0
-        var curFrameTime = 0L
-        helper = AnimViewHelper(isSurfaceView = false) { framePositionCount, frameTime ->
-            frameCount = framePositionCount
-            curFrameTime = frameTime
-            background.invalidateSelf()
-        }
-        background = AnimViewDrawable {
-            drawAnim(it, frameCount, curFrameTime)
-        }
-    }
-
-    override fun resume() {
-        helper.resume()
-    }
-
-    override fun pause() {
-        helper.pause()
-    }
-
-    override fun removeAnimId(animId: Long) {
-        helper.removeAnimId(animId)
-    }
-
-    /**
-     * 结束动画
-     */
-    override fun endAnimation() {
-        helper.endAnimation()
+        background = AnimViewDrawable { drawAnimFps(it, frameCount, curFrameTime) }
     }
 
     /**
      * open drawAnim方法
      */
-    open fun drawAnim(canvas: Canvas?, framePositionCount: Int, frameTime: Long) {
-        helper.drawAnim(canvas, framePositionCount, frameTime)
+    open fun drawAnimFps(canvas: Canvas?, framePositionCount: Int, frameTime: Long) {
+        drawAnim(canvas, framePositionCount, frameTime)
     }
 
-    /**
-     * 添加动画播放
-     */
-    override fun addAnimDisplay(animPathObject: AnimPathObject) {
-        helper.addAnimDisplay(animPathObject)
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        player.setCanvasFrameCallback(this)
     }
+
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        player.setCanvasFrameCallback(null)
         endAnimation()
     }
-
-    override fun addAnimListener(iAnimListener: IAnimListener) {
-        helper.addAnimListener(iAnimListener)
-    }
-
-    override fun removeAnimListener(iAnimListener: IAnimListener?) {
-        helper.removeAnimListener(iAnimListener)
-    }
-
-    override fun setOnItemClick(onItemClick: OnAnimItemClick?) {
-        helper.setOnItemClick(onItemClick)
-    }
-
 
     override fun getView(): View {
         return this
@@ -90,12 +54,9 @@ open class AnimView @JvmOverloads constructor(
             Animer.log.e("AnimView", "getViewByAnimName name:$name")
         }) {
             val context = AnimationEx.mApplication ?: return@tryCatch null
-            val id =
-                context.resources.getIdentifier(
-                    name,
-                    "id",
-                    context.packageName
-                )
+            val id = context.resources.getIdentifier(
+                name, "id", context.packageName
+            )
             this.findFragmentOfGivenView()?.let {
                 it.view?.findViewById<View>(id)
             } ?: this.getFragmentActivity()?.findViewById(id)
@@ -103,9 +64,24 @@ open class AnimView @JvmOverloads constructor(
     }
 
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
-        if (event != null) {
-            helper.touchEvent(event)
-        }
+        if (event != null) touchAnimEvent(event)
         return super.dispatchTouchEvent(event)
+    }
+
+    override fun doCanvasFrame(frameTime: Long): Boolean {
+        val framePositionCount = if (frameTime == 0L) {
+            1
+        } else {
+            val framePositionCount = frameTime / fpsTime
+            if (framePositionCount <= 1) {
+                1
+            } else {
+                framePositionCount.toInt()
+            }
+        }
+        frameCount = framePositionCount
+        curFrameTime = frameTime
+        background.invalidateSelf()
+        return true
     }
 }

@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit
  */
 const val TAG = "PathObjectDeal"
 
-class PathObjectDeal : IPathObjectDeal {
+class PathObjectDeal(parserEnd: () -> Unit) : IPathObjectDeal {
 
     private val animDisplayScope = CoroutineScope(Animer.calculationDispatcher)
 
@@ -42,6 +42,7 @@ class PathObjectDeal : IPathObjectDeal {
     /**
      * 路径坐标
      */
+    override val animDrawIds: MutableList<Long> = mutableListOf()
     override val animDrawObjects: ConcurrentHashMap<Long, BaseAnimDrawObject> = ConcurrentHashMap()
 
     /**
@@ -54,20 +55,10 @@ class PathObjectDeal : IPathObjectDeal {
      */
     override val animListeners = mutableSetOf<IAnimListener>()
 
-    private val animDrawIds: CopyOnWriteArrayList<Long> = CopyOnWriteArrayList()
-
     /**
      * 路径缓存
      */
-    private val pathCacheMap: com.google.common.cache.Cache<String,
-            MutableMap<Int, MutableList<AnimDrawObject>>> =
-        CacheBuilder.newBuilder()
-            .concurrencyLevel(1)
-            .maximumSize(50)
-            .initialCapacity(5)
-            .expireAfterWrite(60, TimeUnit.SECONDS)
-            .expireAfterAccess(60, TimeUnit.SECONDS)
-            .build()
+    private val pathCacheMap: com.google.common.cache.Cache<String, MutableMap<Int, MutableList<AnimDrawObject>>> = CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(50).initialCapacity(5).expireAfterWrite(60, TimeUnit.SECONDS).expireAfterAccess(60, TimeUnit.SECONDS).build()
 
 
     private var loggingExceptionHandler = CoroutineExceptionHandler { context, throwable ->
@@ -78,8 +69,7 @@ class PathObjectDeal : IPathObjectDeal {
      * 计算路径上的各个坐标点
      */
     private val animPather = animDisplayScope.actor<AnimPathObject>(
-        coroutineContext + loggingExceptionHandler,
-        capacity = 300
+        coroutineContext + loggingExceptionHandler, capacity = 300
     ) {
         supervisorScope {
             for (animPath in this@actor) {
@@ -107,16 +97,10 @@ class PathObjectDeal : IPathObjectDeal {
                                 drawsMap = pathCacheMap.get(pathKey) {
                                     Log.i("zzzc", "loader")
                                     val pathProcessItem = PathProcessItem(
-                                        end.itemX, end.itemY,
-                                        end.itemAlpha, end.itemScaleX, end.itemScaleY,
-                                        end.itemRotation
+                                        end.itemX, end.itemY, end.itemAlpha, end.itemScaleX, end.itemScaleY, end.itemRotation
                                     )
                                     val pathProcess = PathProcess(
-                                        start.toAnimDrawObject(animPath.clickable, animPath.expand),
-                                        end.toAnimDrawObject(animPath.clickable, animPath.expand),
-                                        start.interpolator, duringTime, item = pathProcessItem,
-                                        current = start.toAnimDrawObject(animPath.clickable, animPath.expand),
-                                        clickable = animPath.clickable, extra = animPath.expand
+                                        start.toAnimDrawObject(animPath.clickable, animPath.expand), end.toAnimDrawObject(animPath.clickable, animPath.expand), start.interpolator, duringTime, item = pathProcessItem, current = start.toAnimDrawObject(animPath.clickable, animPath.expand), clickable = animPath.clickable, extra = animPath.expand
                                     )
 
                                     if (drawsMap[startPosition] == null) {
@@ -174,6 +158,7 @@ class PathObjectDeal : IPathObjectDeal {
                 drawObject.animDraws = drawsMap
                 animDrawObjects[drawObject.animId] = drawObject
                 animDrawIds.add(drawObject.animId)
+                parserEnd()
             }
         }
     }
@@ -206,9 +191,12 @@ class PathObjectDeal : IPathObjectDeal {
      */
     override fun removeAnimId(animId: Long) {
         animDrawIds.remove(animId)
-        val animObject = animDrawObjects.remove(animId)
-        animListeners.forEach {
-            it.onCancelAnim(animId, animObject?.extra ?: "")
+        if (animListeners.isNotEmpty()) {
+            val map = animDrawObjects.toMap()
+            animListeners.forEach {
+                val animObject = map[animId]
+                it.onCancelAnim(animId, animObject?.extra ?: "")
+            }
         }
     }
 

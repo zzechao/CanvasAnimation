@@ -469,7 +469,6 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        anim_surface?.endAnimation()
         anim_surface?.removeAnimListener(null)
     }
 

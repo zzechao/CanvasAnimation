@@ -23,13 +23,14 @@ import java.util.concurrent.CopyOnWriteArrayList
  * @author:zhouzechao
  * description：*
  */
-class PathObjectDeal2 : IPathObjectDeal {
+class PathObjectDeal2(parserEnd: () -> Unit) : IPathObjectDeal {
 
     private val animDisplayScope = CoroutineScope(Animer.calculationDispatcher)
 
     /**
      * 路径坐标
      */
+    override val animDrawIds: MutableList<Long> = mutableListOf()
     override val animDrawObjects: ConcurrentHashMap<Long, BaseAnimDrawObject> = ConcurrentHashMap()
 
     /**
@@ -41,8 +42,6 @@ class PathObjectDeal2 : IPathObjectDeal {
      * 动画事件
      */
     override val animListeners = mutableSetOf<IAnimListener>()
-
-    private val animDrawIds: CopyOnWriteArrayList<Long> = CopyOnWriteArrayList()
 
     private var loggingExceptionHandler = CoroutineExceptionHandler { context, throwable ->
         Animer.log.e("CoroutineException", "Coroutine exception occurred. $context", throwable)
@@ -93,6 +92,7 @@ class PathObjectDeal2 : IPathObjectDeal {
                     drawObject.animDraws = drawPathProcessMap
                     animDrawObjects[drawObject.animId] = drawObject
                     animDrawIds.add(drawObject.animId)
+                    parserEnd()
                 }
             }
         }
@@ -126,9 +126,12 @@ class PathObjectDeal2 : IPathObjectDeal {
      */
     override fun removeAnimId(animId: Long) {
         animDrawIds.remove(animId)
-        val animObject = animDrawObjects.remove(animId)
-        animListeners.forEach {
-            it.onCancelAnim(animId, animObject?.extra ?: "")
+        if (animListeners.isNotEmpty()) {
+            val map = animDrawObjects.toMap()
+            animListeners.forEach {
+                val animObject = map[animId]
+                it.onCancelAnim(animId, animObject?.extra ?: "")
+            }
         }
     }
 }

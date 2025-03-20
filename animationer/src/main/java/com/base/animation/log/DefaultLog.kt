@@ -27,6 +27,7 @@ open class DefaultLog : ILog {
     }
 
     override fun d(tag: String, message: String) {
+        Log.d(tag, message)
     }
 
     override fun i(tag: String, message: () -> Any?) {

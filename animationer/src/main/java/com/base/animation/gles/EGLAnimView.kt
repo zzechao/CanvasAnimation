@@ -7,7 +7,7 @@ import android.util.AttributeSet
 import android.view.TextureView
 import android.view.View
 import com.base.animation.*
-import com.base.animation.model.AnimPathObject
+import com.base.animation.common.AnimPlayer
 
 /**
  * @author zzechao
@@ -15,9 +15,9 @@ import com.base.animation.model.AnimPathObject
  */
 class EGLAnimView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
-) : TextureView(context, attrs), TextureView.SurfaceTextureListener, IAnimView {
+) : TextureView(context, attrs), TextureView.SurfaceTextureListener, IAnimView by AnimPlayer(false) {
 
-    private val mEGLHelper by lazy { EGLHelper() }
+
 
     init {
         surfaceTextureListener = this
@@ -28,7 +28,6 @@ class EGLAnimView @JvmOverloads constructor(
         GLES20.glViewport(0, 0, width, height)
         GLES20.glClearColor(0f, 0f, 1f, 1f)
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-        mEGLHelper.swapBuffers()
     }
 
 
@@ -36,45 +35,16 @@ class EGLAnimView @JvmOverloads constructor(
         GLES20.glViewport(0, 0, width, height)
         GLES20.glClearColor(0f, 0f, 1f, 1f)
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-        mEGLHelper.swapBuffers()
     }
 
     override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
-        mEGLHelper.destroyEGL()
         return true
     }
 
     override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
-        recreate(surface)
     }
 
     private fun recreate(surface: SurfaceTexture) {
-        mEGLHelper.destroyEGL()
-        mEGLHelper.initEGL(surface)
-    }
-
-    override fun resume() {
-    }
-
-    override fun pause() {
-    }
-
-    override fun endAnimation() {
-    }
-
-    override fun addAnimDisplay(animPathObject: AnimPathObject) {
-    }
-
-    override fun removeAnimId(animId: Long) {
-    }
-
-    override fun addAnimListener(iAnimListener: IAnimListener) {
-    }
-
-    override fun removeAnimListener(iAnimListener: IAnimListener?) {
-    }
-
-    override fun setOnItemClick(onItemClick: OnAnimItemClick?) {
     }
 
     override fun getViewByAnimName(name: String): View? {

@@ -241,10 +241,7 @@ class TestAnimCanvasFragment : Fragment(), OnAnimItemClick {
             Log.i("zzc", this.buildString())
             lifecycleScope.launch(Dispatchers.IO) {
                 anim_surface ?: return@launch
-                AnimDecoder2.suspendPlayAnimWithAnimNode(
-                    anim_surface,
-                    this@apply,
-                ) { node, displayItem ->
+                AnimDecoder2.suspendPlayAnimWithAnimNode(anim_surface, this@apply) { node, displayItem ->
                     when (displayItem) {
                         is BitmapDisplayItem -> {
                             displayItem.mBitmap =
@@ -716,7 +713,6 @@ class TestAnimCanvasFragment : Fragment(), OnAnimItemClick {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        anim_surface?.endAnimation()
         anim_surface?.removeAnimListener(null)
     }
 

@@ -12,21 +12,15 @@ import android.view.Choreographer
  * description：根据是否SurfaceView 区分 post frame的 looper
  */
 object ChoreographerKT {
-
-
     internal val mainHandler = Handler(Looper.getMainLooper())
-    private val mainChoreographer by lazy {
-        Choreographer.getInstance()
-    }
+    private val mainChoreographer by lazy { Choreographer.getInstance() }
 
     internal val animViewHandler: Handler by lazy {
-        val handlerThread = HandlerThread("animViewHelper")
+        val handlerThread = HandlerThread("AnimPlayer_Handler")
         handlerThread.start()
         Handler(handlerThread.looper)
     }
-    private val surfaceViewChoreographer by lazy {
-        Choreographer.getInstance()
-    }
+    private val surfaceViewChoreographer by lazy { Choreographer.getInstance() }
 
     /**
      * 根据不同looper 构造
