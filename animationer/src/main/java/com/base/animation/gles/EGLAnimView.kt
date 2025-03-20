@@ -3,6 +3,7 @@ package com.base.animation.gles
 import android.content.Context
 import android.graphics.SurfaceTexture
 import android.opengl.GLES20
+import android.os.Build
 import android.util.AttributeSet
 import android.view.TextureView
 import android.view.View
@@ -14,8 +15,8 @@ import com.base.animation.common.AnimPlayer
  * @date 2025/3/19 15:46
  */
 class EGLAnimView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null
-) : TextureView(context, attrs), TextureView.SurfaceTextureListener, IAnimView by AnimPlayer(false) {
+    context: Context, attrs: AttributeSet? = null, private val player: EGLAnimPlayer = EGLAnimPlayer()
+) : TextureView(context, attrs), TextureView.SurfaceTextureListener, IAnimView by player {
 
 
 
@@ -24,27 +25,33 @@ class EGLAnimView @JvmOverloads constructor(
     }
 
     override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
-        recreate(surface)
-        GLES20.glViewport(0, 0, width, height)
-        GLES20.glClearColor(0f, 0f, 1f, 1f)
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+        player.onSurfaceTextureAvailable(surface, width, height)
     }
 
 
     override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
-        GLES20.glViewport(0, 0, width, height)
-        GLES20.glClearColor(0f, 0f, 1f, 1f)
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+        player.onSurfaceTextureSizeChanged(surface, width, height)
     }
 
     override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
-        return true
+        return player.onSurfaceTextureDestroyed(surface)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !surfaceTexture.isReleased) {
+            surfaceTexture.release()
+        } else {
+            kotlin.runCatching { surfaceTexture.release() }
+        }
+        endAnimation()
     }
 
     override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
     }
 
-    private fun recreate(surface: SurfaceTexture) {
+    override fun getView(): View {
+        return this
     }
 
     override fun getViewByAnimName(name: String): View? {

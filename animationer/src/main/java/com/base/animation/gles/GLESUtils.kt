@@ -14,7 +14,7 @@ object GLESUtils {
      * @param shaderCode
      * @return
      */
-    fun loadShader(type: Int, shaderCode: String?): Int {
+    fun loadShader(type: Int, shaderCode: String): Int {
         // create a vertex shader type (GLES20.GL_VERTEX_SHADER)
         // or a fragment shader type (GLES20.GL_FRAGMENT_SHADER)
 
