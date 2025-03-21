@@ -43,15 +43,11 @@ class PathObjectDeal2(parserEnd: () -> Unit) : IPathObjectDeal {
      */
     override val animListeners = mutableSetOf<IAnimListener>()
 
-    private var loggingExceptionHandler = CoroutineExceptionHandler { context, throwable ->
-        Animer.log.e("CoroutineException", "Coroutine exception occurred. $context", throwable)
-    }
-
     /**
      * 计算路径上的各个坐标点
      */
     private val animPather = animDisplayScope.actor<AnimPathObject>(
-        Animer.calculationDispatcher + loggingExceptionHandler,
+        Animer.exceptionHandler,
         capacity = 300
     ) {
         supervisorScope {

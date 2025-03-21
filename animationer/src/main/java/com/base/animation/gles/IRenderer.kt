@@ -12,4 +12,6 @@ interface IRenderer {
     fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int)
 
     fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean
+
+    fun onSurfaceTextureUpdated(surface: SurfaceTexture)
 }

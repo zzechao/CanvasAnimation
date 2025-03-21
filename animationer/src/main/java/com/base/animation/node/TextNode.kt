@@ -29,5 +29,13 @@ class TextNode : IXmlDrawableNode() {
     @JvmField
     var fontSize = 10
 
+    @AnimAttributeName("maxWidth", DefaultAttributeCoder::class)
+    @JvmField
+    var maxWidth = -1
+
+    @AnimAttributeName("singleLine", DefaultAttributeCoder::class)
+    @JvmField
+    var singleLine = false
+
     override var displayItem: KClass<out BaseDisplayItem> = StringDisplayItem::class
 }

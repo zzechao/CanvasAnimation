@@ -4,9 +4,8 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.PointF
 import android.os.Build
-import android.text.Layout
-import android.text.StaticLayout
-import android.text.TextPaint
+import android.text.*
+import androidx.core.text.TextDirectionHeuristicsCompat
 import com.base.animation.DoubleLinkedReference
 import com.base.animation.OnAnimItemClick
 import com.base.animation.model.AnimDrawObject
@@ -17,85 +16,55 @@ import com.base.animation.model.AnimDrawObject
  * description：单个view的绘制item
  */
 class StringDisplayItem(
-    override var displayHeight: Int,
-    val message: String,
-    txtColor: Int
+    fontSize: Int, message: String, txtColor: Int, private val maxWidth: Int, private val singleLine: Boolean
 ) : BaseDisplayItem() {
 
     private val paint by lazy {
         TextPaint().apply {
             color = txtColor
             style = Paint.Style.FILL
-            textSize = displayHeight.toFloat()
+            textSize = fontSize.toFloat()
         }
     }
 
     private var txtStaticLayout: StaticLayout? = null
 
     init {
+        displayHeight = fontSize
         displayWidth = displayHeight * message.length
-    }
-
-    override fun draw(
-        canvas: Canvas,
-        x: Float,
-        y: Float,
-        alpha: Int,
-        scaleX: Float,
-        scaleY: Float,
-        rotation: Float
-    ) {
-        if (txtStaticLayout == null) {
-            txtStaticLayout = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                StaticLayout.Builder.obtain(
-                    message,
-                    0,
-                    message.length,
-                    paint,
-                    minOf(displayWidth, canvas.width)
-                ).build()
-            } else {
-                StaticLayout(
-                    message,
-                    paint,
-                    minOf(displayWidth, canvas.width),
-                    Layout.Alignment.ALIGN_NORMAL,
-                    1.0f,
-                    0.0f,
-                    false
-                )
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            txtStaticLayout = StaticLayout.Builder.obtain(
+                message, 0, message.length, paint, if (maxWidth > 0) maxWidth else displayWidth
+            ).apply {
+                if (singleLine) {
+                    setMaxLines(1)
+                    setEllipsize(TextUtils.TruncateAt.END)
+                    setBreakStrategy(Layout.BREAK_STRATEGY_SIMPLE)
+                }
+            }.build()
+        } else if (singleLine) {
+            StaticLayout(
+                message, 0, message.length, paint, if (maxWidth > 0) maxWidth else displayWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false, TextUtils.TruncateAt.END, if (maxWidth > 0) maxWidth else displayWidth
+            )
+        } else {
+            StaticLayout(
+                message, 0, message.length, paint, if (maxWidth > 0) maxWidth else displayWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false
+            )
         }
-        super.draw(canvas, x, y, alpha, scaleX, scaleY, rotation)
     }
 
-    override fun draw(
-        canvas: Canvas,
-        x: Float,
-        y: Float,
-        alpha: Int,
-        scaleX: Float,
-        scaleY: Float
-    ) {
+    override fun drawDisplayItem(canvas: Canvas, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float) {
         txtStaticLayout?.paint?.alpha = alpha
         canvas.translate(x, y)
         txtStaticLayout?.draw(canvas)
     }
 
     override fun getScalePX(scaleX: Float): Float {
-        return displayWidth * 1f / 2
+        return if (maxWidth > 0) maxWidth / 2f else displayWidth / 2f
     }
 
     override fun getScalePY(scaleY: Float): Float {
-        return displayHeight * 1f / 2
-    }
-
-    override fun getRotatePX(rotation: Float, scaleX: Float): Float {
-        return displayWidth * 1f / 2
-    }
-
-    override fun getRotatePY(rotation: Float, scaleY: Float): Float {
-        return displayHeight * 1f / 2
+        return if (maxWidth > 0 && !singleLine) (txtStaticLayout?.lineCount ?: 1) * displayHeight / 2f else displayHeight / 2f
     }
 
     override fun touch(animId: Long, onAnimItemClick: OnAnimItemClick, animDrawObject: AnimDrawObject, touchPoint: DoubleLinkedReference<PointF>, extra: String) {

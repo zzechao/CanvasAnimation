@@ -18,8 +18,6 @@ class EGLAnimView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, private val player: EGLAnimPlayer = EGLAnimPlayer()
 ) : TextureView(context, attrs), TextureView.SurfaceTextureListener, IAnimView by player {
 
-
-
     init {
         surfaceTextureListener = this
     }
@@ -37,17 +35,8 @@ class EGLAnimView @JvmOverloads constructor(
         return player.onSurfaceTextureDestroyed(surface)
     }
 
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !surfaceTexture.isReleased) {
-            surfaceTexture.release()
-        } else {
-            kotlin.runCatching { surfaceTexture.release() }
-        }
-        endAnimation()
-    }
-
     override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
+        player.onSurfaceTextureUpdated(surface)
     }
 
     override fun getView(): View {

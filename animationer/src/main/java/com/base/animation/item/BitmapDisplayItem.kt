@@ -47,51 +47,7 @@ open class BitmapDisplayItem : BaseDisplayItem() {
         mBitmap = bitmap
     }
 
-    override fun draw(
-        canvas: Canvas,
-        x: Float,
-        y: Float,
-        alpha: Int,
-        scaleX: Float,
-        scaleY: Float,
-        rotation: Float
-    ) {
-        canvas.withSave {
-            if (displaySizeSet) {
-                val drawX = x - (displayWidth / scaleX / 2f)
-                val drawY = y - (displayHeight / scaleY / 2f)
-
-                if (rotation != 0f) {
-                    canvas.rotate(
-                        rotation,
-                        drawX + getRotatePX(rotation, scaleX),
-                        drawY + getRotatePY(rotation, scaleY)
-                    )
-                }
-            } else {
-                val drawX = x - (bitmapWidth / 2 / scaleX)
-                val drawY = y - (bitmapHeight / 2 / scaleY)
-                if (rotation != 0f) {
-                    canvas.rotate(
-                        rotation,
-                        drawX + getRotatePX(rotation, scaleX),
-                        drawY + getRotatePY(rotation, scaleY)
-                    )
-                }
-            }
-
-
-            if (scaleX != 1f || scaleY != 1f) {
-                canvas.scale(scaleX, scaleY, x + getScalePX(scaleX), y + getScalePY(scaleY))
-            }
-
-            draw(canvas, x, y, alpha, scaleX, scaleY)
-        }
-    }
-
-    override fun draw(
-        canvas: Canvas, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float
-    ) {
+    override fun drawDisplayItem(canvas: Canvas, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float) {
         mBitmap.takeUnless { mBitmap?.isRecycled == true }?.let {
             paint.alpha = alpha
             mBitmap?.let {
@@ -115,37 +71,12 @@ open class BitmapDisplayItem : BaseDisplayItem() {
     }
 
     override fun getScalePX(scaleX: Float): Float {
-        return if (displaySizeSet) {
-            displayWidth * 1f / 2
-        } else {
-            bitmapWidth * 1f / 2
-        }
+        return if (displaySizeSet) displayWidth / 2f else bitmapWidth / 2f
     }
 
     override fun getScalePY(scaleY: Float): Float {
-        return if (displaySizeSet) {
-            displayHeight * 1f / 2
-        } else {
-            bitmapHeight * 1f / 2
-        }
+        return if (displaySizeSet) displayHeight / 2f else bitmapHeight / 2f
     }
-
-    override fun getRotatePX(rotation: Float, scaleX: Float): Float {
-        return if (displaySizeSet) {
-            displayWidth / scaleX / 2f
-        } else {
-            bitmapWidth / scaleX / 2f
-        }
-    }
-
-    override fun getRotatePY(rotation: Float, scaleY: Float): Float {
-        return if (displaySizeSet) {
-            displayHeight / scaleY / 2f
-        } else {
-            bitmapHeight / scaleY / 2f
-        }
-    }
-
 
     override fun touch(animId: Long, onAnimItemClick: OnAnimItemClick, animDrawObject: AnimDrawObject, touchPoint: DoubleLinkedReference<PointF>, extra: String) {
         var displayWidth = bitmapWidth.toFloat()

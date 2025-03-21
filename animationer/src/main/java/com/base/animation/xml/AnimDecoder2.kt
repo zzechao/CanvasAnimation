@@ -140,7 +140,7 @@ object AnimDecoder2 {
                     key = key, kClass = animNode.displayItem
                 ) {
                     val stringDisplayItem = StringDisplayItem(
-                        animNode.fontSize, animNode.txt, animNode.color
+                        animNode.fontSize, animNode.txt, animNode.color, animNode.maxWidth, animNode.singleLine
                     )
                     dealDisplayItem.invoke(
                         animNode, stringDisplayItem

@@ -6,14 +6,14 @@ package com.base.animation.gles
  */
 class EGLAnimShader {
     // 顶点着色器代码
-    private val vertexShaderCode = """attribute vec4 vPosition;
+    val vertexShaderCode = """attribute vec4 vPosition;
         void main() {
           gl_Position = vPosition;
         }
         """
 
     // 片段着色器代码
-    private val fragmentShaderCode = """precision mediump float;
+    val fragmentShaderCode = """precision mediump float;
         uniform vec4 vColor;
         void main() {
           gl_FragColor = vColor;

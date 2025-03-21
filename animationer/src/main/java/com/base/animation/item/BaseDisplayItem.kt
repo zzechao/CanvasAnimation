@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.PointF
 import androidx.annotation.CallSuper
 import androidx.core.graphics.withSave
+import com.base.animation.Animer.animDisplayId
 import com.base.animation.DoubleLinkedReference
 import com.base.animation.IDisplayItem
 import com.base.animation.OnAnimItemClick
@@ -31,16 +32,13 @@ abstract class BaseDisplayItem : IDisplayItem, IRecycle {
         rotation: Float
     ) {
         canvas.withSave {
+            if (rotation != 0f) {
+                canvas.rotate(rotation, x + getRotatePX(rotation, scaleX), y + getRotatePY(rotation, scaleY))
+            }
             if (scaleX != 1f || scaleY != 1f) {
                 canvas.scale(scaleX, scaleY, x + getScalePX(scaleX), y + getScalePY(scaleY))
             }
-            if (rotation != 0f) {
-                canvas.rotate(
-                    rotation, x + getRotatePX(rotation, scaleX),
-                    y + getRotatePY(rotation, scaleY)
-                )
-            }
-            draw(canvas, x, y, alpha, scaleX, scaleY)
+            drawDisplayItem(canvas, x, y, alpha, scaleX, scaleY)
         }
     }
 
@@ -83,7 +81,5 @@ abstract class BaseDisplayItem : IDisplayItem, IRecycle {
         return 0f
     }
 
-    abstract fun draw(canvas: Canvas, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float)
+    abstract fun drawDisplayItem(canvas: Canvas, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float)
 }
-
-val animDisplayId = AtomicLong(System.currentTimeMillis() / 1000L)

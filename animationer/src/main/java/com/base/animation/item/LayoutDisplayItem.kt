@@ -22,47 +22,18 @@ class LayoutDisplayItem(val context: Context, private val layout: Int) : BaseDis
         LayoutInflater.from(context.applicationContext).inflate(layout, null)
     }
 
-    private var isMeasure: Boolean = false
-
-    override fun draw(
-        canvas: Canvas,
-        x: Float,
-        y: Float,
-        alpha: Int,
-        scaleX: Float,
-        scaleY: Float,
-        rotation: Float
-    ) {
-        if (!isMeasure) {
-            isMeasure = true
-            val widthSpec =
-                View.MeasureSpec.makeMeasureSpec(displayWidth, View.MeasureSpec.UNSPECIFIED)
-            val heightSpec =
-                View.MeasureSpec.makeMeasureSpec(displayHeight, View.MeasureSpec.UNSPECIFIED)
-            view.measure(widthSpec, heightSpec)
-            displayWidth = view.measuredWidth
-            displayHeight = view.measuredHeight
-            view.layout(0, 0, view.measuredWidth, view.measuredHeight)
-        }
-        canvas.withSave {
-            var drawX = x
-            var drawY = y
-            if (scaleX != 1f || scaleY != 1f) {
-                drawX = x - (displayWidth / scaleX / 2f)
-                drawY = y - (displayHeight / scaleY / 2f)
-                canvas.scale(scaleX, scaleY, x + getScalePX(scaleX), y + getScalePY(scaleY))
-            }
-            if (rotation != 0f) {
-                canvas.rotate(
-                    rotation, drawX + getRotatePX(rotation, scaleX),
-                    drawY + getRotatePY(rotation, scaleY)
-                )
-            }
-            draw(canvas, x, y, alpha, scaleX, scaleY)
-        }
+    init {
+        val widthSpec =
+            View.MeasureSpec.makeMeasureSpec(displayWidth, View.MeasureSpec.UNSPECIFIED)
+        val heightSpec =
+            View.MeasureSpec.makeMeasureSpec(displayHeight, View.MeasureSpec.UNSPECIFIED)
+        view.measure(widthSpec, heightSpec)
+        displayWidth = view.measuredWidth
+        displayHeight = view.measuredHeight
+        view.layout(0, 0, view.measuredWidth, view.measuredHeight)
     }
 
-    override fun draw(
+    override fun drawDisplayItem(
         canvas: Canvas,
         x: Float,
         y: Float,
@@ -78,18 +49,10 @@ class LayoutDisplayItem(val context: Context, private val layout: Int) : BaseDis
 
 
     override fun getScalePX(scaleX: Float): Float {
-        return displayWidth * 1f / 2
-    }
-
-    override fun getScalePY(scaleY: Float): Float {
-        return displayHeight * 1f / 2
-    }
-
-    override fun getRotatePX(rotation: Float, scaleX: Float): Float {
         return displayWidth / 2f
     }
 
-    override fun getRotatePY(rotation: Float, scaleY: Float): Float {
+    override fun getScalePY(scaleY: Float): Float {
         return displayHeight / 2f
     }
 

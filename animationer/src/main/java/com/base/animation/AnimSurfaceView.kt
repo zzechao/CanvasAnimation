@@ -12,7 +12,7 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import com.base.animation.common.AnimPlayer
-import java.util.concurrent.Executors
+import kotlinx.coroutines.*
 
 /**
  * @author:zhouzechao
@@ -27,9 +27,8 @@ open class AnimSurfaceView @JvmOverloads constructor(
         private const val TAG = "AnimSurfaceView"
     }
 
-    private val drawableThreadPool by lazy { Executors.newSingleThreadExecutor() }
-
     private var isSurfaceRelease: Boolean = true
+    private var animScope: CoroutineScope? = null
 
     init {
         holder.addCallback(this)
@@ -42,6 +41,7 @@ open class AnimSurfaceView @JvmOverloads constructor(
         super.onAttachedToWindow()
         player.setCanvasFrameCallback(this)
         setZOrderOnTop(true)
+        animScope = CoroutineScope(Animer.animDispatcher + SupervisorJob() + Animer.exceptionHandler)
     }
 
     override fun onDetachedFromWindow() {
@@ -50,6 +50,7 @@ open class AnimSurfaceView @JvmOverloads constructor(
         endAnimation()
         holder.removeCallback(this)
         holder.surface.release()
+        animScope?.cancel()
     }
 
     override fun getView(): View {
@@ -105,7 +106,7 @@ open class AnimSurfaceView @JvmOverloads constructor(
                 framePositionCount.toInt()
             }
         }
-        drawableThreadPool.submit {
+        animScope?.launch {
             val canvas = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 holder.lockHardwareCanvas()
             } else {

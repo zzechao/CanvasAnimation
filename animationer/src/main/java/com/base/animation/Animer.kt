@@ -2,12 +2,14 @@ package com.base.animation
 
 import com.base.animation.log.DefaultLog
 import com.base.animation.log.ILog
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.asCoroutineDispatcher
 import java.util.concurrent.LinkedBlockingDeque
 import java.util.concurrent.ThreadFactory
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * @author:zhouzechao
@@ -19,6 +21,14 @@ const val CalculationThreadName: String = "calculation_%d"
 
 object Animer {
     var log: ILog = DefaultLog()
+
+    val animDisplayId = AtomicLong(System.currentTimeMillis() / 1000L)
+    val exceptionHandler by lazy {
+        CoroutineExceptionHandler { context, throwable ->
+            log.e("CoroutineException", "Coroutine exception occurred. $context", throwable)
+        }
+    }
+
 
     private val animThreadFactory = object : ThreadFactory {
         private val mThreadId =
@@ -46,11 +56,21 @@ object Animer {
         log = iLog
     }
 
-    val animDispatcher = ThreadPoolExecutor(
-        1, 1, 1000L, TimeUnit.MILLISECONDS, LinkedBlockingDeque(), animThreadFactory
-    ).asCoroutineDispatcher()
+    val animDispatcher by lazy {
+        ThreadPoolExecutor(
+            1, 1, 1000L, TimeUnit.MILLISECONDS, LinkedBlockingDeque(), animThreadFactory
+        ).asCoroutineDispatcher()
+    }
 
-    val calculationDispatcher = ThreadPoolExecutor(
-        1, 1, 1000L, TimeUnit.MILLISECONDS, LinkedBlockingDeque(), calculationThreadFactory
-    ).asCoroutineDispatcher()
+    val calculationDispatcher by lazy {
+        ThreadPoolExecutor(
+            1, 1, 1000L, TimeUnit.MILLISECONDS, LinkedBlockingDeque(), calculationThreadFactory
+        ).asCoroutineDispatcher()
+    }
+
+    val glThreadDispatcher by lazy {
+        ThreadPoolExecutor(
+            1, 1, 1000L, TimeUnit.MILLISECONDS, LinkedBlockingDeque(), calculationThreadFactory
+        ).asCoroutineDispatcher()
+    }
 }

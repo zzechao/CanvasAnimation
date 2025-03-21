@@ -244,8 +244,7 @@ class TestAnimCanvasFragment : Fragment(), OnAnimItemClick {
                 AnimDecoder2.suspendPlayAnimWithAnimNode(anim_surface, this@apply) { node, displayItem ->
                     when (displayItem) {
                         is BitmapDisplayItem -> {
-                            displayItem.mBitmap =
-                                BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, 100, 100)
+                            displayItem.mBitmap = BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, 100, 100)
                         }
                     }
                     displayItem

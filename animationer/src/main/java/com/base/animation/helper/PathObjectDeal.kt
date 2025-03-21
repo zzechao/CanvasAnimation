@@ -31,9 +31,10 @@ import java.util.concurrent.TimeUnit
  * @date: 2020/12/9
  * description：处理animPathObject转每一帧的绘制点
  */
-const val TAG = "PathObjectDeal"
-
 class PathObjectDeal(parserEnd: () -> Unit) : IPathObjectDeal {
+    companion object {
+        private const val TAG = "PathObjectDeal"
+    }
 
     private val animDisplayScope = CoroutineScope(Animer.calculationDispatcher)
 
@@ -60,16 +61,11 @@ class PathObjectDeal(parserEnd: () -> Unit) : IPathObjectDeal {
      */
     private val pathCacheMap: com.google.common.cache.Cache<String, MutableMap<Int, MutableList<AnimDrawObject>>> = CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(50).initialCapacity(5).expireAfterWrite(60, TimeUnit.SECONDS).expireAfterAccess(60, TimeUnit.SECONDS).build()
 
-
-    private var loggingExceptionHandler = CoroutineExceptionHandler { context, throwable ->
-        Animer.log.e("CoroutineException", "Coroutine exception occurred. $context", throwable)
-    }
-
     /**
      * 计算路径上的各个坐标点
      */
     private val animPather = animDisplayScope.actor<AnimPathObject>(
-        coroutineContext + loggingExceptionHandler, capacity = 300
+        Animer.exceptionHandler, capacity = 300
     ) {
         supervisorScope {
             for (animPath in this@actor) {

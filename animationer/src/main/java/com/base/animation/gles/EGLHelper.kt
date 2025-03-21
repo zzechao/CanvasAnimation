@@ -2,6 +2,7 @@ package com.base.animation.gles
 
 import android.opengl.*
 import com.base.animation.Animer
+import javax.microedition.khronos.egl.EGL10
 
 /**
  * EGL环境搭建类
@@ -57,12 +58,14 @@ class EGLHelper {
 
         // 3、资源配置，例如颜色配置等
         val attribList = intArrayOf(
-            EGL14.EGL_RED_SIZE, 8, EGL14.EGL_GREEN_SIZE, 8,
-            EGL14.EGL_BLUE_SIZE, 8, EGL14.EGL_ALPHA_SIZE, 8,
-            EGL14.EGL_DEPTH_SIZE, 16, EGL14.EGL_STENCIL_SIZE, 8,
-            EGL14.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES2_BIT,
-            EGL14.EGL_NONE, 0,  // placeholder for recordable [@-3]
-            EGL14.EGL_NONE
+            EGL10.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES2_BIT,  //指定渲染api类别
+            EGL10.EGL_RED_SIZE, 8,
+            EGL10.EGL_GREEN_SIZE, 8,
+            EGL10.EGL_BLUE_SIZE, 8,
+            EGL10.EGL_ALPHA_SIZE, 8,
+            EGL10.EGL_DEPTH_SIZE, 0,
+            EGL10.EGL_STENCIL_SIZE, 0,
+            EGL10.EGL_NONE
         )
         val configs = arrayOfNulls<EGLConfig>(1)
         val numConfigs = IntArray(1)
@@ -94,7 +97,7 @@ class EGLHelper {
      */
     fun swapBuffers() {
         if (mEGLDisplay != EGL14.EGL_NO_DISPLAY && mEGLSurface != EGL14.EGL_NO_SURFACE) {
-            if (!EGL14.eglSwapBuffers(mEGLDisplay, mEGLSurface)) throw RuntimeException("swap buffers error")
+            if (!EGL14.eglSwapBuffers(mEGLDisplay, mEGLSurface)) throw RuntimeException("swap buffers error") else Animer.log.e(TAG, "egl swapBuffers success!")
         }
     }
 
