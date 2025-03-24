@@ -8,6 +8,7 @@ import android.text.*
 import androidx.core.text.TextDirectionHeuristicsCompat
 import com.base.animation.DoubleLinkedReference
 import com.base.animation.OnAnimItemClick
+import com.base.animation.gles.EGLRender
 import com.base.animation.model.AnimDrawObject
 
 /**
@@ -57,6 +58,10 @@ class StringDisplayItem(
         txtStaticLayout?.paint?.alpha = alpha
         canvas.translate(x, y)
         txtStaticLayout?.draw(canvas)
+    }
+
+    override fun drawDisplayItem(animId: Long, render: EGLRender, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float, rotation: Float) {
+        //render.drawAnim(x, y, alpha, scaleX, scaleY, rotation)
     }
 
     override fun getScalePX(scaleX: Float): Float {

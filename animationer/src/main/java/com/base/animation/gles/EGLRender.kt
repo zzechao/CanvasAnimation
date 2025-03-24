@@ -2,10 +2,7 @@ package com.base.animation.gles
 
 import android.graphics.SurfaceTexture
 import android.opengl.GLES20
-import com.base.animation.gles.test.Circle
-import com.base.animation.gles.test.Square
-import com.base.animation.gles.test.Triangle
-import kotlin.random.Random
+import com.base.animation.gles.test.Image
 
 
 /**
@@ -15,29 +12,23 @@ import kotlin.random.Random
 class EGLRender : IRenderer {
 
     private val mEGLHelper by lazy { EGLHelper() }
-    private val triangle = Triangle()
-    private val square = Square()
-    private val circle = Circle()
+    private val image = Image()
+    override var mSurface: SurfaceTexture? = null
 
     override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
+        mSurface = surface
         mEGLHelper.initEGL(surface)
         GLES20.glViewport(0, 0, width, height)
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-        triangle.surfaceCreated()
-        triangle.surfaceChanged(width, height)
-        square.surfaceCreated()
-        square.surfaceChanged(width, height)
-        circle.surfaceCreated()
-        circle.surfaceChanged(width, height)
+        image.surfaceCreated()
+        image.surfaceChanged(width, height)
         mEGLHelper.swapBuffers()
     }
 
     override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
         GLES20.glViewport(0, 0, width, height)
-        triangle.surfaceChanged(width, height)
-        square.surfaceChanged(width, height)
-        circle.surfaceChanged(width, height)
+        image.surfaceChanged(width, height)
         mEGLHelper.swapBuffers();
     }
 
@@ -47,22 +38,14 @@ class EGLRender : IRenderer {
     }
 
     override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
+        mSurface = surface
     }
 
-    fun drawAnim(framePositionCount: Int, frameTime: Long) {
-        when (Random.nextInt(3)) {
-            0 -> {
-                square.draw()
-            }
-
-            1 -> {
-                circle.draw()
-            }
-
-            2 -> {
-                triangle.draw()
-            }
-        }
+    fun drawAnim(
+        textureID: Int, displayWidth: Int, displayHeight: Int, x: Float,
+        y: Float, alpha: Int, scaleX: Float, scaleY: Float, rotation: Float
+    ) {
+        image.draw(textureID, displayWidth, displayHeight, x, y, alpha, scaleX, scaleY, rotation)
         mEGLHelper.swapBuffers()
     }
 }

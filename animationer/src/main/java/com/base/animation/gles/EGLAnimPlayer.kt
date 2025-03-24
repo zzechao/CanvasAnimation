@@ -13,13 +13,14 @@ import kotlinx.coroutines.channels.actor
  * @author zzechao
  * @date 2025/3/19 15:46
  */
-class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(false), IRenderer by render, CanvasHandler.CanvasFrameCallback {
+class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(false),
+    IRenderer by render, CanvasHandler.CanvasFrameCallback {
 
     companion object {
         private const val TAG = "EGLAnimPlayer"
     }
 
-    private var mSurface: SurfaceTexture? = null
+    override var mSurface: SurfaceTexture? = null
 
     private val glScope by lazy { CoroutineScope(Animer.glThreadDispatcher) }
     private val glActor = glScope.actor<EGLAction>(Animer.exceptionHandler, capacity = 20) {
@@ -81,7 +82,9 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
             }
         }
         glActor.offer(EGLAction(EGLAction.MSG_PLAY) {
-            render.drawAnim(framePositionCount, frameTime)
+            val ids = pathObjectDeal.animDrawIds.toList()
+            val data = pathObjectDeal.animDrawObjects.toMap()
+            ids.forEach { data[it]?.drawRender(render, pathObjectDeal, framePositionCount, frameTime) }
         })
         return true
     }

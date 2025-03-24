@@ -19,6 +19,7 @@ class EGLAnimView @JvmOverloads constructor(
 ) : TextureView(context, attrs), TextureView.SurfaceTextureListener, IAnimView by player {
 
     init {
+        isOpaque = false
         surfaceTextureListener = this
     }
 

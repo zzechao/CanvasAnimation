@@ -9,8 +9,8 @@ import com.base.animation.DoubleLinkedReference
 import com.base.animation.IDisplayItem
 import com.base.animation.OnAnimItemClick
 import com.base.animation.cache.IRecycle
+import com.base.animation.gles.EGLRender
 import com.base.animation.model.AnimDrawObject
-import java.util.concurrent.atomic.AtomicLong
 
 /**
  * @author:zhouzechao
@@ -40,6 +40,10 @@ abstract class BaseDisplayItem : IDisplayItem, IRecycle {
             }
             drawDisplayItem(canvas, x, y, alpha, scaleX, scaleY)
         }
+    }
+
+    override fun drawRender(animId: Long, render: EGLRender, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float, rotation: Float) {
+        drawDisplayItem(animId, render, x, y, alpha, scaleX, scaleY, rotation)
     }
 
     override fun touch(animId: Long, onAnimItemClick: OnAnimItemClick, animDrawObject: AnimDrawObject, touchPoint: DoubleLinkedReference<PointF>, extra: String) {
@@ -82,4 +86,6 @@ abstract class BaseDisplayItem : IDisplayItem, IRecycle {
     }
 
     abstract fun drawDisplayItem(canvas: Canvas, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float)
+
+    abstract fun drawDisplayItem(animId: Long, render: EGLRender, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float, rotation: Float)
 }

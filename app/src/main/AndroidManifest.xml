@@ -14,9 +14,9 @@
     <application
         android:allowBackup="true"
         android:fullBackupContent="true"
-        android:icon="@mipmap/xin"
+        android:icon="@mipmap/xin1"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/xin"
+        android:roundIcon="@mipmap/xin1"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.CanvasAnimation">

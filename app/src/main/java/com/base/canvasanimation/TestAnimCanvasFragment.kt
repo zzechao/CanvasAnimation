@@ -5,6 +5,7 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.NinePatch
@@ -843,16 +844,7 @@ class TestAnimCanvasFragment : Fragment(), OnAnimItemClick {
                 ) { node, displayItem ->
                     when (displayItem) {
                         is BitmapDisplayItem -> {
-                            displayItem.mBitmap = suspendCancellableCoroutine {
-                                Glide.with(this@TestAnimCanvasFragment).asBitmap().load(url).into(object : CustomTarget<Bitmap>() {
-                                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                        it.resume(resource)
-                                    }
-
-                                    override fun onLoadCleared(placeholder: Drawable?) {
-                                    }
-                                })
-                            }
+                            displayItem.mBitmap = BitmapFactory.decodeResource(resources, R.mipmap.xin)
                         }
                     }
                     displayItem

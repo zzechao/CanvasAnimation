@@ -7,6 +7,8 @@ import android.graphics.SurfaceTexture
  * @date 2025/3/20 20:00
  */
 interface IRenderer {
+    var mSurface: SurfaceTexture?
+
     fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int)
 
     fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int)

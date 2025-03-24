@@ -8,6 +8,7 @@ import android.view.View
 import androidx.core.graphics.withSave
 import com.base.animation.DoubleLinkedReference
 import com.base.animation.OnAnimItemClick
+import com.base.animation.gles.EGLRender
 import com.base.animation.model.AnimDrawObject
 
 
@@ -45,6 +46,10 @@ class LayoutDisplayItem(val context: Context, private val layout: Int) : BaseDis
         canvas.translate(x, drawY)
         view.alpha = alpha.toFloat()
         view.draw(canvas)
+    }
+
+    override fun drawDisplayItem(animId: Long, render: EGLRender, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float, rotation: Float) {
+        //render.drawAnim(x, y, alpha, scaleX, scaleY, rotation)
     }
 
 

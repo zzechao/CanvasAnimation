@@ -17,9 +17,11 @@ import com.base.animation.IAnimListener
 import com.base.animation.OnAnimItemClick
 import com.base.animation.item.BitmapDisplayItem
 import com.base.animation.model.AnimDrawObject
+import com.base.animation.node.ImageNode
 import com.base.animation.xml.AnimDecoder2
 import com.base.animation.xml.AnimEncoder
 import com.base.animation.xml.buildAnimNode
+import com.base.animation.xml.buildString
 import com.base.animation.xml.node.coder.InterpolatorEnum
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
@@ -107,7 +109,7 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
         })
 
         anim_1?.setOnClickListener {
-            startSingleAnim3()
+            startImageDouAnim2()
         }
 
         anim_2?.setOnClickListener {
@@ -153,6 +155,7 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
                             DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context)
                                 .toFloat() / 2 - size / 2
                         )
+                        rotation = 360f
                         scaleX = 2f
                         scaleY = 2f
                         durTime = 1000
@@ -235,28 +238,28 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
                     }
                 }
             }
-            layoutNode {
-                this.layoutIdName = "view_test_layout"
-                startNode {
-                    point = PointF(
-                        DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context)
-                            .toFloat() / 2 - size / 2, size / 2f
-                    )
-                    scaleX = 0f
-                    scaleY = 0f
-                    endNode {
-                        point = PointF(
-                            0f,
-                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context)
-                                .toFloat() / 2 - size / 2
-                        )
-                        scaleX = 3f
-                        scaleY = 3f
-                        durTime = 1000
-                        interpolator = InterpolatorEnum.Accelerate.type
-                    }
-                }
-            }
+//            layoutNode {
+//                this.layoutIdName = "view_test_layout"
+//                startNode {
+//                    point = PointF(
+//                        DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context)
+//                            .toFloat() / 2 - size / 2, size / 2f
+//                    )
+//                    scaleX = 0f
+//                    scaleY = 0f
+//                    endNode {
+//                        point = PointF(
+//                            0f,
+//                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context)
+//                                .toFloat() / 2 - size / 2
+//                        )
+//                        scaleX = 3f
+//                        scaleY = 3f
+//                        durTime = 1000
+//                        interpolator = InterpolatorEnum.Accelerate.type
+//                    }
+//                }
+//            }
         }.apply {
             lifecycleScope.launch(Dispatchers.IO) {
                 anim_surface ?: return@launch
@@ -533,6 +536,76 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
             anim_1.visibility = View.VISIBLE
             anim_2.visibility = View.VISIBLE
             anim_3.visibility = View.VISIBLE
+        }
+    }
+
+    private fun startImageDouAnim2() {
+        val size = 50
+        val url = "http://imgs.pago.tv/gifts/69753013-38d8-44de-8a14-286cf4f81083.png"
+        AnimEncoder().buildAnimNode {
+            imageDouNode {
+                this.rocation = 10
+                this.url = url
+                this.displayHeightSize = size
+                startNode {
+                    scaleX = 2f
+                    scaleY = 2f
+                    point = PointF(
+                        DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context)
+                            .toFloat() / 2 - size / scaleX / 2,
+                        DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context)
+                            .toFloat() - size / scaleY / 2
+                    )
+                    endNode {
+                        scaleX = 2f
+                        scaleY = 2f
+                        point = PointF(
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context)
+                                .toFloat() / 2 - size / scaleX / 2,
+                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context)
+                                .toFloat() / 2 - size / scaleY / 2
+                        )
+                        durTime = 1000
+                        interpolator = InterpolatorEnum.Decelerate.type
+                    }
+                    endNode {
+                        scaleX = 2f
+                        scaleY = 2f
+                        point = PointF(
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context)
+                                .toFloat() / 2 - size / scaleX / 2,
+                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context)
+                                .toFloat() - size / scaleY / 2
+                        )
+                        durTime = 2000
+                        interpolator = InterpolatorEnum.Accelerate.type
+                    }
+                }
+            }
+        }.buildString().apply {
+            lifecycleScope.launch {
+                anim_surface ?: return@launch
+                AnimDecoder2.suspendPlayAnimWithXml(
+                    anim_surface, this@apply
+                ) { node, displayItem ->
+                    when (displayItem) {
+                        is ImageDouNode.BitmapDouDisplay -> {
+                            loadImage(fragment = this@TestAnimCanvasFragment3, (node as ImageNode).url, node.displayHeightSize)?.let {
+                                displayItem.setBitmap(it)
+                            }
+                        }
+
+                        is BitmapDisplayItem -> {
+                            displayItem.setBitmap(
+                                BitmapLoader.decodeBitmapFrom(
+                                    resources, R.mipmap.xin, 1, 100, 100
+                                )
+                            )
+                        }
+                    }
+                    displayItem
+                }
+            }
         }
     }
 }

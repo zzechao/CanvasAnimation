@@ -22,7 +22,6 @@ class DisplayItemCache {
             .concurrencyLevel(4)
             .maximumSize(displayMaxCacheSize)
             .initialCapacity(10)
-            .expireAfterWrite(60, TimeUnit.SECONDS)
             .expireAfterAccess(60, TimeUnit.SECONDS)
             .build()
     }

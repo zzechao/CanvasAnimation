@@ -28,6 +28,7 @@
 
     <com.base.animation.gles.EGLAnimView
         android:id="@+id/anim_surface"
+        android:background="@null"
         android:layout_height="match_parent"
         android:layout_width="match_parent" />
 

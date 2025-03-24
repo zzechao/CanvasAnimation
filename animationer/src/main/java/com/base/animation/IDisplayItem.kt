@@ -3,6 +3,7 @@ package com.base.animation
 import android.graphics.Canvas
 import android.graphics.PointF
 import android.view.animation.BaseInterpolator
+import com.base.animation.gles.EGLRender
 import com.base.animation.helper.data.PathProcess
 import com.base.animation.model.AnimDrawObject
 
@@ -36,6 +37,8 @@ interface IDisplayItem {
      * 绘制
      */
     fun draw(canvas: Canvas, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float, rotation: Float)
+
+    fun drawRender(animId: Long, render: EGLRender, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float, rotation: Float)
 
     /**
      * 点击位置，在Touch的ACTION_UP返回

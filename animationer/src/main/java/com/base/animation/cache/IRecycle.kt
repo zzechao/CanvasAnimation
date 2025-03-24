@@ -1,7 +1,5 @@
 package com.base.animation.cache
 
-import java.lang.annotation.Inherited
-
 /**
  * @author:zhouzechao
  * @date: 1/24/21
@@ -15,13 +13,3 @@ interface IRecycle {
 
     fun recycle()
 }
-
-/**
- * 是否执行对象缓存，对应经常创建的使用
- */
-@Target(AnnotationTarget.CLASS)
-@Retention(AnnotationRetention.RUNTIME)
-@Inherited
-annotation class AteDisplayItem(
-    val usePoolCache: Boolean = false
-)

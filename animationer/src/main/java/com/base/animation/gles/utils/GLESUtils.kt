@@ -1,4 +1,4 @@
-package com.base.animation.gles
+package com.base.animation.gles.utils
 
 import android.opengl.GLES20
 

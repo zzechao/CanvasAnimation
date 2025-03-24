@@ -32,7 +32,7 @@ open class AnimPlayer(
     /**
      * pathObject转化
      */
-    private val pathObjectDeal by lazy {
+    protected val pathObjectDeal by lazy {
         if (AnimationEx.mode == 1) PathObjectDeal {
             onResume()
         } else PathObjectDeal2 {

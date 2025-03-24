@@ -2,8 +2,8 @@ package com.base.animation.model
 
 import android.graphics.Canvas
 import android.graphics.PointF
-import android.util.Log
 import com.base.animation.DoubleLinkedReference
+import com.base.animation.gles.EGLRender
 import com.base.animation.helper.IPathObjectDeal
 import com.base.animation.helper.PathObjectDeal
 import com.base.animation.item.BaseDisplayItem
@@ -26,7 +26,10 @@ class DrawObject(val animId: Long, override val extra: String) : BaseAnimDrawObj
     var curDisplayItemId = ""
     var displayItem: BaseDisplayItem? = null
 
-    override fun draw(canvas: Canvas, pathObjectDeal: IPathObjectDeal, framePositionCount: Int, frameTime: Long) {
+    /**
+     * 处理路径
+     */
+    private fun pathDrawable(pathObjectDeal: IPathObjectDeal, framePositionCount: Int, displayItemDraw: BaseDisplayItem.(AnimDrawObject) -> Unit) {
         if ((pathObjectDeal is PathObjectDeal)) {
             if (currencyPosition >= animDraws.size - 1) {
                 currencyPosition = animDraws.size - 1
@@ -54,12 +57,22 @@ class DrawObject(val animId: Long, override val extra: String) : BaseAnimDrawObj
                         curDisplayItemId = drawObject.displayItemId
                         displayItem = pathObjectDeal.getDisplayItem(drawObject.displayItemId)
                     }
-                    displayItem?.apply {
-                        draw(canvas, drawObject.point.x, drawObject.point.y, drawObject.alpha, drawObject.scaleX, drawObject.scaleY, drawObject.rotation)
-                    }
+                    displayItem?.let { displayItemDraw(it, drawObject) }
                 }
                 currencyPosition += framePositionCount
             }
+        }
+    }
+
+    override fun draw(canvas: Canvas, pathObjectDeal: IPathObjectDeal, framePositionCount: Int, frameTime: Long) {
+        pathDrawable(pathObjectDeal, framePositionCount) { drawObject ->
+            draw(canvas, drawObject.point.x, drawObject.point.y, drawObject.alpha, drawObject.scaleX, drawObject.scaleY, drawObject.rotation)
+        }
+    }
+
+    override fun drawRender(render: EGLRender, pathObjectDeal: IPathObjectDeal, framePositionCount: Int, frameTime: Long) {
+        pathDrawable(pathObjectDeal, framePositionCount) { drawObject ->
+            drawRender(animId, render, drawObject.point.x, drawObject.point.y, drawObject.alpha, drawObject.scaleX, drawObject.scaleY, drawObject.rotation)
         }
     }
 
@@ -82,14 +95,7 @@ class DrawObject(val animId: Long, override val extra: String) : BaseAnimDrawObj
 }
 
 data class AnimDrawObject(
-    var displayItemId: String,
-    var point: PointF = PointF(0f, 0f),
-    var alpha: Int = 100,
-    var scaleX: Float = 1.0f,
-    var scaleY: Float = 1.0f,
-    var rotation: Float = 0.0f,
-    var clickable: Boolean = false,
-    var expand: String = ""
+    var displayItemId: String, var point: PointF = PointF(0f, 0f), var alpha: Int = 100, var scaleX: Float = 1.0f, var scaleY: Float = 1.0f, var rotation: Float = 0.0f, var clickable: Boolean = false, var expand: String = ""
 ) {
     fun reset(point: PointF, alpha: Int, scaleX: Float, scaleY: Float, rotation: Float) {
         this.point = point
@@ -105,31 +111,16 @@ data class AnimDrawObject(
  */
 fun PathObject.toAnimDrawObject(clickable: Boolean, expand: String): AnimDrawObject {
     return AnimDrawObject(
-        displayItemId,
-        point,
-        alpha,
-        scaleX,
-        scaleY,
-        rotation,
-        clickable = clickable,
-        expand = expand
+        displayItemId, point, alpha, scaleX, scaleY, rotation, clickable = clickable, expand = expand
     )
 }
 
 fun PathObject.toAnimDrawObject2(): AnimDrawObject {
     return AnimDrawObject(
-        displayItemId,
-        point,
-        alpha,
-        scaleX,
-        scaleY,
-        rotation
+        displayItemId, point, alpha, scaleX, scaleY, rotation
     )
 }
 
 enum class Status(val value: Int) {
-    INIT(0),
-    START(1),
-    DRAWING(2),
-    STOP(3)
+    INIT(0), START(1), DRAWING(2), STOP(3)
 }
