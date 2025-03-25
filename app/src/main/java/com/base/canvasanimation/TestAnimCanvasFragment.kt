@@ -410,10 +410,8 @@ class TestAnimCanvasFragment : Fragment(), OnAnimItemClick {
                     scaleY = 0f
                     endNode {
                         point = PointF(
-                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
-                                .toFloat() / 2 - size / 2,
-                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
-                                .toFloat() / 2 - size / 2
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context).toFloat() / 2,
+                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context).toFloat() / 2
                         )
                         scaleX = 2f
                         scaleY = 2f
@@ -488,7 +486,7 @@ class TestAnimCanvasFragment : Fragment(), OnAnimItemClick {
 
 
     private fun startImageDouAnim2() {
-        val size = 150
+        val size = resources.getDimensionPixelSize(R.dimen.size)
         val url = "http://imgs.pago.tv/gifts/69753013-38d8-44de-8a14-286cf4f81083.png"
         AnimEncoder().buildAnimNode {
             imageDouNode {
@@ -496,34 +494,28 @@ class TestAnimCanvasFragment : Fragment(), OnAnimItemClick {
                 this.url = url
                 this.displayHeightSize = size
                 startNode {
-                    scaleX = 2f
-                    scaleY = 2f
+                    scaleX = 1f
+                    scaleY = 1f
                     point = PointF(
-                        DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
-                            .toFloat() / 2 - size / scaleX / 2,
-                        DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
-                            .toFloat() - size / scaleY / 2
+                        DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context) / 2f,
+                        DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context) / 1f
                     )
                     endNode {
-                        scaleX = 2f
-                        scaleY = 2f
+                        scaleX = 1f
+                        scaleY = 1f
                         point = PointF(
-                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
-                                .toFloat() / 2 - size / scaleX / 2,
-                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
-                                .toFloat() / 2 - size / scaleY / 2
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context) / 2f,
+                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context) / 2f
                         )
                         durTime = 1000
                         interpolator = InterpolatorEnum.Decelerate.type
                     }
                     endNode {
-                        scaleX = 2f
-                        scaleY = 2f
+                        scaleX = 1f
+                        scaleY = 1f
                         point = PointF(
-                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context)
-                                .toFloat() / 2 - size / scaleX / 2,
-                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context)
-                                .toFloat() - size / scaleY / 2
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment.context) / 2f,
+                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment.context) / 1f
                         )
                         durTime = 2000
                         interpolator = InterpolatorEnum.Accelerate.type

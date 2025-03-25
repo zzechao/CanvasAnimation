@@ -30,9 +30,8 @@ object Animer {
     }
 
 
-    private val animThreadFactory = object : ThreadFactory {
-        private val mThreadId =
-            AtomicInteger(0)
+    val animThreadFactory = object : ThreadFactory {
+        private val mThreadId = AtomicInteger(0)
 
         override fun newThread(r: Runnable): Thread {
             val t = Thread(r)
@@ -41,9 +40,8 @@ object Animer {
         }
     }
 
-    private val calculationThreadFactory = object : ThreadFactory {
-        private val mThreadId =
-            AtomicInteger(0)
+    val calculationThreadFactory = object : ThreadFactory {
+        private val mThreadId = AtomicInteger(0)
 
         override fun newThread(r: Runnable): Thread {
             val t = Thread(r)
@@ -56,19 +54,7 @@ object Animer {
         log = iLog
     }
 
-    val animDispatcher by lazy {
-        ThreadPoolExecutor(
-            1, 1, 1000L, TimeUnit.MILLISECONDS, LinkedBlockingDeque(), animThreadFactory
-        ).asCoroutineDispatcher()
-    }
-
     val calculationDispatcher by lazy {
-        ThreadPoolExecutor(
-            1, 1, 1000L, TimeUnit.MILLISECONDS, LinkedBlockingDeque(), calculationThreadFactory
-        ).asCoroutineDispatcher()
-    }
-
-    val glThreadDispatcher by lazy {
         ThreadPoolExecutor(
             1, 1, 1000L, TimeUnit.MILLISECONDS, LinkedBlockingDeque(), calculationThreadFactory
         ).asCoroutineDispatcher()

@@ -11,8 +11,12 @@ import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
+import com.base.animation.Animer.animThreadFactory
 import com.base.animation.common.AnimPlayer
 import kotlinx.coroutines.*
+import java.util.concurrent.LinkedBlockingDeque
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
 /**
  * @author:zhouzechao
@@ -41,7 +45,10 @@ open class AnimSurfaceView @JvmOverloads constructor(
         super.onAttachedToWindow()
         player.setCanvasFrameCallback(this)
         setZOrderOnTop(true)
-        animScope = CoroutineScope(Animer.animDispatcher + SupervisorJob() + Animer.exceptionHandler)
+        animScope = CoroutineScope(
+            ThreadPoolExecutor(
+            1, 1, 1000L, TimeUnit.MILLISECONDS, LinkedBlockingDeque(), animThreadFactory
+        ).asCoroutineDispatcher() + SupervisorJob() + Animer.exceptionHandler)
     }
 
     override fun onDetachedFromWindow() {

@@ -2,7 +2,6 @@ package com.base.animation.gles
 
 
 import android.opengl.GLES20
-import android.util.Log
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.RemovalListener
@@ -30,8 +29,7 @@ object EGLTexturePools {
 
 
     fun getTexture(animId: Long, createTexture: () -> Int): Int {
-        return textureCaches.getIfPresent(animId).also {
-        } ?: createTexture().also {
+        return textureCaches.getIfPresent(animId) ?: createTexture().also {
             putTexture(animId, it)
         }
     }

@@ -89,7 +89,6 @@ class Image {
         1.0f, 0.0f,  // 右下
     )
 
-
     private var positionHandle = 0
 
     // 纹理坐标句柄
@@ -101,7 +100,6 @@ class Image {
     // Use to access and set the view transformation
     private var vPMatrixHandle = 0
 
-    private val vertexCount = vertexCoords.size / COORDS_PER_VERTEX
     private val vertexStride = COORDS_PER_VERTEX * 4 // 4 bytes per vertex
 
     private var surfaceWidth = 0f
@@ -144,10 +142,19 @@ class Image {
         vPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix")
         // 获取Texture句柄
         texHandle = GLES20.glGetUniformLocation(mProgram, "vTexture")
+
+        val linkStatus = IntArray(1)
+        GLES20.glGetProgramiv(mProgram, GLES20.GL_LINK_STATUS, linkStatus, 0)
+        if (linkStatus[0] == 0) {
+            GLES20.glDeleteProgram(mProgram)
+            mProgram = 0
+        }
     }
 
     fun surfaceChanged(width: Int, height: Int) {
         GLES20.glViewport(0, 0, width, height)
+        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
 
         surfaceWidth = width.toFloat()
         surfaceHeight = height.toFloat()
@@ -157,15 +164,6 @@ class Image {
         textureID: Int, displayWidth: Int, displayHeight: Int, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float, rotation: Float
     ) {
         Log.d(TAG, "draw: $textureID $displayWidth $displayHeight $x $y $alpha $scaleX $scaleY $rotation ")
-        mDisplayScaleX = surfaceWidth / displayWidth
-        mDisplayScaleY = surfaceHeight / displayHeight
-
-        // 将程序添加到OpenGL ES环境
-        GLES20.glUseProgram(mProgram)
-
-        // 重新绘制背景色为黑色
-        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
 
         // 为正方形顶点启用控制句柄
         GLES20.glEnableVertexAttribArray(positionHandle)
@@ -177,6 +175,9 @@ class Image {
         // 写入坐标数据
         GLES20.glVertexAttribPointer(texCoordinateHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false, vertexStride, textureBuffer)
 
+        mDisplayScaleX = surfaceWidth / (displayWidth / 2f)
+        mDisplayScaleY = surfaceHeight / (displayHeight / 2f)
+
         val mMVPMatrix = FloatArray(16)
         getMatrix(mMVPMatrix)
         /**
@@ -185,9 +186,8 @@ class Image {
          */
         flip(mMVPMatrix, false, true)
 
-
-        val drawX = x / surfaceWidth * mDisplayScaleX
-        val drawY = y / surfaceHeight * mDisplayScaleY
+        val drawX = (x - displayWidth / 4f) / surfaceWidth * mDisplayScaleX
+        val drawY = (y - displayHeight / 4f) / surfaceHeight * mDisplayScaleY
 
         // 将投影和视图变换传递给着色器
         GLES20.glUniformMatrix4fv(
@@ -201,6 +201,9 @@ class Image {
         // 设置纹理采样器编号，该编号和glActiveTexture中设置的编号相同
         GLES20.glUniform1i(texHandle, 0)
 
+        GLES20.glEnable(GLES20.GL_BLEND)
+        GLES20.glBlendFuncSeparate(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA, GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA)
+
         // 绘制
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
 
@@ -210,7 +213,8 @@ class Image {
         GLES20.glDisableVertexAttribArray(texHandle)
     }
 
-    fun getMatrix(
+
+    private fun getMatrix(
         matrix: FloatArray?
     ) {
         val projection = FloatArray(16)
@@ -219,6 +223,15 @@ class Image {
         Matrix.orthoM(projection, 0, -1f, 1f * mDisplayScaleX, -1f * mDisplayScaleY, 1f, 1f, -1f)
         Matrix.setLookAtM(camera, 0, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f)
         Matrix.multiplyMM(matrix, 0, projection, 0, camera, 0)
+    }
+
+    fun glClearCreate() {
+        // 将程序添加到OpenGL ES环境
+        GLES20.glUseProgram(mProgram)
+    }
+
+    fun surfaceDestroyed() {
+        GLES20.glDeleteProgram(mProgram)
     }
 
     companion object {

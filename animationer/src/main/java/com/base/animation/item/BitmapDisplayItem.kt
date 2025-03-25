@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.PointF
-import android.graphics.Rect
 import android.graphics.RectF
 import android.opengl.GLES20
 import android.opengl.GLUtils
@@ -27,53 +26,36 @@ open class BitmapDisplayItem : BaseDisplayItem() {
     private val paint by lazy {
         Paint().apply {
             isAntiAlias = false
-            isFilterBitmap = true
         }
     }
 
-    open var bitmapWidth: Int = 50
-    open var bitmapHeight: Int = 50
-    private var mBitmapRect: Rect? = null
+
     private var mDisplayRect: RectF? = null
     private var displaySizeSet = false
 
     open var mBitmap: Bitmap? = null
-        set(value) {
-            field = value
-            bitmapWidth = value?.width ?: 50
-            bitmapHeight = value?.height ?: 50
-        }
 
     open fun setBitmap(bitmap: Bitmap) {
         mBitmap = bitmap
+        if (!displaySizeSet) {
+            displayWidth = bitmap.width
+            displayHeight = bitmap.height
+        }
     }
 
     override fun drawDisplayItem(canvas: Canvas, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float) {
         mBitmap.takeUnless { mBitmap?.isRecycled == true }?.let {
             paint.alpha = alpha
-            mBitmap?.let {
-                if (displaySizeSet) {
-                    val drawX = x - (displayWidth / scaleX / 2f)
-                    val drawY = y - (displayHeight / scaleY / 2f)
-
-                    mDisplayRect?.set(
-                        drawX, drawY, drawX + displayWidth, drawY + displayHeight
-                    )
-                    mDisplayRect?.let { rect ->
-                        canvas.drawBitmap(it, null, rect, paint)
-                    }
-                } else {
-                    val drawX = x - (bitmapWidth / 2 / scaleX)
-                    val drawY = y - (bitmapHeight / 2 / scaleY)
-                    canvas.drawBitmap(it, drawX, drawY, paint)
-                }
-            }
+            val drawX = x - (displayWidth / scaleX / 2f)
+            val drawY = y - (displayHeight / scaleY / 2f)
+            mDisplayRect?.set(drawX, drawY, drawX + displayWidth, drawY + displayHeight)
+            mDisplayRect?.let { rect -> canvas.drawBitmap(it, null, rect, paint) }
         }
     }
 
     override fun drawDisplayItem(animId: Long, render: EGLRender, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float, rotation: Float) {
         val textureID = getTextureIfPresent(animId)
-        render.drawAnim(textureID, bitmapWidth, bitmapHeight, x, y, alpha, scaleX, scaleY, rotation)
+        render.glRenderFrameBuffers(textureID, displayWidth, displayHeight, x, y, alpha, scaleX, scaleY, rotation)
     }
 
     private fun getTextureIfPresent(animId: Long): Int {
@@ -101,20 +83,16 @@ open class BitmapDisplayItem : BaseDisplayItem() {
     }
 
     override fun getScalePX(scaleX: Float): Float {
-        return if (displaySizeSet) displayWidth / 2f else bitmapWidth / 2f
+        return displayWidth / 2f
     }
 
     override fun getScalePY(scaleY: Float): Float {
-        return if (displaySizeSet) displayHeight / 2f else bitmapHeight / 2f
+        return displayHeight / 2f
     }
 
     override fun touch(animId: Long, onAnimItemClick: OnAnimItemClick, animDrawObject: AnimDrawObject, touchPoint: DoubleLinkedReference<PointF>, extra: String) {
-        var displayWidth = bitmapWidth.toFloat()
-        var displayHeight = bitmapHeight.toFloat()
-        if (displaySizeSet) {
-            displayWidth = this.displayWidth.toFloat()
-            displayHeight = this.displayHeight.toFloat()
-        }
+        val displayWidth = displayWidth.toFloat()
+        val displayHeight = displayHeight.toFloat()
         val left = animDrawObject.point.x - displayWidth / 2
         val right = animDrawObject.point.x + displayWidth / 2
         val top = animDrawObject.point.y - displayHeight / 2
@@ -134,17 +112,13 @@ open class BitmapDisplayItem : BaseDisplayItem() {
         this.displayWidth = displayWidth
         this.displayHeight = displayHeight
         displaySizeSet = true
-        mBitmapRect = Rect(0, 0, bitmapWidth, bitmapHeight)
         mDisplayRect = RectF()
     }
 
     override fun recycle() {
         super.recycle()
         displaySizeSet = false
-        mBitmapRect = null
         mDisplayRect = null
-        bitmapWidth = 0
-        bitmapHeight = 0
         mBitmap = null
     }
 }

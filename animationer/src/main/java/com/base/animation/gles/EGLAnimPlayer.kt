@@ -3,28 +3,40 @@ package com.base.animation.gles
 import android.graphics.SurfaceTexture
 import android.os.Build
 import com.base.animation.Animer
+import com.base.animation.Animer.calculationThreadFactory
 import com.base.animation.CanvasHandler
 import com.base.animation.common.AnimPlayer
 import com.base.animation.fpsTime
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.actor
+import java.util.concurrent.LinkedBlockingDeque
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
 /**
  * @author zzechao
  * @date 2025/3/19 15:46
  */
-class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(false),
-    IRenderer by render, CanvasHandler.CanvasFrameCallback {
+class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(false), IRenderer by render, CanvasHandler.CanvasFrameCallback {
 
     companion object {
         private const val TAG = "EGLAnimPlayer"
     }
 
+    private var isReleased: Boolean = false
     override var mSurface: SurfaceTexture? = null
 
-    private val glScope by lazy { CoroutineScope(Animer.glThreadDispatcher) }
-    private val glActor = glScope.actor<EGLAction>(Animer.exceptionHandler, capacity = 20) {
+
+    private val glScope by lazy {
+        CoroutineScope(
+            ThreadPoolExecutor(
+                1, 1, 1000L, TimeUnit.MILLISECONDS, LinkedBlockingDeque(), calculationThreadFactory
+            ).asCoroutineDispatcher()
+        )
+    }
+    private val glActor = glScope.actor<EGLAction>(Animer.exceptionHandler, capacity = 50) {
         for (msg in channel) {
+            if (isReleased) return@actor
             Animer.log.d(TAG, "actor EGLAction:${msg.description()} run")
             msg.action()
         }
@@ -84,8 +96,21 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
         glActor.offer(EGLAction(EGLAction.MSG_PLAY) {
             val ids = pathObjectDeal.animDrawIds.toList()
             val data = pathObjectDeal.animDrawObjects.toMap()
+            render.glClearCreate()
             ids.forEach { data[it]?.drawRender(render, pathObjectDeal, framePositionCount, frameTime) }
+            render.swapBuffers()
         })
         return true
+    }
+
+    fun release() {
+        render.release()
+        isReleased = true
+        setCanvasFrameCallback(null)
+    }
+
+    fun attachSurface() {
+        isReleased = false
+        setCanvasFrameCallback(this)
     }
 }

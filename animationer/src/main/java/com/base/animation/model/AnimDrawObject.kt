@@ -30,37 +30,36 @@ class DrawObject(val animId: Long, override val extra: String) : BaseAnimDrawObj
      * 处理路径
      */
     private fun pathDrawable(pathObjectDeal: IPathObjectDeal, framePositionCount: Int, displayItemDraw: BaseDisplayItem.(AnimDrawObject) -> Unit) {
-        if ((pathObjectDeal is PathObjectDeal)) {
-            if (currencyPosition >= animDraws.size - 1) {
-                currencyPosition = animDraws.size - 1
-                status = Status.STOP
-                pathObjectDeal.animListeners.forEach {
-                    it.onEndAnim(animId, extra)
-                }
-                pathObjectDeal.removeAnimId(animId)
-                return
-            } else {
-                if (currencyPosition == 0) {
-                    status = Status.START
-                    pathObjectDeal.animListeners.forEach {
-                        it.onStartAnim(animId, extra)
-                    }
-                } else if (status == Status.START) {
-                    status = Status.DRAWING
-                    pathObjectDeal.animListeners.forEach {
-                        it.onRunningAnim(animId, extra)
-                    }
-                }
-
-                animDraws[currencyPosition]?.forEach { drawObject ->
-                    if (drawObject.displayItemId != curDisplayItemId || displayItem == null) {
-                        curDisplayItemId = drawObject.displayItemId
-                        displayItem = pathObjectDeal.getDisplayItem(drawObject.displayItemId)
-                    }
-                    displayItem?.let { displayItemDraw(it, drawObject) }
-                }
-                currencyPosition += framePositionCount
+        if (currencyPosition == 0) {
+            status = Status.START
+            pathObjectDeal.animListeners.forEach {
+                it.onStartAnim(animId, extra)
             }
+        } else if (status == Status.START) {
+            status = Status.DRAWING
+            pathObjectDeal.animListeners.forEach {
+                it.onRunningAnim(animId, extra)
+            }
+        } else if (currencyPosition >= animDraws.size - 1) {
+            currencyPosition = animDraws.size - 1
+            status = Status.STOP
+            pathObjectDeal.animListeners.forEach {
+                it.onEndAnim(animId, extra)
+            }
+            pathObjectDeal.removeAnimId(animId)
+        }
+
+        animDraws[currencyPosition]?.forEach { drawObject ->
+            if (drawObject.displayItemId != curDisplayItemId || displayItem == null) {
+                curDisplayItemId = drawObject.displayItemId
+                displayItem = pathObjectDeal.getDisplayItem(drawObject.displayItemId)
+            }
+            displayItem?.let { displayItemDraw(it, drawObject) }
+        }
+
+        currencyPosition += framePositionCount
+        if (status == Status.STOP) {
+            pathObjectDeal.removeAnimId(animId)
         }
     }
 

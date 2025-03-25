@@ -51,4 +51,14 @@ class EGLAnimView @JvmOverloads constructor(
             this.findFragmentOfGivenView()?.let { it.view?.findViewById<View>(id) } ?: this.getFragmentActivity()?.findViewById(id)
         }
     }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        player.release()
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        player.attachSurface()
+    }
 }
