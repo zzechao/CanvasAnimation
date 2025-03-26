@@ -2,14 +2,12 @@ package com.base.animation.gles
 
 import android.content.Context
 import android.graphics.SurfaceTexture
-import android.opengl.GLES20
-import android.os.Build
 import android.util.AttributeSet
+import android.util.Log
+import android.view.MotionEvent
 import android.view.TextureView
 import android.view.View
 import com.base.animation.*
-import com.base.animation.common.AnimPlayer
-import com.base.animation.model.AnimPathObject
 
 /**
  * @author zzechao
@@ -20,6 +18,7 @@ class EGLAnimView @JvmOverloads constructor(
 ) : TextureView(context, attrs), TextureView.SurfaceTextureListener, IAnimView by player {
 
     init {
+        isFocusable = true
         isOpaque = false
         surfaceTextureListener = this
     }
@@ -60,5 +59,10 @@ class EGLAnimView @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         player.onAttachedToWindow()
+    }
+
+    override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
+        if (event != null) touchAnimEvent(event)
+        return super.dispatchTouchEvent(event)
     }
 }

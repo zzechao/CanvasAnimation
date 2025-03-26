@@ -93,7 +93,6 @@ class PathObjectDeal(parserEnd: () -> Unit) : IPathObjectDeal {
                                 var pathKey = "${fpsTime}_${start.key()}_${end.key()}_${duringTime}_${displayItem?.let { "${it::class.simpleName}_${it.isCalculate}" }}"
                                 pathKey = md.digest(pathKey.toByteArray(Charsets.UTF_8)).toHexString()
                                 drawsMap = pathCacheMap.get(pathKey) {
-                                    Log.i("zzzc", "loader")
                                     val pathProcessItem = PathProcessItem(
                                         end.itemX, end.itemY, end.itemAlpha, end.itemScaleX, end.itemScaleY, end.itemRotation
                                     )

@@ -181,6 +181,7 @@ class EGLRender : IRenderer {
      * 绑定FBO
      */
     fun drawRenderEnd() {
+        shader.unUseShader()
         mEGLHelper.swapBuffers()
     }
 

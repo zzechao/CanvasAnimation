@@ -68,6 +68,10 @@ class EGLAnimShader {
         GLES20.glUseProgram(mProgram)
     }
 
+    fun unUseShader() {
+        GLES20.glUseProgram(0)
+    }
+
     fun destroyShader() {
         GLES20.glDeleteProgram(mProgram)
     }

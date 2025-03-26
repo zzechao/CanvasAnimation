@@ -5,6 +5,7 @@ import android.os.Build
 import com.base.animation.Animer
 import com.base.animation.Animer.calculationThreadFactory
 import com.base.animation.CanvasHandler
+import com.base.animation.DoubleLinkedReference
 import com.base.animation.common.AnimPlayer
 import com.base.animation.fpsTime
 import com.base.animation.model.AnimPathObject
@@ -94,9 +95,23 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
             glActor?.offer(EGLAction(EGLAction.MSG_PLAY) {
                 val ids = pathObjectDeal.animDrawIds.toList()
                 val data = pathObjectDeal.animDrawObjects.toMap()
-                render.drawRenderBegin()
-                ids.forEach { data[it]?.drawRender(render, pathObjectDeal, framePositionCount, frameTime) }
-                render.drawRenderEnd()
+                if (ids.isNotEmpty()) {
+                    render.drawRenderBegin()
+                    ids.forEach { data[it]?.drawRender(render, pathObjectDeal, framePositionCount, frameTime) }
+                    render.drawRenderEnd()
+                    mTouchPointF?.let { DoubleLinkedReference(it) }?.let {
+                        val size = ids.size - 1
+                        for (index in size downTo 0) {
+                            data[ids[index]]?.touch(pathObjectDeal, it)
+                        }
+                        mTouchPointF = null
+                    }
+                } else {
+                    pause()
+                    render.drawRenderBegin()
+                    render.drawRenderEnd()
+                    pathObjectDeal.animDrawObjects.clear()
+                }
             })
         }
         return true

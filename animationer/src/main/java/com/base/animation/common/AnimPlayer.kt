@@ -27,7 +27,7 @@ open class AnimPlayer(
     private var callback: CanvasHandler.CanvasFrameCallback? = null
 
     private var isResume = AtomicBoolean(false)
-    private var mTouchPointF: PointF? = null
+    protected var mTouchPointF: PointF? = null
 
     /**
      * pathObject转化
