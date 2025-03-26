@@ -144,10 +144,12 @@ class EGLRender : IRenderer {
         Matrix.orthoM(projection, 0, -1f, 1f * mDisplayScaleX, -1f * mDisplayScaleY, 1f, 1f, -1f)
         Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f)
         Matrix.multiplyMM(mMVPMatrix, 0, projection, 0, viewMatrix, 0)
+        GLES20.glUniform1f(shader.uAlphaHandle, alpha / 255f)
 
         // 将投影和视图变换传递给着色器
         GLES20.glUniformMatrix4fv(
-            shader.vPMatrixHandle, 1, false, mMVPMatrix.flip(false, y = true).translate(drawX, drawY).rotate(rotation).scale(scaleX, scaleY), 0
+            shader.vPMatrixHandle, 1, false,
+            mMVPMatrix.flip(false, y = true).translate(drawX, drawY).rotate(rotation).scale(scaleX, scaleY), 0
         )
 
         // 激活纹理编号0
@@ -158,7 +160,11 @@ class EGLRender : IRenderer {
         GLES20.glUniform1i(shader.texHandle, 0)
 
         GLES20.glEnable(GLES20.GL_BLEND)
-        GLES20.glBlendFuncSeparate(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA, GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA)
+        if (alpha < 255) {
+            GLES20.glBlendFuncSeparate(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA, GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA)
+        } else {
+            GLES20.glBlendFuncSeparate(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA, GLES20.GL_ONE, GLES20.GL_ONE)
+        }
 
         // 绘制
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)

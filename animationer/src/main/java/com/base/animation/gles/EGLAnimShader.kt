@@ -22,9 +22,11 @@ class EGLAnimShader {
     // 片段着色器代码
     private val fragmentShaderCode = """precision mediump float;
         uniform sampler2D vTexture;
+        uniform float uAlpha;
         varying vec2 aTexCoordinate;
         void main() {
-          gl_FragColor = texture2D(vTexture, aTexCoordinate);
+            vec4 color = texture2D(vTexture, aTexCoordinate);
+            gl_FragColor = vec4(color.rgb, color.a * uAlpha);
         }
         """
 
@@ -41,6 +43,8 @@ class EGLAnimShader {
     // Use to access and set the view transformation
     var vPMatrixHandle = 0
 
+    var uAlphaHandle = 0
+
 
     fun initShader() {
         val vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode)
@@ -55,6 +59,7 @@ class EGLAnimShader {
         texCoordinateHandle = GLES20.glGetAttribLocation(mProgram, "vTexCoordinate")
         vPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix")
         texHandle = GLES20.glGetUniformLocation(mProgram, "vTexture")
+        uAlphaHandle = GLES20.glGetUniformLocation(mProgram, "uAlpha")
 
         val linkStatus = IntArray(1)
         GLES20.glGetProgramiv(mProgram, GLES20.GL_LINK_STATUS, linkStatus, 0)
