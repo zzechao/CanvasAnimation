@@ -47,4 +47,6 @@ class EGLTexturePools {
     private fun putTexture(bitmapHash: Int, textureId: Int) {
         textureCaches.put(bitmapHash, textureId)
     }
+
+    fun textureCacheMap() = textureCaches.asMap()
 }

@@ -52,8 +52,8 @@ class EGLAnimView @JvmOverloads constructor(
     }
 
     override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
         player.onDetachedFromWindow()
+        super.onDetachedFromWindow()
     }
 
     override fun onAttachedToWindow() {

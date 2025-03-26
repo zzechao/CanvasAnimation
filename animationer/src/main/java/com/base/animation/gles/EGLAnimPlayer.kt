@@ -2,6 +2,8 @@ package com.base.animation.gles
 
 import android.graphics.SurfaceTexture
 import android.os.Build
+import android.util.Log
+import android.view.Surface
 import com.base.animation.Animer
 import com.base.animation.Animer.calculationThreadFactory
 import com.base.animation.CanvasHandler
@@ -54,7 +56,6 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
     override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
         kotlin.runCatching {
             glActor?.offer(EGLAction(EGLAction.MSG_INIT) {
-                mSurface = surface
                 render.onSurfaceTextureAvailable(surface, width, height)
             })
         }
@@ -69,14 +70,7 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
     }
 
     override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
-        render.onSurfaceTextureDestroyed(surface)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !surface.isReleased) {
-            surface.release()
-        } else {
-            kotlin.runCatching { surface.release() }
-        }
-        endAnimation()
-        return false
+        return render.onSurfaceTextureDestroyed(surface)
     }
 
     override fun doCanvasFrame(frameTime: Long): Boolean {
@@ -123,16 +117,15 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
     }
 
     fun onDetachedFromWindow() {
-        isReleased = true
-        setCanvasFrameCallback(null)
-        endAnimation()
-        render.release()
-        glActor?.close()
-        glScope?.cancel()
+        Log.d(TAG, "onDetachedFromWindow")
+        glActor?.offer(EGLAction(EGLAction.MSG_RELEASE) {
+            setCanvasFrameCallback(null)
+            endAnimation()
+            render.release()
+        })
     }
 
     fun onAttachedToWindow() {
-        isReleased = false
         initActor()
     }
 

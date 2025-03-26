@@ -1,13 +1,18 @@
 package com.base.animation.gles
 
 import android.opengl.GLES20
-import com.base.animation.gles.utils.GLESUtils.loadShader
+import com.base.animation.Animer
+import com.base.animation.gles.utils.GLESUtils
 
 /**
  * @author zzechao
  * @date 2025/3/20 18:39
  */
 class EGLAnimShader {
+    companion object {
+        private const val TAG = "EGLAnimShader"
+    }
+
     // 顶点着色器代码
     private val vertexShaderCode = """uniform mat4 uMVPMatrix;
         attribute vec4 vPosition;
@@ -47,8 +52,8 @@ class EGLAnimShader {
 
 
     fun initShader() {
-        val vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode)
-        val fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode)
+        val vertexShader = GLESUtils.loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode)
+        val fragmentShader = GLESUtils.loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode)
 
         mProgram = GLES20.glCreateProgram()
         GLES20.glAttachShader(mProgram, vertexShader)
@@ -78,6 +83,19 @@ class EGLAnimShader {
     }
 
     fun destroyShader() {
+        Animer.log.i(TAG, "destroyShader")
+        unUseShader()
+        GLES20.glDisableVertexAttribArray(positionHandle)
+        GLES20.glDisableVertexAttribArray(texCoordinateHandle)
+        GLES20.glDisableVertexAttribArray(texHandle)
+        GLES20.glDisableVertexAttribArray(vPMatrixHandle)
+        GLES20.glDisableVertexAttribArray(uAlphaHandle)
+        GLES20.glDetachShader(mProgram, GLES20.GL_VERTEX_SHADER)
+        GLES20.glDeleteShader(GLES20.GL_VERTEX_SHADER)
+        GLES20.glDetachShader(mProgram, GLES20.GL_FRAGMENT_SHADER)
+        GLES20.glDeleteShader(GLES20.GL_FRAGMENT_SHADER)
         GLES20.glDeleteProgram(mProgram)
+        GLES20.glReleaseShaderCompiler()
+        Animer.log.i(TAG, "destroyShader end")
     }
 }

@@ -4,6 +4,7 @@ import android.graphics.SurfaceTexture
 import android.opengl.GLES20
 import android.opengl.Matrix
 import android.util.Log
+import android.view.Surface
 import com.base.animation.gles.utils.MatrixUtils.flip
 import com.base.animation.gles.utils.flip
 import com.base.animation.gles.utils.rotate
@@ -79,11 +80,17 @@ class EGLRender : IRenderer {
         mEGLHelper.initEGL(surface)
 
         // 初始化形状坐标的顶点字节缓冲区
-        vertexBuffer = ByteBuffer.allocateDirect(vertexCoords.size * 4).order(ByteOrder.nativeOrder()).asFloatBuffer().put(vertexCoords)
+        vertexBuffer = ByteBuffer.allocateDirect(vertexCoords.size * 4)
+            .order(ByteOrder.nativeOrder())
+            .asFloatBuffer()
+            .put(vertexCoords)
         vertexBuffer?.position(0)
 
         // 初始化纹理坐标顶点字节缓冲区
-        textureBuffer = ByteBuffer.allocateDirect(textureCoords.size * 4).order(ByteOrder.nativeOrder()).asFloatBuffer().put(textureCoords)
+        textureBuffer = ByteBuffer.allocateDirect(textureCoords.size * 4)
+            .order(ByteOrder.nativeOrder())
+            .asFloatBuffer()
+            .put(textureCoords)
         textureBuffer?.position(0)
 
         shader.initShader()
@@ -97,13 +104,11 @@ class EGLRender : IRenderer {
 
 
     override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
-
-        return false
+        release()
+        return true
     }
 
-    override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
-        mSurface = surface
-    }
+    override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {}
 
     private fun refreshSurfaceView(width: Int, height: Int) {
         GLES20.glViewport(0, 0, width, height)
@@ -192,7 +197,13 @@ class EGLRender : IRenderer {
     }
 
     fun release() {
-        mEGLHelper.destroyEGL()
+        texturePools.textureCacheMap().map {
+            GLES20.glDeleteTextures(1, intArrayOf(it.value), 0)
+        }
+        GLES20.glDisable(GLES20.GL_BLEND)
         shader.destroyShader()
+        mEGLHelper.destroyEGL()
+        vertexBuffer?.clear()
+        textureBuffer?.clear()
     }
 }

@@ -32,7 +32,6 @@ object MatrixUtils {
 }
 
 fun FloatArray.rotate(angle: Float): FloatArray {
-    Log.i("MatrixUtils", "rotate: $angle")
     return MatrixUtils.rotate(this, angle)
 }
 
