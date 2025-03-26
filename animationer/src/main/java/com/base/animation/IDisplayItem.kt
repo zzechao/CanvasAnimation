@@ -29,7 +29,7 @@ interface IDisplayItem {
     fun setDisplaySize(displayWidth: Int, displayHeight: Int)
 
     /**
-     * 是否自己进行绘制坐标的计算，只能针对com.base.animation.AnimationEx.getMode为2时使用
+     * 是否自己进行绘制坐标的计算
      */
     fun calculate(pathProcess: PathProcess, current: AnimDrawObject, interpolator: BaseInterpolator) {}
 

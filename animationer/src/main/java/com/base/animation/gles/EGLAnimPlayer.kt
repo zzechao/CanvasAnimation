@@ -1,22 +1,19 @@
 package com.base.animation.gles
 
 import android.graphics.SurfaceTexture
-import android.os.Build
 import android.util.Log
-import android.view.Surface
 import com.base.animation.Animer
-import com.base.animation.Animer.calculationThreadFactory
 import com.base.animation.CanvasHandler
 import com.base.animation.DoubleLinkedReference
 import com.base.animation.common.AnimPlayer
 import com.base.animation.fpsTime
 import com.base.animation.model.AnimPathObject
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.actor
-import java.util.concurrent.LinkedBlockingDeque
-import java.util.concurrent.ThreadPoolExecutor
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.Executors
 
 /**
  * @author zzechao
@@ -30,10 +27,6 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
         private const val TAG = "EGLAnimPlayer"
     }
 
-    private var isReleased: Boolean = false
-    override var mSurface: SurfaceTexture? = null
-
-
     private var glScope: CoroutineScope? = null
     private var glActor: SendChannel<EGLAction>? = null
 
@@ -42,6 +35,8 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
             glActor?.offer(EGLAction(EGLAction.MSG_RESUME) {
                 super.resume()
             })
+        }.onFailure {
+            release()
         }
     }
 
@@ -50,6 +45,8 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
             glActor?.offer(EGLAction(EGLAction.MSG_PAUSE) {
                 super.pause()
             })
+        }.onFailure {
+            release()
         }
     }
 
@@ -58,6 +55,8 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
             glActor?.offer(EGLAction(EGLAction.MSG_INIT) {
                 render.onSurfaceTextureAvailable(surface, width, height)
             })
+        }.onFailure {
+            release()
         }
     }
 
@@ -66,6 +65,8 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
             glActor?.offer(EGLAction(EGLAction.MSG_SIZE_CHANGED) {
                 render.onSurfaceTextureSizeChanged(surface, width, height)
             })
+        }.onFailure {
+            release()
         }
     }
 
@@ -107,6 +108,8 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
                     pathObjectDeal.animDrawObjects.clear()
                 }
             })
+        }.onFailure {
+            release()
         }
         return true
     }
@@ -119,10 +122,16 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
     fun onDetachedFromWindow() {
         Log.d(TAG, "onDetachedFromWindow")
         glActor?.offer(EGLAction(EGLAction.MSG_RELEASE) {
-            setCanvasFrameCallback(null)
-            endAnimation()
-            render.release()
+            release()
+            glActor?.close()
+            glScope?.cancel()
         })
+    }
+
+    private fun release() {
+        setCanvasFrameCallback(null)
+        endAnimation()
+        render.release()
     }
 
     fun onAttachedToWindow() {
@@ -130,17 +139,19 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
     }
 
     private fun initActor() {
+        glActor?.close()
+        glScope?.cancel()
         glScope = CoroutineScope(
-            ThreadPoolExecutor(
-                1, 1, 1000L, TimeUnit.MILLISECONDS, LinkedBlockingDeque(), calculationThreadFactory
-            ).asCoroutineDispatcher() + SupervisorJob() + Animer.exceptionHandler
+            Executors.newSingleThreadExecutor().asCoroutineDispatcher() + Animer.exceptionHandler
         )
         glActor = glScope?.actor(capacity = 50) {
             for (msg in channel) {
-                if (isReleased) return@actor
                 Animer.log.d(TAG, "actor EGLAction:${msg.description()} run")
                 msg.action()
             }
+        }
+        glActor?.invokeOnClose {
+            release()
         }
     }
 }

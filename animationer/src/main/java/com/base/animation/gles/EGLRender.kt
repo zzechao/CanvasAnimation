@@ -3,9 +3,7 @@ package com.base.animation.gles
 import android.graphics.SurfaceTexture
 import android.opengl.GLES20
 import android.opengl.Matrix
-import android.util.Log
-import android.view.Surface
-import com.base.animation.gles.utils.MatrixUtils.flip
+import androidx.annotation.WorkerThread
 import com.base.animation.gles.utils.flip
 import com.base.animation.gles.utils.rotate
 import com.base.animation.gles.utils.scale
@@ -28,7 +26,6 @@ class EGLRender : IRenderer {
 
     private val mEGLHelper by lazy { EGLHelper() }
     private val shader by lazy { EGLAnimShader() }
-    override var mSurface: SurfaceTexture? = null
 
     private var surfaceWidth = -1
     private var surfaceHeight = -1
@@ -74,9 +71,8 @@ class EGLRender : IRenderer {
 
     private val texturePools by lazy { EGLTexturePools() }
 
+    @WorkerThread
     override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
-        mSurface = surface
-
         mEGLHelper.initEGL(surface)
 
         // 初始化形状坐标的顶点字节缓冲区
@@ -98,16 +94,15 @@ class EGLRender : IRenderer {
         refreshSurfaceView(width, height)
     }
 
+    @WorkerThread
     override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
         refreshSurfaceView(width, height)
     }
 
+    @WorkerThread
+    override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean = true
 
-    override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
-        release()
-        return true
-    }
-
+    @WorkerThread
     override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {}
 
     private fun refreshSurfaceView(width: Int, height: Int) {
@@ -120,7 +115,7 @@ class EGLRender : IRenderer {
         mEGLHelper.swapBuffers()
     }
 
-
+    @WorkerThread
     fun drawItem(
         animId: Long, bitmapHashCode: Int, displayWidth: Int, displayHeight: Int, x: Float, y: Float,
         alpha: Int, scaleX: Float, scaleY: Float, rotation: Float, createTexture: () -> Int
@@ -182,6 +177,7 @@ class EGLRender : IRenderer {
     /**
      * 清除颜色
      */
+    @WorkerThread
     fun drawRenderBegin() {
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
@@ -189,17 +185,20 @@ class EGLRender : IRenderer {
     }
 
     /**
-     * 绑定FBO
+     * 渲染
      */
+    @WorkerThread
     fun drawRenderEnd() {
         shader.unUseShader()
         mEGLHelper.swapBuffers()
     }
 
+    @WorkerThread
     fun release() {
         texturePools.textureCacheMap().map {
             GLES20.glDeleteTextures(1, intArrayOf(it.value), 0)
         }
+        texturePools.clear()
         GLES20.glDisable(GLES20.GL_BLEND)
         shader.destroyShader()
         mEGLHelper.destroyEGL()

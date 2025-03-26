@@ -103,6 +103,7 @@ class EGLHelper {
      * 销毁EGL环境
      */
     fun destroyEGL() {
+        Animer.log.d(TAG, "egl destroy!")
         if (mEGLDisplay != EGL14.EGL_NO_DISPLAY) EGL14.eglMakeCurrent(mEGLDisplay, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_CONTEXT)
 
         if (mEGLDisplay != EGL14.EGL_NO_DISPLAY && mEGLSurface != EGL14.EGL_NO_SURFACE) {
@@ -122,5 +123,6 @@ class EGLHelper {
         }
 
         mEGLConfig = null
+        Animer.log.d        (TAG, "egl destroy success!")
     }
 }

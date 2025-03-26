@@ -49,4 +49,8 @@ class EGLTexturePools {
     }
 
     fun textureCacheMap() = textureCaches.asMap()
+
+    fun clear() {
+        textureCaches.invalidateAll()
+    }
 }
