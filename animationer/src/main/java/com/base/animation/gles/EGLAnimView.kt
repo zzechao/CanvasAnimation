@@ -9,6 +9,7 @@ import android.view.TextureView
 import android.view.View
 import com.base.animation.*
 import com.base.animation.common.AnimPlayer
+import com.base.animation.model.AnimPathObject
 
 /**
  * @author zzechao
@@ -26,7 +27,6 @@ class EGLAnimView @JvmOverloads constructor(
     override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
         player.onSurfaceTextureAvailable(surface, width, height)
     }
-
 
     override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
         player.onSurfaceTextureSizeChanged(surface, width, height)
@@ -54,11 +54,11 @@ class EGLAnimView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        player.release()
+        player.onDetachedFromWindow()
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        player.attachSurface()
+        player.onAttachedToWindow()
     }
 }

@@ -59,7 +59,9 @@ class PathObjectDeal(parserEnd: () -> Unit) : IPathObjectDeal {
     /**
      * 路径缓存
      */
-    private val pathCacheMap: com.google.common.cache.Cache<String, MutableMap<Int, MutableList<AnimDrawObject>>> = CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(50).initialCapacity(5).expireAfterWrite(60, TimeUnit.SECONDS).expireAfterAccess(60, TimeUnit.SECONDS).build()
+    private val pathCacheMap: com.google.common.cache.Cache<String, MutableMap<Int, MutableList<AnimDrawObject>>> =
+        CacheBuilder.newBuilder().concurrencyLevel(10).maximumSize(50).initialCapacity(10)
+            .expireAfterAccess(60, TimeUnit.SECONDS).build()
 
     /**
      * 计算路径上的各个坐标点

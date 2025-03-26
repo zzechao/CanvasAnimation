@@ -1,20 +1,13 @@
 package com.base.animation.gles
 
+import android.opengl.GLES20
+import com.base.animation.gles.utils.GLESUtils.loadShader
+
 /**
  * @author zzechao
  * @date 2025/3/20 18:39
  */
 class EGLAnimShader {
-    /**
-     * 绘制的流程
-     * 1.顶点着色程序 - 用于渲染形状的顶点的 OpenGL ES 图形代码
-     * 2.片段着色器 - 用于渲染具有特定颜色或形状的形状的 OpenGL ES 代码纹理。
-     * 3.程序 - 包含您想要用于绘制的着色器的 OpenGL ES 对象 一个或多个形状
-     *
-     *
-     * 您至少需要一个顶点着色器来绘制形状，以及一个 fragment 着色器来为该形状着色。
-     * 这些着色器必须经过编译，然后添加到 OpenGL ES 程序中，该程序随后用于绘制形状。
-     */
     // 顶点着色器代码
     private val vertexShaderCode = """uniform mat4 uMVPMatrix;
         attribute vec4 vPosition;
@@ -34,4 +27,48 @@ class EGLAnimShader {
           gl_FragColor = texture2D(vTexture, aTexCoordinate);
         }
         """
+
+    private var mProgram = 0
+
+    var positionHandle = 0
+
+    // 纹理坐标句柄
+    var texCoordinateHandle = 0
+
+    // 纹理Texture句柄
+    var texHandle = 0
+
+    // Use to access and set the view transformation
+    var vPMatrixHandle = 0
+
+
+    fun initShader() {
+        val vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode)
+        val fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode)
+
+        mProgram = GLES20.glCreateProgram()
+        GLES20.glAttachShader(mProgram, vertexShader)
+        GLES20.glAttachShader(mProgram, fragmentShader)
+        GLES20.glLinkProgram(mProgram)
+
+        positionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition")
+        texCoordinateHandle = GLES20.glGetAttribLocation(mProgram, "vTexCoordinate")
+        vPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix")
+        texHandle = GLES20.glGetUniformLocation(mProgram, "vTexture")
+
+        val linkStatus = IntArray(1)
+        GLES20.glGetProgramiv(mProgram, GLES20.GL_LINK_STATUS, linkStatus, 0)
+        if (linkStatus[0] == 0) {
+            GLES20.glDeleteProgram(mProgram)
+            mProgram = 0
+        }
+    }
+
+    fun useShader() {
+        GLES20.glUseProgram(mProgram)
+    }
+
+    fun destroyShader() {
+        GLES20.glDeleteProgram(mProgram)
+    }
 }

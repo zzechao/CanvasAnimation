@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import com.base.animation.common.AnimPlayer
+import com.base.animation.model.AnimPathObject
 
 /**
  * @author:zhouzechao
@@ -33,16 +34,15 @@ open class AnimView @JvmOverloads constructor(
         drawAnim(canvas, framePositionCount, frameTime)
     }
 
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        player.setCanvasFrameCallback(this)
-    }
-
-
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         player.setCanvasFrameCallback(null)
         endAnimation()
+    }
+
+    override fun addAnimDisplay(animPathObject: AnimPathObject) {
+        player.addAnimDisplay(animPathObject)
+        player.setCanvasFrameCallback(this)
     }
 
     override fun getView(): View {

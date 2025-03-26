@@ -13,6 +13,7 @@ import android.view.SurfaceView
 import android.view.View
 import com.base.animation.Animer.animThreadFactory
 import com.base.animation.common.AnimPlayer
+import com.base.animation.model.AnimPathObject
 import kotlinx.coroutines.*
 import java.util.concurrent.LinkedBlockingDeque
 import java.util.concurrent.ThreadPoolExecutor
@@ -43,7 +44,6 @@ open class AnimSurfaceView @JvmOverloads constructor(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        player.setCanvasFrameCallback(this)
         setZOrderOnTop(true)
         animScope = CoroutineScope(
             ThreadPoolExecutor(
@@ -58,6 +58,11 @@ open class AnimSurfaceView @JvmOverloads constructor(
         holder.removeCallback(this)
         holder.surface.release()
         animScope?.cancel()
+    }
+
+    override fun addAnimDisplay(animPathObject: AnimPathObject) {
+        player.addAnimDisplay(animPathObject)
+        player.setCanvasFrameCallback(this)
     }
 
     override fun getView(): View {
