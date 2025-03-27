@@ -11,12 +11,14 @@ import android.view.LayoutInflater
 import android.view.Surface
 import android.view.View
 import androidx.core.graphics.withSave
+import androidx.core.graphics.withTranslation
 import com.base.animation.Animer
 import com.base.animation.DoubleLinkedReference
 import com.base.animation.OnAnimItemClick
 import com.base.animation.gles.EGLAnimTexture
 import com.base.animation.gles.EGLRender
 import com.base.animation.model.AnimDrawObject
+import kotlin.math.max
 
 
 /**
@@ -50,7 +52,8 @@ class LayoutDisplayItem(val context: Context, private val layout: Int) : BaseDis
     }
 
     override fun drawDisplayItem(animId: Long, render: EGLRender, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float, rotation: Float) {
-        render.drawItem(animId, layout.hashCode(), displayWidth, displayHeight, x, y, alpha, scaleX, scaleY, rotation, ::getTextureIfPresent)
+        val maxSize = max(displayWidth, displayHeight)
+        render.drawItem(animId, layout.hashCode(), maxSize, maxSize, x, y, alpha, scaleX, scaleY, rotation, ::getTextureIfPresent)
     }
 
     private fun getTextureIfPresent(): EGLAnimTexture {
@@ -64,7 +67,8 @@ class LayoutDisplayItem(val context: Context, private val layout: Int) : BaseDis
         val textureId = externalTextureId[0]
         val eglAnimTexture = EGLAnimTexture(textureId, EGLAnimTexture.TextureType.LAYOUT)
         val surfaceTexture = SurfaceTexture(textureId)
-        surfaceTexture.setDefaultBufferSize(displayWidth, displayHeight)
+        val maxSize = max(displayWidth, displayHeight)
+        surfaceTexture.setDefaultBufferSize(maxSize, maxSize)
         val surface = Surface(surfaceTexture)
         eglAnimTexture.surfaceTexture = surfaceTexture
         eglAnimTexture.surface = surface
@@ -74,7 +78,9 @@ class LayoutDisplayItem(val context: Context, private val layout: Int) : BaseDis
             surface.lockCanvas(null)
         }
         canvas?.let {
-            view.draw(it)
+            it.withTranslation((maxSize - displayWidth) / 2f, (maxSize - displayHeight) / 2f) {
+                view.draw(it)
+            }
             surface.unlockCanvasAndPost(canvas)
         }
         Animer.log.d(tag, "getTextureIfPresent: $textureId")

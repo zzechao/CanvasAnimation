@@ -4,7 +4,6 @@ import android.graphics.SurfaceTexture
 import android.opengl.GLES11Ext
 import android.opengl.GLES20
 import android.opengl.Matrix
-import android.view.Surface
 import androidx.annotation.WorkerThread
 import com.base.animation.Animer
 import com.base.animation.gles.utils.flip
@@ -153,12 +152,11 @@ class EGLRender : IRenderer {
         GLES20.glUniform1i(shader.uIsColor2DHandle, if (animTexture.type == EGLAnimTexture.TextureType.BITMAP) 1 else 0)
         GLES20.glUniform1f(shader.uAlphaHandle, alpha / 255f)
 
+        Matrix.setIdentityM(mMVPMatrix, 0)
         if (animTexture.type == EGLAnimTexture.TextureType.STRING || animTexture.type == EGLAnimTexture.TextureType.LAYOUT) {
             animTexture.surfaceTexture?.updateTexImage()
             animTexture.surfaceTexture?.getTransformMatrix(mMVPMatrix)
         }
-
-        Matrix.setIdentityM(mMVPMatrix, 0)
         Matrix.orthoM(projection, 0, -1f, 1f * mDisplayScaleX, -1f * mDisplayScaleY, 1f, 1f, -1f)
         Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f)
         Matrix.multiplyMM(mMVPMatrix, 0, projection, 0, viewMatrix, 0)
@@ -170,16 +168,12 @@ class EGLRender : IRenderer {
 
         // 绑定纹理
         if (animTexture.type == EGLAnimTexture.TextureType.BITMAP) {
-            GLES20.glUniform1i(shader.uIsColor2DHandle, 1)
-
             // 激活纹理编号0
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, animTexture.textureId)
-            // 设置纹理采样器编号，该编号和glActiveTexture中设置的编号相同
             GLES20.glUniform1i(shader.texHandle, 0)
-        } else if (animTexture.type == EGLAnimTexture.TextureType.STRING || animTexture.type == EGLAnimTexture.TextureType.LAYOUT) {
-            GLES20.glUniform1i(shader.uIsColor2DHandle, 0)
 
+        } else if (animTexture.type == EGLAnimTexture.TextureType.STRING || animTexture.type == EGLAnimTexture.TextureType.LAYOUT) {
             // 绑定外部纹理到纹理单元1
             GLES20.glActiveTexture(GLES20.GL_TEXTURE1)
             GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, animTexture.textureId)

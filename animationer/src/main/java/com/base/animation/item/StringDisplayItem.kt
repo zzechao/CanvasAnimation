@@ -6,6 +6,8 @@ import android.opengl.GLES20
 import android.os.Build
 import android.text.*
 import android.view.Surface
+import androidx.core.graphics.withSave
+import androidx.core.graphics.withTranslation
 import androidx.core.text.TextDirectionHeuristicsCompat
 import com.base.animation.Animer
 import com.base.animation.DoubleLinkedReference
@@ -13,6 +15,7 @@ import com.base.animation.OnAnimItemClick
 import com.base.animation.gles.EGLAnimTexture
 import com.base.animation.gles.EGLRender
 import com.base.animation.model.AnimDrawObject
+import kotlin.math.max
 
 /**
  * @author:zhouzechao
@@ -34,7 +37,7 @@ class StringDisplayItem(
     private var txtStaticLayout: StaticLayout? = null
 
     init {
-        displayHeight = (fontSize + 20)
+        displayHeight = (fontSize + 10)
         displayWidth = fontSize * message.length
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             txtStaticLayout = StaticLayout.Builder.obtain(
@@ -65,7 +68,8 @@ class StringDisplayItem(
     }
 
     override fun drawDisplayItem(animId: Long, render: EGLRender, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float, rotation: Float) {
-        render.drawItem(animId, txtStaticLayout.hashCode(), displayWidth, displayHeight, x, y, alpha, scaleX, scaleY, rotation, ::getTextureIfPresent)
+        val maxSize = max(displayWidth, displayHeight)
+        render.drawItem(animId, txtStaticLayout.hashCode(), maxSize, maxSize, x, y, alpha, scaleX, scaleY, rotation, ::getTextureIfPresent)
     }
 
     private fun getTextureIfPresent(): EGLAnimTexture {
@@ -79,7 +83,8 @@ class StringDisplayItem(
         val textureId = externalTextureId[0]
         val eglAnimTexture = EGLAnimTexture(textureId, EGLAnimTexture.TextureType.STRING)
         val surfaceTexture = SurfaceTexture(textureId)
-        surfaceTexture.setDefaultBufferSize(displayWidth, displayHeight)
+        val maxSize = max(displayWidth, displayHeight)
+        surfaceTexture.setDefaultBufferSize(maxSize, maxSize)
         eglAnimTexture.surfaceTexture = surfaceTexture
         eglAnimTexture.surface = Surface(surfaceTexture)
         val canvas = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -88,7 +93,9 @@ class StringDisplayItem(
             eglAnimTexture.surface?.lockCanvas(null)
         }
         canvas?.let {
-            txtStaticLayout?.draw(it)
+            it.withTranslation((maxSize - displayWidth) / 2f, (maxSize - displayHeight) / 2f) {
+                txtStaticLayout?.draw(it)
+            }
             eglAnimTexture.surface?.unlockCanvasAndPost(canvas)
         }
         Animer.log.d(tag, "getTextureIfPresent: $textureId")
