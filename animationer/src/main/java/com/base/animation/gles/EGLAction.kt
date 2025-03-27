@@ -13,7 +13,6 @@ data class EGLAction(val msg: Int, val action: () -> Unit) {
         const val MSG_RESUME = 3
         const val MSG_RELEASE = 4
         const val MSG_SIZE_CHANGED = 5
-        const val MSG_BIND_TEXTURE_BITMAP = 6
     }
 
     fun description(): String {
@@ -24,7 +23,6 @@ data class EGLAction(val msg: Int, val action: () -> Unit) {
             MSG_RESUME -> "MSG_RESUME"
             MSG_RELEASE -> "MSG_RELEASE"
             MSG_SIZE_CHANGED -> "MSG_SIZE_CHANGED"
-            MSG_BIND_TEXTURE_BITMAP -> "MSG_BIND_TEXTURE_BITMAP"
             else -> ""
         }
     }
