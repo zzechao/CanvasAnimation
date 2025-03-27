@@ -19,9 +19,7 @@ import java.util.concurrent.Executors
  * @author zzechao
  * @date 2025/3/19 15:46
  */
-class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(false),
-    IRenderer by render,
-    CanvasHandler.CanvasFrameCallback {
+class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(false), IRenderer by render, CanvasHandler.CanvasFrameCallback {
 
     companion object {
         private const val TAG = "EGLAnimPlayer"
@@ -31,43 +29,23 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
     private var glActor: SendChannel<EGLAction>? = null
 
     override fun resume() {
-        kotlin.runCatching {
-            glActor?.offer(EGLAction(EGLAction.MSG_RESUME) {
-                super.resume()
-            })
-        }.onFailure {
-            release()
-        }
+        safeOffer(EGLAction(EGLAction.MSG_RESUME) { super.resume() })
     }
 
     override fun pause() {
-        kotlin.runCatching {
-            glActor?.offer(EGLAction(EGLAction.MSG_PAUSE) {
-                super.pause()
-            })
-        }.onFailure {
-            release()
-        }
+        safeOffer(EGLAction(EGLAction.MSG_PAUSE) { super.pause() })
     }
 
     override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
-        kotlin.runCatching {
-            glActor?.offer(EGLAction(EGLAction.MSG_INIT) {
-                render.onSurfaceTextureAvailable(surface, width, height)
-            })
-        }.onFailure {
-            release()
-        }
+        safeOffer(EGLAction(EGLAction.MSG_INIT) {
+            render.onSurfaceTextureAvailable(surface, width, height)
+        }).onFailure { release() }
     }
 
     override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
-        kotlin.runCatching {
-            glActor?.offer(EGLAction(EGLAction.MSG_SIZE_CHANGED) {
-                render.onSurfaceTextureSizeChanged(surface, width, height)
-            })
-        }.onFailure {
-            release()
-        }
+        safeOffer(EGLAction(EGLAction.MSG_SIZE_CHANGED) {
+            render.onSurfaceTextureSizeChanged(surface, width, height)
+        })
     }
 
     override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
@@ -86,31 +64,27 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
                 framePositionCount.toInt()
             }
         }
-        kotlin.runCatching {
-            glActor?.offer(EGLAction(EGLAction.MSG_PLAY) {
-                val ids = pathObjectDeal.animDrawIds.toList()
-                val data = pathObjectDeal.animDrawObjects.toMap()
-                if (ids.isNotEmpty()) {
-                    render.drawRenderBegin()
-                    ids.forEach { data[it]?.drawRender(render, pathObjectDeal, framePositionCount, frameTime) }
-                    render.drawRenderEnd()
-                    mTouchPointF?.let { DoubleLinkedReference(it) }?.let {
-                        val size = ids.size - 1
-                        for (index in size downTo 0) {
-                            data[ids[index]]?.touch(pathObjectDeal, it)
-                        }
-                        mTouchPointF = null
+        safeOffer(EGLAction(EGLAction.MSG_PLAY) {
+            val ids = pathObjectDeal.animDrawIds.toList()
+            val data = pathObjectDeal.animDrawObjects.toMap()
+            if (ids.isNotEmpty()) {
+                render.drawRenderBegin()
+                ids.forEach { data[it]?.drawRender(render, pathObjectDeal, framePositionCount, frameTime) }
+                render.drawRenderEnd()
+                mTouchPointF?.let { DoubleLinkedReference(it) }?.let {
+                    val size = ids.size - 1
+                    for (index in size downTo 0) {
+                        data[ids[index]]?.touch(pathObjectDeal, it)
                     }
-                } else {
-                    pause()
-                    render.drawRenderBegin()
-                    render.drawRenderEnd()
-                    pathObjectDeal.animDrawObjects.clear()
+                    mTouchPointF = null
                 }
-            })
-        }.onFailure {
-            release()
-        }
+            } else {
+                pause()
+                render.drawRenderBegin()
+                render.drawRenderEnd()
+                pathObjectDeal.animDrawObjects.clear()
+            }
+        })
         return true
     }
 
@@ -121,7 +95,7 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
 
     fun onDetachedFromWindow() {
         Log.d(TAG, "onDetachedFromWindow")
-        glActor?.offer(EGLAction(EGLAction.MSG_RELEASE) {
+        safeOffer(EGLAction(EGLAction.MSG_RELEASE) {
             release()
             glActor?.close()
             glScope?.cancel()
@@ -153,5 +127,9 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
         glActor?.invokeOnClose {
             release()
         }
+    }
+
+    private fun safeOffer(msg: EGLAction): Result<Unit> {
+        return kotlin.runCatching { glActor?.offer(msg) }
     }
 }
