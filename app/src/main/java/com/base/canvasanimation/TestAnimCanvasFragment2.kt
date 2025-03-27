@@ -236,28 +236,28 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick {
                     }
                 }
             }
-//            layoutNode {
-//                this.layoutIdName = "view_test_layout"
-//                startNode {
-//                    point = PointF(
-//                        DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment2.context)
-//                            .toFloat() / 2 - size / 2, size / 2f
-//                    )
-//                    scaleX = 0f
-//                    scaleY = 0f
-//                    endNode {
-//                        point = PointF(
-//                            0f,
-//                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment2.context)
-//                                .toFloat() / 2 - size / 2
-//                        )
-//                        scaleX = 3f
-//                        scaleY = 3f
-//                        durTime = 1000
-//                        interpolator = InterpolatorEnum.Accelerate.type
-//                    }
-//                }
-//            }
+            layoutNode {
+                this.layoutIdName = "view_test_layout"
+                startNode {
+                    point = PointF(
+                        DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment2.context)
+                            .toFloat() / 2 - size / 2, size / 2f
+                    )
+                    scaleX = 0f
+                    scaleY = 0f
+                    endNode {
+                        point = PointF(
+                            0f,
+                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment2.context)
+                                .toFloat() / 2 - size / 2
+                        )
+                        scaleX = 3f
+                        scaleY = 3f
+                        durTime = 1000
+                        interpolator = InterpolatorEnum.Accelerate.type
+                    }
+                }
+            }
         }.apply {
             lifecycleScope.launch(Dispatchers.IO) {
                 anim_surface ?: return@launch

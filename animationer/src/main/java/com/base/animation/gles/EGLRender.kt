@@ -1,9 +1,12 @@
 package com.base.animation.gles
 
 import android.graphics.SurfaceTexture
+import android.opengl.GLES11Ext
 import android.opengl.GLES20
 import android.opengl.Matrix
+import android.view.Surface
 import androidx.annotation.WorkerThread
+import com.base.animation.Animer
 import com.base.animation.gles.utils.flip
 import com.base.animation.gles.utils.rotate
 import com.base.animation.gles.utils.scale
@@ -16,6 +19,11 @@ import java.nio.FloatBuffer
 /**
  * @author zzechao
  * @date 2025/3/19 18:36
+ * @description: 渲染器
+ * 1. 初始化EGL环境
+ * 2. 初始化Shader
+ * 3. 初始化纹理
+ * 4. 绘制
  */
 class EGLRender : IRenderer {
     companion object {
@@ -71,22 +79,18 @@ class EGLRender : IRenderer {
 
     private val texturePools by lazy { EGLTexturePools() }
 
+    private var nanoTime = 0L
+
     @WorkerThread
     override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
         mEGLHelper.initEGL(surface)
 
         // 初始化形状坐标的顶点字节缓冲区
-        vertexBuffer = ByteBuffer.allocateDirect(vertexCoords.size * 4)
-            .order(ByteOrder.nativeOrder())
-            .asFloatBuffer()
-            .put(vertexCoords)
+        vertexBuffer = ByteBuffer.allocateDirect(vertexCoords.size * 4).order(ByteOrder.nativeOrder()).asFloatBuffer().put(vertexCoords)
         vertexBuffer?.position(0)
 
         // 初始化纹理坐标顶点字节缓冲区
-        textureBuffer = ByteBuffer.allocateDirect(textureCoords.size * 4)
-            .order(ByteOrder.nativeOrder())
-            .asFloatBuffer()
-            .put(textureCoords)
+        textureBuffer = ByteBuffer.allocateDirect(textureCoords.size * 4).order(ByteOrder.nativeOrder()).asFloatBuffer().put(textureCoords)
         textureBuffer?.position(0)
 
         shader.initShader()
@@ -103,7 +107,8 @@ class EGLRender : IRenderer {
     override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean = true
 
     @WorkerThread
-    override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {}
+    override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
+    }
 
     private fun refreshSurfaceView(width: Int, height: Int) {
         GLES20.glViewport(0, 0, width, height)
@@ -117,10 +122,9 @@ class EGLRender : IRenderer {
 
     @WorkerThread
     fun drawItem(
-        animId: Long, bitmapHashCode: Int, displayWidth: Int, displayHeight: Int, x: Float, y: Float,
-        alpha: Int, scaleX: Float, scaleY: Float, rotation: Float, createTexture: () -> Int
+        animId: Long, hashCode: Int, displayWidth: Int, displayHeight: Int, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float, rotation: Float, createTexture: () -> EGLAnimTexture
     ) {
-        val textureID = texturePools.getTexture(bitmapHashCode, createTexture)
+        val animTexture = texturePools.getTexture(hashCode, createTexture)
 
         /**
          * 这里因为画布坐标和纹理坐标存在两倍的缩放比，所以需要将画布坐标和纹理坐标进行缩放，所以将displaySize/2f
@@ -141,23 +145,47 @@ class EGLRender : IRenderer {
         // 写入坐标数据
         GLES20.glVertexAttribPointer(shader.texCoordinateHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false, vertexStride, textureBuffer)
 
-        Matrix.orthoM(projection, 0, -1f, 1f * mDisplayScaleX, -1f * mDisplayScaleY, 1f, 1f, -1f)
-        Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f)
-        Matrix.multiplyMM(mMVPMatrix, 0, projection, 0, viewMatrix, 0)
+        if (System.currentTimeMillis() - nanoTime > 2000) {
+            nanoTime = System.currentTimeMillis()
+            Animer.log.d(TAG, "drawItem: $animId, $hashCode, $displayWidth, $displayHeight, $x, $y, $alpha, $scaleX, $scaleY, $rotation, ${animTexture.textureId}-${animTexture.type}")
+        }
+
+        GLES20.glUniform1i(shader.uIsColor2DHandle, if (animTexture.type == EGLAnimTexture.TextureType.BITMAP) 1 else 0)
         GLES20.glUniform1f(shader.uAlphaHandle, alpha / 255f)
 
-        // 将投影和视图变换传递给着色器
-        GLES20.glUniformMatrix4fv(
-            shader.vPMatrixHandle, 1, false,
-            mMVPMatrix.flip(false, y = true).translate(drawX, drawY).rotate(rotation).scale(scaleX, scaleY), 0
-        )
+        Matrix.setIdentityM(mMVPMatrix, 0)
 
-        // 激活纹理编号0
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
+
         // 绑定纹理
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureID)
-        // 设置纹理采样器编号，该编号和glActiveTexture中设置的编号相同
-        GLES20.glUniform1i(shader.texHandle, 0)
+        if (animTexture.type == EGLAnimTexture.TextureType.BITMAP) {
+            Matrix.orthoM(projection, 0, -1f, 1f * mDisplayScaleX, -1f * mDisplayScaleY, 1f, 1f, -1f)
+            Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f)
+            Matrix.multiplyMM(mMVPMatrix, 0, projection, 0, viewMatrix, 0)
+            // 将投影和视图变换传递给着色器
+            GLES20.glUniformMatrix4fv(
+                shader.vPMatrixHandle, 1, false, mMVPMatrix.flip(false, y = true).translate(drawX, drawY)
+                    .rotate(rotation).scale(scaleX, scaleY), 0
+            )
+            // 激活纹理编号0
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, animTexture.textureId)
+            // 设置纹理采样器编号，该编号和glActiveTexture中设置的编号相同
+            GLES20.glUniform1i(shader.texHandle, 0)
+        } else if (animTexture.type == EGLAnimTexture.TextureType.STRING || animTexture.type == EGLAnimTexture.TextureType.LAYOUT) {
+            Matrix.orthoM(projection, 0, -1f, 1f * mDisplayScaleX, -1f * mDisplayScaleY, 1f, 1f, -1f)
+            Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f)
+            Matrix.multiplyMM(mMVPMatrix, 0, projection, 0, viewMatrix, 0)
+            // 将投影和视图变换传递给着色器
+            GLES20.glUniformMatrix4fv(
+                shader.vPMatrixHandle, 1, false, mMVPMatrix.flip(false, y = true).translate(drawX, drawY)
+                    .rotate(rotation).scale(scaleX, scaleY), 0
+            )
+
+            // 绑定外部纹理到纹理单元1
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE1)
+            GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, animTexture.textureId)
+            GLES20.glUniform1i(shader.vTextureOESHandle, 1); // 对应GL_TEXTURE1
+        }
 
         GLES20.glEnable(GLES20.GL_BLEND)
         if (alpha < 255) {
@@ -196,7 +224,9 @@ class EGLRender : IRenderer {
     @WorkerThread
     fun release() {
         texturePools.textureCacheMap().map {
-            GLES20.glDeleteTextures(1, intArrayOf(it.value), 0)
+            GLES20.glDeleteTextures(1, intArrayOf(it.value.textureId), 0)
+            it.value.surface?.release()
+            it.value.surfaceTexture?.release()
         }
         texturePools.clear()
         GLES20.glDisable(GLES20.GL_BLEND)

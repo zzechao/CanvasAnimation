@@ -5,6 +5,7 @@ import android.graphics.SurfaceTexture
 /**
  * @author zzechao
  * @date 2025/3/20 20:00
+ * 渲染器接口
  */
 interface IRenderer {
 

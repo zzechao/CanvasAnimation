@@ -3,11 +3,17 @@ package com.base.animation.item
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.PointF
+import android.graphics.SurfaceTexture
+import android.opengl.GLES11Ext
+import android.opengl.GLES20
 import android.os.Build
 import android.text.*
+import android.view.Surface
 import androidx.core.text.TextDirectionHeuristicsCompat
+import com.base.animation.Animer
 import com.base.animation.DoubleLinkedReference
 import com.base.animation.OnAnimItemClick
+import com.base.animation.gles.EGLAnimTexture
 import com.base.animation.gles.EGLRender
 import com.base.animation.model.AnimDrawObject
 
@@ -61,7 +67,29 @@ class StringDisplayItem(
     }
 
     override fun drawDisplayItem(animId: Long, render: EGLRender, x: Float, y: Float, alpha: Int, scaleX: Float, scaleY: Float, rotation: Float) {
-        //render.drawAnim(x, y, alpha, scaleX, scaleY, rotation)
+        render.drawItem(animId, txtStaticLayout.hashCode(), displayWidth, displayHeight, x, y, alpha, scaleX, scaleY, rotation, ::getTextureIfPresent)
+    }
+
+    private fun getTextureIfPresent(): EGLAnimTexture {
+        val externalTextureId = IntArray(1)
+        GLES20.glGenTextures(1, externalTextureId, 0)
+        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, externalTextureId[0])
+        GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR)
+        GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
+
+        // 创建SurfaceTexture和Surface
+        val textureId = externalTextureId[0]
+        val eglAnimTexture = EGLAnimTexture(textureId, EGLAnimTexture.TextureType.STRING)
+        val surfaceTexture = SurfaceTexture(textureId)
+        eglAnimTexture.surfaceTexture = surfaceTexture
+        eglAnimTexture.surface = Surface(surfaceTexture)
+        val canvas = eglAnimTexture.surface?.lockCanvas(null)
+        canvas?.let {
+            txtStaticLayout?.draw(it)
+            eglAnimTexture.surface?.unlockCanvasAndPost(canvas)
+        }
+        Animer.log.d(tag, "getTextureIfPresent: $textureId")
+        return eglAnimTexture
     }
 
     override fun getScalePX(scaleX: Float): Float {

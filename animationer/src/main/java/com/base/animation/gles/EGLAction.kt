@@ -3,6 +3,7 @@ package com.base.animation.gles
 /**
  * @author zzechao
  * @date 2025/3/21 11:15
+ * EGL消息
  */
 data class EGLAction(val msg: Int, val action: () -> Unit) {
     companion object {

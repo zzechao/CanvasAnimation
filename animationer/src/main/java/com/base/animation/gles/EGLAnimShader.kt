@@ -7,6 +7,7 @@ import com.base.animation.gles.utils.GLESUtils
 /**
  * @author zzechao
  * @date 2025/3/20 18:39
+ * 着色器
  */
 class EGLAnimShader {
     companion object {
@@ -25,13 +26,21 @@ class EGLAnimShader {
         """
 
     // 片段着色器代码
-    private val fragmentShaderCode = """precision mediump float;
+    private val fragmentShaderCode = """#extension GL_OES_EGL_image_external : require
+        precision mediump float;
         uniform sampler2D vTexture;
+        uniform samplerExternalOES vTextureOES;
         uniform float uAlpha;
+        uniform bool uIsColor2D;
         varying vec2 aTexCoordinate;
         void main() {
-            vec4 color = texture2D(vTexture, aTexCoordinate);
-            gl_FragColor = vec4(color.rgb, color.a * uAlpha);
+            vec4 color2D = texture2D(vTexture, aTexCoordinate);
+            vec4 colorOES = texture2D(vTextureOES, aTexCoordinate);
+            if (uIsColor2D) {
+                gl_FragColor = vec4(color2D.rgb, color2D.a * uAlpha);
+            } else {
+                gl_FragColor = vec4(colorOES.rgb, colorOES.a * uAlpha);
+            }
         }
         """
 
@@ -50,6 +59,9 @@ class EGLAnimShader {
 
     var uAlphaHandle = 0
 
+    var vTextureOESHandle = 0
+
+    var uIsColor2DHandle = 0
 
     fun initShader() {
         val vertexShader = GLESUtils.loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode)
@@ -64,7 +76,9 @@ class EGLAnimShader {
         texCoordinateHandle = GLES20.glGetAttribLocation(mProgram, "vTexCoordinate")
         vPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix")
         texHandle = GLES20.glGetUniformLocation(mProgram, "vTexture")
+        vTextureOESHandle = GLES20.glGetUniformLocation(mProgram, "vTextureOES")
         uAlphaHandle = GLES20.glGetUniformLocation(mProgram, "uAlpha")
+        uIsColor2DHandle = GLES20.glGetUniformLocation(mProgram, "uIsColor2D")
 
         val linkStatus = IntArray(1)
         GLES20.glGetProgramiv(mProgram, GLES20.GL_LINK_STATUS, linkStatus, 0)
@@ -85,11 +99,15 @@ class EGLAnimShader {
     fun destroyShader() {
         Animer.log.i(TAG, "destroyShader")
         unUseShader()
+
         GLES20.glDisableVertexAttribArray(positionHandle)
         GLES20.glDisableVertexAttribArray(texCoordinateHandle)
         GLES20.glDisableVertexAttribArray(texHandle)
         GLES20.glDisableVertexAttribArray(vPMatrixHandle)
         GLES20.glDisableVertexAttribArray(uAlphaHandle)
+        GLES20.glDisableVertexAttribArray(vTextureOESHandle)
+        GLES20.glDisableVertexAttribArray(uIsColor2DHandle)
+
         GLES20.glDetachShader(mProgram, GLES20.GL_VERTEX_SHADER)
         GLES20.glDeleteShader(GLES20.GL_VERTEX_SHADER)
         GLES20.glDetachShader(mProgram, GLES20.GL_FRAGMENT_SHADER)

@@ -10,8 +10,8 @@ import java.util.concurrent.TimeUnit
 
 /**
  * @author zzechao
- * 纹理ID缓存池
  * @date 2025/3/24 19:02
+ * @desc 纹理池
  */
 class EGLTexturePools {
 
@@ -21,22 +21,22 @@ class EGLTexturePools {
 
     private var nanoTime = 0L
 
-    private val textureCaches: Cache<Int, Int> by lazy {
+    private val textureCaches: Cache<Int, EGLAnimTexture> by lazy {
         CacheBuilder.newBuilder().concurrencyLevel(4).maximumSize(DISPLAYMAXCACHESIZE).initialCapacity(10).expireAfterAccess(60, TimeUnit.SECONDS).build()
     }
 
-
-    fun getTexture(bitmapHash: Int, createTexture: () -> Int): Int {
+    fun getTexture(bitmapHash: Int, createTexture: () -> EGLAnimTexture): EGLAnimTexture {
         return textureCaches.getIfPresent(bitmapHash)?.let {
             if (System.currentTimeMillis() - nanoTime > 5000) {
                 nanoTime = System.currentTimeMillis()
-                Log.i("EGLTexturePools", "getTexture:${it} $bitmapHash size:${textureCaches.size()} ${GLES20.glIsTexture(it)}")
+                Log.i("EGLTexturePools", "getTexture:${it} $bitmapHash size:${textureCaches.size()} ${GLES20.glIsTexture(it.textureId)}")
             }
-            if (GLES20.glIsTexture(it)) {
+            if (GLES20.glIsTexture(it.textureId)) {
                 it
             } else {
-                Log.i("EGLTexturePools", "getTexture glIsTexture ${it} $bitmapHash size:${textureCaches.size()} ${GLES20.glIsTexture(it)}")
-                GLES20.glDeleteTextures(1, intArrayOf(it), 0)
+                Log.i("EGLTexturePools", "getTexture glIsTexture ${it} $bitmapHash size:${textureCaches.size()} ${GLES20.glIsTexture(it.textureId)}")
+                GLES20.glDeleteTextures(1, intArrayOf(it.textureId), 0)
+                it.surface?.release()
                 createTexture().apply { putTexture(bitmapHash, this) }
             }
         } ?: createTexture().also {
@@ -44,7 +44,7 @@ class EGLTexturePools {
         }
     }
 
-    private fun putTexture(bitmapHash: Int, textureId: Int) {
+    private fun putTexture(bitmapHash: Int, textureId: EGLAnimTexture) {
         textureCaches.put(bitmapHash, textureId)
     }
 

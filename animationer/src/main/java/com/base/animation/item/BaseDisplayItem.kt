@@ -19,6 +19,8 @@ import com.base.animation.model.AnimDrawObject
  */
 abstract class BaseDisplayItem : IDisplayItem, IRecycle {
 
+    protected val tag = this::class.java.simpleName
+
     open var displayHeight: Int = 0
     open var displayWidth: Int = 0
     private var itemId = animDisplayId.incrementAndGet()

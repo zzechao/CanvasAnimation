@@ -6,8 +6,6 @@ import javax.microedition.khronos.egl.EGL10
 
 /**
  * EGL环境搭建类
- *
- *
  * 1.创建显示屏幕类EGLDisplay
  * 2.配置FrameBuffer类EGLConfig
  * 3.创建FrameBuffer的EGLSurface

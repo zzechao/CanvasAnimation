@@ -18,6 +18,10 @@ import java.util.concurrent.Executors
 /**
  * @author zzechao
  * @date 2025/3/19 15:46
+ * @description EGL动画播放
+ * @param render 渲染器
+ * @param glScope 协程作用域
+ * @param glActor 协程通道
  */
 class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(false), IRenderer by render, CanvasHandler.CanvasFrameCallback {
 
@@ -69,7 +73,9 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
             val data = pathObjectDeal.animDrawObjects.toMap()
             if (ids.isNotEmpty()) {
                 render.drawRenderBegin()
-                ids.forEach { data[it]?.drawRender(render, pathObjectDeal, framePositionCount, frameTime) }
+                kotlin.runCatching {
+                    ids.forEach { data[it]?.drawRender(render, pathObjectDeal, framePositionCount, frameTime) }
+                }
                 render.drawRenderEnd()
                 mTouchPointF?.let { DoubleLinkedReference(it) }?.let {
                     val size = ids.size - 1

@@ -12,6 +12,9 @@ import com.base.animation.*
 /**
  * @author zzechao
  * @date 2025/3/19 15:46
+ * @desc EGL动画View
+ *  继承TextureView，实现TextureView.SurfaceTextureListener，实现IAnimView接口
+ *  实现IAnimView接口的方法，通过EGLAnimPlayer来实现
  */
 class EGLAnimView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, private val player: EGLAnimPlayer = EGLAnimPlayer()
