@@ -30,11 +30,11 @@ if (secretPropsFile.exists()) {
 publishing {
     publications {
         debug(MavenPublication) {
-//            println("publish-maven Log-------> PUBLISH_GROUP_ID: $PUBLISH_GROUP_ID; " +
-//                    "PUBLISH_ARTIFACT_ID: $PUBLISH_ARTIFACT_ID; " +
-//                    "PUBLISH_VERSION: $project.version; " +
-//                    "ossrhUsername:$ossrhUsername; " +
-//                    "ossrhPassword:$ossrhPassword ")
+            println("publish-maven Log-------> PUBLISH_GROUP_ID: $PUBLISH_GROUP_ID; " +
+                    "PUBLISH_ARTIFACT_ID: $PUBLISH_ARTIFACT_ID; " +
+                    "PUBLISH_VERSION: $project.version; " +
+                    "ossrhUsername:$ossrhUsername; " +
+                    "ossrhPassword:$ossrhPassword ")
 
             groupId PUBLISH_GROUP_ID
             artifactId PUBLISH_ARTIFACT_ID
@@ -91,11 +91,11 @@ publishing {
         }
 
         release(MavenPublication) {
-//            println("publish-maven Log-------> PUBLISH_GROUP_ID: $PUBLISH_GROUP_ID; " +
-//                    "PUBLISH_ARTIFACT_ID: $PUBLISH_ARTIFACT_ID; " +
-//                    "PUBLISH_VERSION: $project.version; " +
-//                    "ossrhUsername:$ossrhUsername; " +
-//                    "ossrhPassword:$ossrhPassword ")
+            println("publish-maven Log-------> PUBLISH_GROUP_ID: $PUBLISH_GROUP_ID; " +
+                    "PUBLISH_ARTIFACT_ID: $PUBLISH_ARTIFACT_ID; " +
+                    "PUBLISH_VERSION: $project.version; " +
+                    "ossrhUsername:$ossrhUsername; " +
+                    "ossrhPassword:$ossrhPassword ")
             // The coordinates of the library, being set from variables that
             // we'll set up in a moment
 
@@ -172,8 +172,8 @@ publishing {
 
             // The username and password we've fetched earlier
             credentials {
-//                username "$ossrhUsername"
-//                password "$ossrhPassword"
+                username "$ossrhUsername"
+                password "$ossrhPassword"
             }
         }
     }
