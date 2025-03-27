@@ -27,21 +27,23 @@ class EGLAnimShader {
 
     // 片段着色器代码
     private val fragmentShaderCode = """#extension GL_OES_EGL_image_external : require
-        precision mediump float;
-        uniform sampler2D vTexture;
-        uniform samplerExternalOES vTextureOES;
-        uniform float uAlpha;
-        uniform bool uIsColor2D;
-        varying vec2 aTexCoordinate;
-        void main() {
-            vec4 color2D = texture2D(vTexture, aTexCoordinate);
-            vec4 colorOES = texture2D(vTextureOES, aTexCoordinate);
-            if (uIsColor2D) {
-                gl_FragColor = vec4(color2D.rgb, color2D.a * uAlpha);
-            } else {
-                gl_FragColor = vec4(colorOES.rgb, colorOES.a * uAlpha);
+            precision mediump float;
+            uniform sampler2D vTexture;
+            uniform samplerExternalOES vTextureOES;
+            uniform float uAlpha;
+            uniform bool uIsColor2D;
+            varying vec2 aTexCoordinate;
+            
+            void main() {
+                vec4 color2D = texture2D(vTexture, aTexCoordinate);
+                vec4 colorOES = texture2D(vTextureOES, aTexCoordinate);
+            
+                if (uIsColor2D) {
+                    gl_FragColor = vec4(color2D.rgb, color2D.a * uAlpha);
+                } else {
+                    gl_FragColor = vec4(colorOES.rgb, colorOES.a * uAlpha);
+                }
             }
-        }
         """
 
     private var mProgram = 0

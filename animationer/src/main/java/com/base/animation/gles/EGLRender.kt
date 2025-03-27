@@ -203,6 +203,12 @@ class EGLRender : IRenderer {
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
         shader.useShader()
+
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
+        GLES20.glUniform1i(shader.texHandle, 0)
+
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE1)
+        GLES20.glUniform1i(shader.vTextureOESHandle, 1);
     }
 
     /**
