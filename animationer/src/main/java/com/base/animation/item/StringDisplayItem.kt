@@ -1,9 +1,6 @@
 package com.base.animation.item
 
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.PointF
-import android.graphics.SurfaceTexture
+import android.graphics.*
 import android.opengl.GLES11Ext
 import android.opengl.GLES20
 import android.os.Build
@@ -37,8 +34,8 @@ class StringDisplayItem(
     private var txtStaticLayout: StaticLayout? = null
 
     init {
-        displayHeight = fontSize
-        displayWidth = displayHeight * message.length
+        displayHeight = (fontSize + 20)
+        displayWidth = fontSize * message.length
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             txtStaticLayout = StaticLayout.Builder.obtain(
                 message, 0, message.length, paint, if (maxWidth > 0) maxWidth else displayWidth
@@ -50,13 +47,14 @@ class StringDisplayItem(
                 }
             }.build()
         } else if (singleLine) {
-            StaticLayout(
+            txtStaticLayout = StaticLayout(
                 message, 0, message.length, paint, if (maxWidth > 0) maxWidth else displayWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false, TextUtils.TruncateAt.END, if (maxWidth > 0) maxWidth else displayWidth
             )
         } else {
-            StaticLayout(
+            txtStaticLayout = StaticLayout(
                 message, 0, message.length, paint, if (maxWidth > 0) maxWidth else displayWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false
             )
+            displayHeight = (txtStaticLayout?.lineCount ?: 1) * (fontSize + 10)
         }
     }
 
@@ -81,9 +79,14 @@ class StringDisplayItem(
         val textureId = externalTextureId[0]
         val eglAnimTexture = EGLAnimTexture(textureId, EGLAnimTexture.TextureType.STRING)
         val surfaceTexture = SurfaceTexture(textureId)
+        surfaceTexture.setDefaultBufferSize(displayWidth, displayHeight)
         eglAnimTexture.surfaceTexture = surfaceTexture
         eglAnimTexture.surface = Surface(surfaceTexture)
-        val canvas = eglAnimTexture.surface?.lockCanvas(null)
+        val canvas = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            eglAnimTexture.surface?.lockHardwareCanvas()
+        } else {
+            eglAnimTexture.surface?.lockCanvas(null)
+        }
         canvas?.let {
             txtStaticLayout?.draw(it)
             eglAnimTexture.surface?.unlockCanvasAndPost(canvas)

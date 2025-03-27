@@ -1,14 +1,16 @@
 package com.base.animation.item
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.PointF
-import android.graphics.SurfaceTexture
+import android.graphics.*
 import android.opengl.GLES11Ext
 import android.opengl.GLES20
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.Surface
 import android.view.View
+import androidx.core.graphics.withSave
 import com.base.animation.Animer
 import com.base.animation.DoubleLinkedReference
 import com.base.animation.OnAnimItemClick
@@ -35,6 +37,7 @@ class LayoutDisplayItem(val context: Context, private val layout: Int) : BaseDis
         displayWidth = view.measuredWidth
         displayHeight = view.measuredHeight
         view.layout(0, 0, view.measuredWidth, view.measuredHeight)
+        Animer.log.d(tag, "LayoutDisplayItem: $layout ${view.measuredWidth} ${view.measuredHeight}")
     }
 
     override fun drawDisplayItem(
@@ -61,12 +64,18 @@ class LayoutDisplayItem(val context: Context, private val layout: Int) : BaseDis
         val textureId = externalTextureId[0]
         val eglAnimTexture = EGLAnimTexture(textureId, EGLAnimTexture.TextureType.LAYOUT)
         val surfaceTexture = SurfaceTexture(textureId)
+        surfaceTexture.setDefaultBufferSize(displayWidth, displayHeight)
+        val surface = Surface(surfaceTexture)
         eglAnimTexture.surfaceTexture = surfaceTexture
-        eglAnimTexture.surface = Surface(surfaceTexture)
-        val canvas = eglAnimTexture.surface?.lockCanvas(null)
+        eglAnimTexture.surface = surface
+        val canvas = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            surface.lockHardwareCanvas()
+        } else {
+            surface.lockCanvas(null)
+        }
         canvas?.let {
             view.draw(it)
-            eglAnimTexture.surface?.unlockCanvasAndPost(canvas)
+            surface.unlockCanvasAndPost(canvas)
         }
         Animer.log.d(tag, "getTextureIfPresent: $textureId")
         return eglAnimTexture
