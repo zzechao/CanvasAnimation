@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:gravity="center"
-    android:layout_height="match_parent"
     android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="@android:color/darker_gray"
+    android:gravity="center"
     android:orientation="vertical">
 
     <ImageView
         android:id="@+id/iv"
         android:layout_width="@dimen/size"
         android:layout_height="@dimen/size"
-        android:src="@mipmap/hua"
-        android:layout_marginTop="@dimen/size"
         android:layout_centerInParent="true"
+        android:layout_marginTop="@dimen/size"
+        android:src="@mipmap/hua"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -40,42 +40,50 @@
 
     <com.base.animation.gles.EGLAnimView
         android:id="@+id/anim_surface"
-        android:background="@null"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_width="match_parent" />
+        android:background="@null" />
+
+    <com.base.animation.gles.EGLAnimView
+        android:id="@+id/anim_surface_2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.5"
+        android:layout_marginTop="100dp"
+        android:background="@null" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:textSize="20sp"
-        android:text="TextureView" />
+        android:text="TextureView"
+        android:textSize="20sp" />
 
     <Button
         android:id="@+id/anim_1"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_height="60dp"
         android:layout_marginBottom="150dp"
-        android:layout_width="wrap_content"
         android:text="送一个" />
 
     <Button
         android:id="@+id/anim_2"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_height="60dp"
         android:layout_marginBottom="80dp"
-        android:layout_width="wrap_content"
         android:text="送多个" />
 
     <Button
         android:id="@+id/anim_3"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_height="60dp"
         android:layout_marginBottom="20dp"
-        android:layout_width="wrap_content"
-        android:text="礼物雨"/>
+        android:text="礼物雨" />
 
 </RelativeLayout>

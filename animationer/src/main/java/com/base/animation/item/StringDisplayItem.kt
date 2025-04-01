@@ -102,6 +102,14 @@ class StringDisplayItem(
         return eglAnimTexture
     }
 
+    override fun getRotatePX(rotation: Float, scaleX: Float): Float {
+        return displayWidth / 2f
+    }
+
+    override fun getRotatePY(rotation: Float, scaleY: Float): Float {
+        return displayHeight / 2f
+    }
+
     override fun getScalePX(scaleX: Float): Float {
         return if (maxWidth > 0) maxWidth / 2f else displayWidth / 2f
     }

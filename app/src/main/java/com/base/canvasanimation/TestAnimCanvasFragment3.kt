@@ -26,10 +26,7 @@ import com.base.animation.xml.node.coder.InterpolatorEnum
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import kotlinx.android.synthetic.main.fragment_anim_canvas3.anim_1
-import kotlinx.android.synthetic.main.fragment_anim_canvas3.anim_2
-import kotlinx.android.synthetic.main.fragment_anim_canvas3.anim_3
-import kotlinx.android.synthetic.main.fragment_anim_canvas3.anim_surface
+import kotlinx.android.synthetic.main.fragment_anim_canvas3.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -60,9 +57,7 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
 
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_anim_canvas3, container, false)
     }
@@ -109,7 +104,7 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
         })
 
         anim_1?.setOnClickListener {
-            //startImageDouAnim2()
+            startImageDouAnim2()
             startSingleAnim2()
         }
 
@@ -151,10 +146,7 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
                     scaleY = 0.5f
                     endNode {
                         point = PointF(
-                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context)
-                                .toFloat() / 2 - size / 2,
-                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context)
-                                .toFloat() / 2 - size / 2
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context).toFloat() / 2 - size / 2, DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context).toFloat() / 2 - size / 2
                         )
                         rotation = 360f
                         scaleX = 2f
@@ -168,17 +160,15 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
                         this.fontSize = 20
                         startNode {
                             point = PointF(
-                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context)
-                                    .toFloat() / 2 - size / 2, size / 2f
+                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context).toFloat() / 2 - size / 2, size / 2f
                             )
                             scaleX = 1f
                             scaleY = 1f
                             endNode {
                                 point = PointF(
-                                    0f,
-                                    DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context)
-                                        .toFloat() / 2 - size / 2
+                                    0f, DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context).toFloat() / 2 - size / 2
                                 )
+                                rotation = 360f
                                 scaleX = 3f
                                 scaleY = 3f
                                 durTime = 2000
@@ -191,8 +181,7 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
                         this.layoutIdName = "view_test_layout"
                         endNode {
                             point = PointF(
-                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context)
-                                    .toFloat() / 2 - size / 2, size / 2f
+                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context).toFloat() / 2 - size / 2, size / 2f
                             )
                             scaleX = 1f
                             scaleY = 1f
@@ -201,10 +190,7 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
                         }
                         endNode {
                             point = PointF(
-                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context)
-                                    .toFloat() / 2 - size / 2,
-                                DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context)
-                                    .toFloat() - size / 2
+                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context).toFloat() / 2 - size / 2, DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context).toFloat() - size / 2
                             )
                             scaleX = 2f
                             scaleY = 2f
@@ -214,10 +200,7 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
                     }
                     endNode {
                         point = PointF(
-                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context)
-                                .toFloat() - size / 2,
-                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context)
-                                .toFloat() / 2 - size / 2
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context).toFloat() - size / 2, DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context).toFloat() / 2 - size / 2
                         )
                         scaleX = 2f
                         scaleY = 2f
@@ -228,8 +211,7 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
                         this.layoutIdName = "view_test_layout"
                         endNode {
                             point = PointF(
-                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context)
-                                    .toFloat() / 2 - size / 2, size / 2f
+                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context).toFloat() / 2 - size / 2, size / 2f
                             )
                             scaleX = 0f
                             scaleY = 0f
@@ -243,16 +225,13 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
                 this.layoutIdName = "view_test_layout"
                 startNode {
                     point = PointF(
-                        DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context)
-                            .toFloat() / 2 - size / 2, size / 2f
+                        DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context).toFloat() / 2 - size / 2, size / 2f
                     )
                     scaleX = 0f
                     scaleY = 0f
                     endNode {
                         point = PointF(
-                            0f,
-                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context)
-                                .toFloat() / 2 - size / 2
+                            0f, DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context).toFloat() / 2 - size / 2
                         )
                         scaleX = 3f
                         scaleY = 3f
@@ -264,14 +243,24 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
         }.apply {
             lifecycleScope.launch(Dispatchers.IO) {
                 anim_surface ?: return@launch
+                val bitmap = BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, 100, 100)
                 AnimDecoder2.suspendPlayAnimWithAnimNode(
                     anim_surface,
                     this@apply,
                 ) { node, displayItem ->
                     when (displayItem) {
                         is BitmapDisplayItem -> {
-                            displayItem.mBitmap =
-                                BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, 100, 100)
+                            displayItem.mBitmap = bitmap
+                        }
+                    }
+                    displayItem
+                }
+                AnimDecoder2.suspendPlayAnimWithAnimNode(
+                    anim_surface_2, this@apply,
+                ) { node, displayItem ->
+                    when (displayItem) {
+                        is BitmapDisplayItem -> {
+                            displayItem.mBitmap = bitmap
                         }
                     }
                     displayItem
@@ -286,8 +275,7 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
             AnimDecoder2.suspendPlayAnimWithXml(anim_surface, xml) { node, displayItem ->
                 when (displayItem) {
                     is BitmapDisplayItem -> {
-                        displayItem.mBitmap =
-                            BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, 100, 100)
+                        displayItem.mBitmap = BitmapLoader.decodeBitmapFrom(resources, R.mipmap.xin, 1, 100, 100)
                     }
                 }
                 displayItem
@@ -308,10 +296,7 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
                     scaleY = 0f
                     endNode {
                         point = PointF(
-                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context)
-                                .toFloat() / 2 - size / 2,
-                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context)
-                                .toFloat() / 2 - size / 2
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context).toFloat() / 2 - size / 2, DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context).toFloat() / 2 - size / 2
                         )
                         scaleX = 2f
                         scaleY = 2f
@@ -324,24 +309,18 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
                             durTime = 500
                             rotation = 360f
                             point = PointF(
-                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context)
-                                    .toFloat() / 2 - size / 2, 0f
+                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context).toFloat() / 2 - size / 2, 0f
                             )
                         }
                         endNode {
                             point = PointF(
-                                0f,
-                                DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context)
-                                    .toFloat() / 2 - size / 2
+                                0f, DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context).toFloat() / 2 - size / 2
                             )
                             alpha = 0
                         }
                         endNode {
                             point = PointF(
-                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context)
-                                    .toFloat() / 2 - size / 2,
-                                DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context)
-                                    .toFloat()
+                                DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context).toFloat() / 2 - size / 2, DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context).toFloat()
                             )
                             scaleX = 0f
                             scaleY = 0f
@@ -350,10 +329,7 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
                             this.layoutIdName = "view_test_layout"
                             endNode {
                                 point = PointF(
-                                    DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context)
-                                        .toFloat(),
-                                    DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context)
-                                        .toFloat() / 2 - size / 2
+                                    DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context).toFloat(), DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context).toFloat() / 2 - size / 2
                                 )
                                 durTime = 500
                                 alpha = 0
@@ -368,21 +344,35 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
         }.apply {
             lifecycleScope.launch {
                 anim_surface ?: return@launch
+                val bitmap = suspendCancellableCoroutine<Bitmap> {
+                    Glide.with(this@TestAnimCanvasFragment3).asBitmap().load(url).into(object : CustomTarget<Bitmap>() {
+                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                            it.resume(resource)
+                        }
+
+                        override fun onLoadCleared(placeholder: Drawable?) {
+                        }
+                    })
+                }
+
+
                 AnimDecoder2.suspendPlayAnimWithAnimNode(
                     anim_surface, this@apply
                 ) { node, displayItem ->
                     when (displayItem) {
                         is BitmapDisplayItem -> {
-                            displayItem.mBitmap = suspendCancellableCoroutine {
-                                Glide.with(this@TestAnimCanvasFragment3).asBitmap().load(url).into(object : CustomTarget<Bitmap>() {
-                                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                        it.resume(resource)
-                                    }
+                            displayItem.mBitmap = bitmap
+                        }
+                    }
+                    displayItem
+                }
 
-                                    override fun onLoadCleared(placeholder: Drawable?) {
-                                    }
-                                })
-                            }
+                AnimDecoder2.suspendPlayAnimWithAnimNode(
+                    anim_surface_2, this@apply
+                ) { node, displayItem ->
+                    when (displayItem) {
+                        is BitmapDisplayItem -> {
+                            displayItem.mBitmap = bitmap
                         }
                     }
                     displayItem
@@ -552,15 +542,13 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
                     scaleX = 1f
                     scaleY = 1f
                     point = PointF(
-                        DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context) / 2f,
-                        DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context) / 1f
+                        DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context) / 2f, DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context) / 1f
                     )
                     endNode {
                         scaleX = 1f
                         scaleY = 1f
                         point = PointF(
-                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context) / 2f,
-                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context) / 2f
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context) / 2f, DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context) / 2f
                         )
                         durTime = 1000
                         interpolator = InterpolatorEnum.Decelerate.type
@@ -569,8 +557,7 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
                         scaleX = 1f
                         scaleY = 1f
                         point = PointF(
-                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context) / 2f,
-                            DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context) / 1f
+                            DisplayUtils.getScreenWidth(this@TestAnimCanvasFragment3.context) / 2f, DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment3.context) / 1f
                         )
                         durTime = 2000
                         interpolator = InterpolatorEnum.Accelerate.type
@@ -582,6 +569,26 @@ class TestAnimCanvasFragment3 : Fragment(), OnAnimItemClick {
                 anim_surface ?: return@launch
                 AnimDecoder2.suspendPlayAnimWithXml(
                     anim_surface, this@apply
+                ) { node, displayItem ->
+                    when (displayItem) {
+                        is ImageDouNode.BitmapDouDisplay -> {
+                            loadImage(fragment = this@TestAnimCanvasFragment3, (node as ImageNode).url, node.displayHeightSize)?.let {
+                                displayItem.setBitmap(it)
+                            }
+                        }
+
+                        is BitmapDisplayItem -> {
+                            displayItem.setBitmap(
+                                BitmapLoader.decodeBitmapFrom(
+                                    resources, R.mipmap.xin, 1, 100, 100
+                                )
+                            )
+                        }
+                    }
+                    displayItem
+                }
+                AnimDecoder2.suspendPlayAnimWithXml(
+                    anim_surface_2, this@apply
                 ) { node, displayItem ->
                     when (displayItem) {
                         is ImageDouNode.BitmapDouDisplay -> {

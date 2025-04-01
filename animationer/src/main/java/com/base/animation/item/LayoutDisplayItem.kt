@@ -18,7 +18,7 @@ import com.base.animation.OnAnimItemClick
 import com.base.animation.gles.EGLAnimTexture
 import com.base.animation.gles.EGLRender
 import com.base.animation.model.AnimDrawObject
-import kotlin.math.max
+import kotlin.math.*
 
 
 /**
@@ -85,6 +85,14 @@ class LayoutDisplayItem(val context: Context, private val layout: Int) : BaseDis
         }
         Animer.log.d(tag, "getTextureIfPresent: $textureId")
         return eglAnimTexture
+    }
+
+    override fun getRotatePX(rotation: Float, scaleX: Float): Float {
+        return displayWidth / 2f
+    }
+
+    override fun getRotatePY(rotation: Float, scaleY: Float): Float {
+        return displayHeight / 2f
     }
 
     override fun getScalePX(scaleX: Float): Float {

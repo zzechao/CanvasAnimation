@@ -2,10 +2,9 @@ package com.base.animation.gles
 
 
 import android.opengl.GLES20
-import android.util.Log
+import com.base.animation.Animer
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
-import com.google.common.cache.RemovalListener
 import java.util.concurrent.TimeUnit
 
 /**
@@ -29,12 +28,12 @@ class EGLTexturePools {
         return textureCaches.getIfPresent(bitmapHash)?.let {
             if (System.currentTimeMillis() - nanoTime > 5000) {
                 nanoTime = System.currentTimeMillis()
-                Log.i("EGLTexturePools", "getTexture:${it} $bitmapHash size:${textureCaches.size()} ${GLES20.glIsTexture(it.textureId)}")
+                Animer.log.i("EGLTexturePools", "getTexture:${it} $bitmapHash size:${textureCaches.size()} ${GLES20.glIsTexture(it.textureId)}")
             }
             if (GLES20.glIsTexture(it.textureId)) {
                 it
             } else {
-                Log.i("EGLTexturePools", "getTexture glIsTexture ${it} $bitmapHash size:${textureCaches.size()} ${GLES20.glIsTexture(it.textureId)}")
+                Animer.log.i("EGLTexturePools", "getTexture glIsTexture ${it} $bitmapHash size:${textureCaches.size()} ${GLES20.glIsTexture(it.textureId)}")
                 GLES20.glDeleteTextures(1, intArrayOf(it.textureId), 0)
                 it.surface?.release()
                 createTexture().apply { putTexture(bitmapHash, this) }

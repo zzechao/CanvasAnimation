@@ -86,6 +86,7 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
                 }
             } else {
                 pause()
+                setCanvasFrameCallback(null)
                 render.drawRenderBegin()
                 render.drawRenderEnd()
                 pathObjectDeal.animDrawObjects.clear()
@@ -100,7 +101,6 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
     }
 
     fun onDetachedFromWindow() {
-        Log.d(TAG, "onDetachedFromWindow")
         safeOffer(EGLAction(EGLAction.MSG_RELEASE) {
             release()
             glActor?.close()

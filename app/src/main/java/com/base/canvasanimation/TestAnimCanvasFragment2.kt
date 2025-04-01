@@ -176,6 +176,7 @@ class TestAnimCanvasFragment2 : Fragment(), OnAnimItemClick {
                                     DisplayUtils.getScreenHeight(this@TestAnimCanvasFragment2.context)
                                         .toFloat() / 2 - size / 2
                                 )
+                                rotation = 360f
                                 scaleX = 3f
                                 scaleY = 3f
                                 durTime = 2000
