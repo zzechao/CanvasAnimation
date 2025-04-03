@@ -144,7 +144,7 @@ class EGLRender : IRenderer {
         // 写入坐标数据
         GLES20.glVertexAttribPointer(shader.texCoordinateHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false, vertexStride, textureBuffer)
 
-        if (System.currentTimeMillis() - nanoTime > 2000) {
+        if (System.currentTimeMillis() - nanoTime > 5000) {
             nanoTime = System.currentTimeMillis()
             Animer.log.d(TAG, "drawItem: $animId, $hashCode, $displayWidth, $displayHeight, $x, $y, $alpha, $scaleX, $scaleY, $rotation, ${animTexture.textureId}-${animTexture.type}")
         }

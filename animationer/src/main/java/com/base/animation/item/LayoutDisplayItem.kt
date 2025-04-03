@@ -60,8 +60,9 @@ class LayoutDisplayItem(val context: Context, private val layout: Int) : BaseDis
         val externalTextureId = IntArray(1)
         GLES20.glGenTextures(1, externalTextureId, 0)
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, externalTextureId[0])
+        GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE)
+        GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE)
         GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR)
-        GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
 
         // 创建SurfaceTexture和Surface
         val textureId = externalTextureId[0]
@@ -72,11 +73,7 @@ class LayoutDisplayItem(val context: Context, private val layout: Int) : BaseDis
         val surface = Surface(surfaceTexture)
         eglAnimTexture.surfaceTexture = surfaceTexture
         eglAnimTexture.surface = surface
-        val canvas = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            surface.lockHardwareCanvas()
-        } else {
-            surface.lockCanvas(null)
-        }
+        val canvas = surface.lockCanvas(null)
         canvas?.let {
             it.withTranslation((maxSize - displayWidth) / 2f, (maxSize - displayHeight) / 2f) {
                 view.draw(it)

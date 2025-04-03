@@ -26,9 +26,9 @@ class EGLTexturePools {
 
     fun getTexture(bitmapHash: Int, createTexture: () -> EGLAnimTexture): EGLAnimTexture {
         return textureCaches.getIfPresent(bitmapHash)?.let {
-            if (System.currentTimeMillis() - nanoTime > 5000) {
+            if (System.currentTimeMillis() - nanoTime > 10000) {
                 nanoTime = System.currentTimeMillis()
-                Animer.log.i("EGLTexturePools", "getTexture:${it} $bitmapHash size:${textureCaches.size()} ${GLES20.glIsTexture(it.textureId)}")
+                Animer.log.i("EGLTexturePools", "$bitmapHash size:${textureCaches.size()} ${GLES20.glIsTexture(it.textureId)}")
             }
             if (GLES20.glIsTexture(it.textureId)) {
                 it

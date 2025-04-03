@@ -187,6 +187,7 @@ class PathObjectDeal(parserEnd: () -> Unit) : IPathObjectDeal {
      * 清空执行中ids
      */
     override fun removeAnimId(animId: Long) {
+        Log.d(TAG, "removeAnimId:$animId")
         animDrawIds.remove(animId)
         if (animListeners.isNotEmpty()) {
             val map = animDrawObjects.toMap()

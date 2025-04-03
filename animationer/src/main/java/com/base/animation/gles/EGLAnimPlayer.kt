@@ -1,7 +1,6 @@
 package com.base.animation.gles
 
 import android.graphics.SurfaceTexture
-import android.util.Log
 import com.base.animation.Animer
 import com.base.animation.CanvasHandler
 import com.base.animation.DoubleLinkedReference
@@ -56,8 +55,8 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
         return render.onSurfaceTextureDestroyed(surface)
     }
 
+    private var nanoTime = 0L
     override fun doCanvasFrame(frameTime: Long): Boolean {
-        Animer.log.d(TAG, "doCanvasFrame")
         val framePositionCount = if (frameTime == 0L) {
             1
         } else {
@@ -71,6 +70,10 @@ class EGLAnimPlayer(private val render: EGLRender = EGLRender()) : AnimPlayer(fa
         safeOffer(EGLAction(EGLAction.MSG_PLAY) {
             val ids = pathObjectDeal.animDrawIds.toList()
             val data = pathObjectDeal.animDrawObjects.toMap()
+            if (System.currentTimeMillis() - nanoTime > 10000) {
+                nanoTime = System.currentTimeMillis()
+                Animer.log.d(TAG, "doCanvasFrameMSG_PLAY ids:$ids")
+            }
             if (ids.isNotEmpty()) {
                 render.drawRenderBegin()
                 kotlin.runCatching {
