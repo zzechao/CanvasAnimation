@@ -1,11 +1,12 @@
-# CanvasAnimation
+# CanvasEGLAnimation
 
 [![GitHub license](https://img.shields.io/github/license/JailedBird/ArouterGradlePlugin.svg)](https://github.com/zzechao/CanvasAnimation/blob/canvas_view_new_feature_2.0/LICENSE)
 
 ## 介绍
 
-`CanvasAnimation` 是一个轻量的属性动画的库。支持普通的view以及surfaceview两种布局进行绘制，还支持xml远程配置模式，配置方便。
-`CanvasAnimation` 使用原生 Android Canvas 库渲染动画，为你提供高性能、低开销的动画体验。
+`CanvasEGLAnimation` 采用声明式的方式构建动画节点，支持自定义节点的绘制元素以及路径过程节点，支持多种插值器，支持xml远程配置模式，配置方便。
+`CanvasEGLAnimation` 使用原生 Android Canvas 库渲染动画，为你提供高性能、低开销的动画体验。
+`CanvasEGLAnimation` 1.1.0版本支持EGLTextureView独立线程队列渲染，采用GL渲染，以补全surfaceView针对动画使用不足。
 
 ## 效果图
 
@@ -31,10 +32,10 @@
 model build.gradle添加
 
 ```groovy
-     implementation "io.github.zzechao:canvasanimation:1.0.3.1"
+     implementation "io.github.zzechao:canvasanimation:1.1.0"
 ```
 
-当前版本：1.0.3.1
+当前版本：1.1.0
 
 ### 动画库初始化
 
