@@ -91,7 +91,7 @@ publishing {
         }
 
         release(MavenPublication) {
-            println("publish-maven Log-------> PUBLISH_GROUP_ID: $PUBLISH_GROUP_ID; " +
+            println("publish-maven release Log-------> PUBLISH_GROUP_ID: $PUBLISH_GROUP_ID; " +
                     "PUBLISH_ARTIFACT_ID: $PUBLISH_ARTIFACT_ID; " +
                     "PUBLISH_VERSION: $project.version; " +
                     "ossrhUsername:$ossrhUsername; " +
@@ -163,7 +163,7 @@ publishing {
 
             //--- 修改配置六 ---
             name = "CanvasAnimation"
-            def releasesRepoUrl = "https://s01.oss.sonatype.org/content/groups/staging/"
+            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
             def releasesRepoUrl2 = "https://s01.oss.sonatype.org/content/repositories/releases/"
             def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
             // You only need this if you want to publish snapshots, otherwise just set the URL
