@@ -119,13 +119,28 @@ open class AnimSurfaceView @JvmOverloads constructor(
             }
         }
         animScope?.launch {
-            val canvas = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                holder.lockHardwareCanvas()
-            } else {
-                holder.lockCanvas()
+            if (isSurfaceRelease) return@launch
+            var canvas: Canvas? = null
+            try {
+                canvas = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    holder.lockHardwareCanvas()
+                } else {
+                    holder.lockCanvas()
+                }
+                if (canvas != null) {
+                    drawAnimFps(canvas, framePositionCount, frameTime)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                if (canvas != null) {
+                    try {
+                        holder.unlockCanvasAndPost(canvas)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
             }
-            drawAnimFps(canvas, framePositionCount, frameTime)
-            holder.unlockCanvasAndPost(canvas)
         }
         return true
     }

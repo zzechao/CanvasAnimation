@@ -43,7 +43,7 @@ class PathObjectDeal(parserEnd: () -> Unit) : IPathObjectDeal {
     /**
      * 路径坐标
      */
-    override val animDrawIds: MutableList<Long> = mutableListOf()
+    override val animDrawIds: MutableList<Long> = CopyOnWriteArrayList()
     override val animDrawObjects: ConcurrentHashMap<Long, BaseAnimDrawObject> = ConcurrentHashMap()
 
     /**
