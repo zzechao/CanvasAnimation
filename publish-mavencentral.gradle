@@ -73,7 +73,7 @@ publishing {
                     connection = 'scm:git:github.com/zzechao/CanvasAnimation.git'
                     developerConnection = 'scm:git:ssh://github.com/zzechao/CanvasAnimation.git'
                     //分支地址：
-                    url = 'https://github.com/zzechao/CanvasAnimation/tree/canvas_view_new_feature_2.0'
+                    url = 'https://github.com/zzechao/CanvasAnimation/tree/master'
                 }
                 // A slightly hacky fix so that your POM will include any transitive dependencies
                 // that your library builds upon
@@ -138,7 +138,7 @@ publishing {
                     connection = 'scm:git:github.com/zzechao/CanvasAnimation.git'
                     developerConnection = 'scm:git:ssh://github.com/zzechao/CanvasAnimation.git'
                     //分支地址：
-                    url = 'https://github.com/zzechao/CanvasAnimation/tree/canvas_view_new_feature_2.0'
+                    url = 'https://github.com/zzechao/CanvasAnimation/tree/master'
                 }
                 // A slightly hacky fix so that your POM will include any transitive dependencies
                 // that your library builds upon
